@@ -131,7 +131,6 @@ export function ExpeditionLibrary({
       </div>
       <header className="ow-header">
         <Brand />
-        <p>Three volumes · One expedition</p>
       </header>
       <section className="ow-intro">
         <p className="ow-eyebrow">THE EXPEDITION LIBRARY</p>
@@ -225,16 +224,13 @@ export function ExpeditionLibrary({
           </section>
         )}
       </div>
-      <footer className="library-footer">
-        <p>Three playable missions · Your progress stays on this device.</p>
-        {selected ? (
+      {selected && (
+        <footer className="library-footer">
           <button className="ow-button" onClick={() => choose(null)}>
             <ArrowLeft size={16} /> View all volumes
           </button>
-        ) : (
-          <p>Choose a book to begin.</p>
-        )}
-      </footer>
+        </footer>
+      )}
       <p className="sr-only" role="status">{phase === 'focusing' ? `Centring ${book?.volume}.` : phase === 'focused' ? `${book?.volume} is ready to open. Use the arrow keys to choose another volume, or Escape to return to the shelf.` : phase === 'opening' ? 'Opening the expedition atlas. Press Escape to cancel.' : ''}</p>
     </main>
   );
