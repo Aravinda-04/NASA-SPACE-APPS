@@ -1,8 +1,15 @@
-import { useLayoutEffect, useRef, useState, type CSSProperties } from "react";
+import {
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+  type CSSProperties,
+} from "react";
 import { ArrowLeft, ArrowRight, Check } from "lucide-react";
 import { BOOKS, type BookDefinition } from "../../data/books";
 import type { ExpeditionProgress, MissionId } from "../../types/expedition";
 import { useReducedMotion } from "../../hooks/useReducedMotion";
+import GlitterWrap from "../../components/GlitterWrap";
 
 export function Brand() {
   return (
@@ -17,24 +24,13 @@ export function BookCover({ book }: { book: BookDefinition }) {
       className="volume-cover"
       style={{ "--volume-cover": book.theme } as CSSProperties}
     >
-      <span className="volume-binding" aria-hidden="true" />
-      <span className="volume-foil" aria-hidden="true" />
-      <span className="volume-cover-copy">
-        <span className="ow-eyebrow">OFF-WORLD / EXPEDITION {book.number}</span>
-        <span className="volume-name">{book.volume}</span>
-        <span className="volume-spacecraft">{book.spacecraft}</span>
-      </span>
       <img
-        className="volume-art"
+        className="volume-cover-art"
         src={book.cover}
-        alt=""
-        width="300"
-        height="220"
+        alt={`Cover of ${book.volume}: ${book.title}`}
+        width="723"
+        height="1024"
       />
-      <span className="volume-foot">
-        <span>{book.title}</span>
-        <span>AN EXPEDITION JOURNAL</span>
-      </span>
     </span>
   );
 }
@@ -47,9 +43,7 @@ export function ExpeditionLibrary({
   onOpen: (id: MissionId) => void;
   initialSelection?: MissionId;
 }) {
-  const [selected, setSelected] = useState<MissionId | null>(
-    initialSelection ?? null,
-  );
+  const [selected, setSelected] = useState<MissionId | null>(null);
   const buttons = useRef<(HTMLButtonElement | null)[]>([]);
   const shelf = useRef<HTMLDivElement>(null);
   const positions = useRef<Map<string, DOMRect>>(new Map());
@@ -83,12 +77,49 @@ export function ExpeditionLibrary({
     }
     positions.current.clear();
   }, [selected, reduced]);
+
+  useEffect(() => {
+    if (!selected) return;
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        choose(null);
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [selected]);
+
+  const handleBackgroundClick = (event: React.MouseEvent) => {
+    if (!selected) return;
+    const target = event.target as HTMLElement;
+    if (
+      target.closest(".volume-button") ||
+      target.closest(".library-invitation") ||
+      target.closest(".library-footer") ||
+      target.closest(".backpack-launcher")
+    ) {
+      return;
+    }
+    choose(null);
+  };
+
   const book = BOOKS.find((item) => item.id === selected);
   return (
     <main
       className={`ow-shell library ${selected ? "library-selected" : ""}`}
       data-theme={selected ?? "library"}
+      onClick={handleBackgroundClick}
     >
+      <div className="library-starfield" aria-hidden="true">
+        <GlitterWrap
+          particleCount={180}
+          density={35}
+          trailAmount={0}
+          color1="#ffffff"
+          color2="#ffffff"
+          color3="#ffffff"
+        />
+      </div>
       <header className="ow-header">
         <Brand />
         <p>Three volumes · One expedition</p>

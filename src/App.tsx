@@ -184,7 +184,6 @@ export function App() {
       ) : (
         <ExpeditionLibrary
           progress={save.progress}
-          initialSelection={save.lastMissionId}
           onOpen={openBook}
         />
       )}
