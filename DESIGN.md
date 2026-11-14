@@ -116,6 +116,25 @@ components:
 
 # Design System: Off-world Expedition Journal
 
+## Interactive atlas revision — 14 November 2026
+
+The selected original cover now moves to the horizontal centre while other books
+recede and the surrounding environment softens into the volume's theme. The
+explicit Open action turns the cover before the warm-paper spread appears. Escape,
+keyboard volume navigation and system reduced motion remain available.
+
+The active contents spread places the interactive atlas on the **left** and the
+curved chronological registry on the **right**. A shared selected record drives
+the globe marker, bounded focus animation, compact field summary and expanded
+native dossier. Mobile starts with the timeline, then opens the atlas with a
+visible Back action. The three mission actions still enter their existing scenes.
+
+NASA surface maps support Moon/Mars; location uncertainty, source frames and
+historical epochs remain explicit. Outer Space uses schematic relationships,
+never live positions. See `docs/implementation-interactive-atlas.md` and the source
+ledger. DM Serif Display / DM Sans are the same approved, locally hosted journal
+faces documented below; the atlas introduces no new font or UI library.
+
 ## Approved library and rewards implementation — 14 November 2026
 
 The active entry is the approved three-book Figma library, implemented in `ExpeditionLibrary` and `BookCover`. Cover text, binding, foil rules and local SVG art are independent layers. Lunar grey `#454a48`, rust `#783d2c` and midnight blue `#172b43` distinguish volumes. Selection moves a book left with a short layout animation, changes the background and exposes an explicit Open action. `BookReader` provides an independently saved introduction/story/science/briefing journey. Warm-paper spreads, 17px prose, source captions and stacked narrow layouts preserve the journal identity.

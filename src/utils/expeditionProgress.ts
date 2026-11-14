@@ -97,7 +97,7 @@ export function normalizeSave(
       result.readingLocations[id] = page;
     const context = saved.readingContexts?.[id];
     if (context && (context.view === "contents" || context.view === "reading") &&
-      (context.panel === "contents" || context.panel === "dossier") &&
+      (context.panel === "contents" || context.panel === "atlas" || context.panel === "dossier") &&
       typeof context.artifactId === "string" && /^[a-z0-9-]{1,80}$/.test(context.artifactId)) {
       result.readingContexts = { ...result.readingContexts, [id]: {
         view: context.view, panel: context.panel, artifactId: context.artifactId,

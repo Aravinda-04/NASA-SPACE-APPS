@@ -24,6 +24,12 @@ Implemented release: Moon / Surveyor 3–Apollo 12, Mars / Curiosity and Outer S
 
 ## Brand Commitments
 
+The library now centres a selected cover against a blurred celestial environment
+before opening an atlas-left / chronology-right journal. Moon and Mars use sourced
+NASA textures and historical site or regional pins; Outer Space uses a labelled
+interactive mission-context schematic. Dossiers expand from the shared selection.
+Original reading-page indices and mission rewards remain independent of browsing.
+
 User-approved illustrated expedition journal with cel-shaded planetary environments. English-first content, optional narration. Working project name is provisional.
 
 ## Evidence on Hand

@@ -5,12 +5,14 @@ import { getPlayableMission, type ChronologicalArtifact } from "../../data/chron
 import { createContentsTrajectory } from "../../utils/contentsTrajectory";
 import type { MissionId } from "../../types/expedition";
 
-export function CurvedContentsTimelinePage({ volumeId, artifacts, selectedId, onSelect, onLibrary }: {
+export function CurvedContentsTimelinePage({ volumeId, artifacts, selectedId, onSelect, onLibrary, controlledId = 'artifact-dossier', folio = '01' }: {
   volumeId: MissionId;
   artifacts: ChronologicalArtifact[];
   selectedId: string;
   onSelect: (id: string) => void;
   onLibrary: () => void;
+  controlledId?: string;
+  folio?: string;
 }) {
   const book = getBook(volumeId);
   const { nodes, path } = createContentsTrajectory(artifacts.length);
@@ -40,7 +42,7 @@ export function CurvedContentsTimelinePage({ volumeId, artifacts, selectedId, on
       <h2 id="contents-heading">A trail of discoveries.</h2>
       <p>A chronological registry of spacecraft, instruments &amp; scientific legacies.</p>
     </header>
-    <p className="archive-instruction" id="contents-description">Select a record to open its scientific dossier.<br />Dates refer to the event named in each entry.</p>
+    <p className="archive-instruction" id="contents-description">Select a record to locate its scientific story.<br />Dates refer to the event named in each entry.</p>
     <div className="contents-timeline" style={{ '--record-count': artifacts.length } as CSSProperties}>
       <svg className="contents-trajectory" viewBox="0 0 520 560" preserveAspectRatio="none" aria-hidden="true">
         <path d={path} className="contents-track" />
@@ -53,7 +55,7 @@ export function CurvedContentsTimelinePage({ volumeId, artifacts, selectedId, on
           const selected = artifact.id === selectedId;
           return <li key={artifact.id}>
             <button id={`contents-${artifact.id}`} className={`contents-record ${selected ? 'is-selected' : ''}`}
-              aria-pressed={selected} aria-controls="artifact-dossier" onClick={() => onSelect(artifact.id)}
+              aria-pressed={selected} aria-controls={controlledId} onClick={() => onSelect(artifact.id)}
               onKeyDown={(event) => {
                 const next = event.key === 'ArrowDown' ? Math.min(index + 1, artifacts.length - 1)
                   : event.key === 'ArrowUp' ? Math.max(index - 1, 0)
@@ -77,6 +79,6 @@ export function CurvedContentsTimelinePage({ volumeId, artifacts, selectedId, on
         })}
       </ol>
     </div>
-    <footer className="archive-page-footer"><span>p. 01 — Table of contents<br />{book.volume} / Volume {book.number}</span><button onClick={onLibrary}><X size={13} aria-hidden="true" />Close book</button></footer>
+    <footer className="archive-page-footer"><span>p. {folio} — Table of contents<br />{book.volume} / Volume {book.number}</span><button onClick={onLibrary}><X size={13} aria-hidden="true" />Close book</button></footer>
   </article>;
 }

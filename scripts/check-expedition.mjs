@@ -303,3 +303,47 @@ assert.deepEqual(normalizeSave(contextSave, missions).collection, v2.collection,
 assert.equal(normalizeSave({ ...v2, readingContexts: { surveyor: { view: 'wrong', artifactId: 'anything', panel: 'dossier' } } }, missions).readingContexts, undefined);
 assert.equal(normalizeSave({ ...v2, readingContexts: { surveyor: { view: 'contents', artifactId: '<script>', panel: 'dossier' } } }, missions).readingContexts, undefined);
 console.log('Passed: 13 sourced chronological records, exactly 3 playable links, chronology, coordinate bounds, 0/1/2/4/5/9-node Bézier geometry, additive reading-context migration and reward preservation.');
+
+const { wrapLongitude, planetCoordinateToVector, shortestAngleDelta, easeAtlasFocus } = await loadTs('../src/utils/planetCoordinates.ts');
+const { SOLAR_ATLAS_BODIES: solarBodies, PLANET_TEXTURES } = await loadTs('../src/data/atlas.ts');
+assert.ok(Math.abs(wrapLongitude(225.71) + 134.29) < 1e-10);
+assert.ok(Math.abs(wrapLongitude(312.05) + 47.95) < 1e-10);
+assert.equal(wrapLongitude(540), -180);
+assert.equal(wrapLongitude(-540), -180);
+const closeTo = (actual, expected) => assert.ok(Math.abs(actual - expected) < 1e-8, `${actual} ≠ ${expected}`);
+planetCoordinateToVector(0, 0).forEach((value, i) => closeTo(value, [1,0,0][i]));
+planetCoordinateToVector(0, 90).forEach((value, i) => closeTo(value, [0,0,-1][i]));
+planetCoordinateToVector(90, 0).forEach((value, i) => closeTo(value, [0,1,0][i]));
+planetCoordinateToVector(-90, 0).forEach((value, i) => closeTo(value, [0,-1,0][i]));
+for (const record of artifacts.filter(item => item.coordinateData)) {
+  const coordinate = record.coordinateData;
+  assert.ok(coordinate.sourceUrl, `${record.id}: source for spatial pin`);
+  assert.match(new URL(coordinate.sourceUrl).hostname, /(^|\.)nasa\.gov$/);
+  const [x,y,z] = planetCoordinateToVector(coordinate.latitude, coordinate.longitude, 4.7);
+  closeTo(Math.hypot(x,y,z), 4.7);
+  closeTo(Math.asin(y / 4.7) * 180 / Math.PI, coordinate.latitude);
+  closeTo(Math.atan2(-z,x) * 180 / Math.PI, coordinate.longitude);
+}
+assert.throws(() => planetCoordinateToVector(91, 0), RangeError);
+assert.throws(() => planetCoordinateToVector(0, NaN), RangeError);
+assert.throws(() => planetCoordinateToVector(0, 0, -1), RangeError);
+closeTo(shortestAngleDelta(179 * Math.PI / 180, -179 * Math.PI / 180), 2 * Math.PI / 180);
+closeTo(shortestAngleDelta(-179 * Math.PI / 180, 179 * Math.PI / 180), -2 * Math.PI / 180);
+assert.equal(easeAtlasFocus(0), 0); assert.equal(easeAtlasFocus(1), 1);
+assert.equal(easeAtlasFocus(-1), 0); assert.equal(easeAtlasFocus(2), 1);
+for (const record of artifacts.filter(item => item.volumeId === 'pioneer')) {
+  assert.equal(record.coordinateData, undefined);
+  assert.ok(solarBodies.some(body => body.id === record.spaceFocus));
+  assert.match(record.atlasContext, /schematic|illustrative/i);
+}
+const curiosityPin = artifacts.find(item => item.id === 'curiosity-rover').coordinateData;
+assert.equal(curiosityPin.latitude, -4.5895); assert.equal(curiosityPin.longitude, 137.4417);
+assert.equal(artifacts.find(item => item.id === 'viking-2').coordinateData.latitude, 47.64, 'Use the planetocentric latitude on the globe');
+assert.equal(artifacts.find(item => item.id === 'ingenuity').coordinateData.precision, 'region');
+for (const [body, texture] of Object.entries(PLANET_TEXTURES)) {
+  assert.ok(readFileSync(new URL('../public' + texture.color, import.meta.url)).length > 10000, `${body}: local surface imagery`);
+  if (texture.relief) assert.ok(readFileSync(new URL('../public' + texture.relief, import.meta.url)).length > 10000);
+}
+const atlasSave = { ...contextSave, readingContexts: { curiosity: { view: 'contents', artifactId: 'curiosity-rover', panel: 'atlas' } } };
+assert.deepEqual(normalizeSave(atlasSave, missions), atlasSave, 'Atlas panel is an additive v2 context');
+console.log('Passed: sourced globe pins, coordinate/texture orientation, longitude wrapping, pole conversion, shortest-path focus, bounded easing, schematic deep-space targets, local NASA textures and atlas save migration.');

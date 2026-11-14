@@ -835,3 +835,49 @@
   font-weight: 100 900;
   font-display: swap;
 }
+
+/* The original covers remain separate, tactile components inside a cinematic shelf. */
+.cinematic-library { position: relative; isolation: isolate; overflow-x: clip; }
+.library-environment { position: absolute; inset: 0; z-index: -1; overflow: hidden; pointer-events: none; background: #151a1d; }
+.library-environment-image { position: absolute; inset: -8%; opacity: 0; filter: blur(14px); background-size: cover; background-position: center; transform: scale(1.08); transition: opacity 700ms ease, transform 1200ms ease; }
+.library-environment-light { position: absolute; inset: 0; background: radial-gradient(ellipse at 50% 48%, #586a6b35, transparent 65%), linear-gradient(180deg,#11181b80,#11181be8); transition: background-color 650ms ease; }
+.library-selected .library-environment-image { opacity: .3; transform: scale(1); }
+.cinematic-library[data-theme="surveyor"] .library-environment-image { background-image: url('/images/atlas/moon-color.jpg'); }
+.cinematic-library[data-theme="curiosity"] .library-environment-image { background-image: url('/images/atlas/mars-color.jpg'); }
+.cinematic-library[data-theme="pioneer"] .library-environment-image { background-image: url('/images/history/pioneer-concept.webp'); opacity: .18; }
+.cinematic-library[data-theme="curiosity"] .library-environment-light { background-color: #5828184d; }
+.cinematic-library[data-theme="pioneer"] .library-environment-light { background-color: #14245280; }
+.cinematic-library .ow-header,.cinematic-library .ow-intro,.cinematic-library .library-footer { position: relative; z-index: 1; }
+.cinematic-library .library-books { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: clamp(22px,4vw,58px); align-items: start; position: relative; width: min(1080px,100%); margin: 0 auto; padding-block: 12px 46px; }
+.cinematic-library .library-option { width: 100%; max-width: 320px; justify-self: center; order: 0; transform-origin: center; transition: transform 600ms cubic-bezier(.16,1,.3,1),opacity 550ms ease,filter 600ms ease; }
+.cinematic-library .library-option.is-selected { z-index: 3; order: 0; transform: translateX(var(--focus-x)) scale(1.035); filter: none; opacity: 1; }
+.cinematic-library.library-selected .library-option:not(.is-selected) { display: block; transform: scale(.86); opacity: .12; filter: blur(3px); pointer-events: none; }
+.cinematic-library .volume-button { perspective: 1600px; }
+.cinematic-library .volume-cover { transform-origin: left center; backface-visibility: hidden; transition: box-shadow 400ms ease; }
+.cinematic-library .volume-button:hover .volume-cover { box-shadow: 0 28px 50px #0008; }
+.cinematic-library .library-invitation { position: relative; z-index: 4; flex-direction: column; text-align: center; justify-content: center; gap: 16px; border: 0; padding: 8px 0 30px; min-height: 180px; }
+.cinematic-library .library-invitation h2 { font-size: 30px; }
+.cinematic-library .library-invitation .ow-eyebrow { margin-bottom: 8px !important; }
+.cinematic-library .library-invitation .ow-button { min-width: 210px; }
+.cinematic-library[data-phase="opening"] .is-selected .volume-cover { animation: cinematic-cover-open 650ms cubic-bezier(.3,0,.2,1) forwards; }
+.cinematic-library[data-phase="opening"] .volume-selected { opacity: 0; }
+.cinematic-library[data-phase="opening"] .library-invitation { opacity: .35; transition: opacity 450ms; }
+.cinematic-library[data-phase="opening"] .volume-button { background: #f3ecd9; border: 5px solid #293332; box-shadow: 0 20px 60px #0009; }
+@keyframes cinematic-cover-open { from { transform: rotateY(0); } to { transform: rotateY(-118deg); opacity: .1; } }
+@media (max-width: 800px) {
+  .cinematic-library .library-books { gap: 18px; }
+  .cinematic-library .volume-name { font-size: clamp(19px,4.5vw,36px); }
+  .cinematic-library .volume-spacecraft { font-size: clamp(9px,1.8vw,14px); }
+}
+@media (max-width: 520px) {
+  .cinematic-library .library-books { grid-template-columns: minmax(0,1fr); max-width: 280px; gap: 34px; }
+  .cinematic-library.library-selected .library-option:not(.is-selected) { display: none; }
+  .cinematic-library .library-option.is-selected { transform: scale(1.015); }
+  .cinematic-library .volume-name { font-size: 44px; }
+  .cinematic-library .volume-spacecraft { font-size: 16px; }
+  .cinematic-library .library-invitation h2 { font-size: 28px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .cinematic-library .library-option,.library-environment-image,.library-environment-light { transition: none; }
+  .cinematic-library[data-phase="opening"] .is-selected .volume-cover { animation: none; }
+}

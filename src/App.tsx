@@ -64,14 +64,22 @@ export function App() {
   useEffect(() => {
     persist(save);
   }, [save, persist]);
-  const openBook = (id: MissionId) => {
+  const openBook = (id: MissionId, fromLibrary = false) => {
     if (document.pointerLockElement) document.exitPointerLock();
     setBackpackOpen(false);
     setReward(null);
     setActiveMissionId(null);
     setBookId(id);
     setRestoreReadingFocus(false);
-    commit({ ...saveRef.current, lastMissionId: id });
+    const current = saveRef.current;
+    const readingContext = current.readingContexts?.[id];
+    commit({
+      ...current,
+      lastMissionId: id,
+      ...(fromLibrary && readingContext ? {
+        readingContexts: { ...current.readingContexts, [id]: { ...readingContext, view: 'contents' as const, panel: 'contents' as const } },
+      } : {}),
+    });
     window.scrollTo(0, 0);
   };
   const discover = useCallback(
@@ -196,9 +204,10 @@ export function App() {
         />
       ) : (
         <ExpeditionLibrary
+          suspended={backpackOpen || reward !== null}
           progress={save.progress}
           initialSelection={save.lastMissionId}
-          onOpen={openBook}
+          onOpen={(id) => openBook(id, true)}
         />
       )}
       <BackpackLauncher

@@ -78,7 +78,7 @@ export interface OptionalAttempt {
 export interface BookReadingContext {
   view: "contents" | "reading";
   artifactId: string;
-  panel: "contents" | "dossier";
+  panel: "contents" | "atlas" | "dossier";
 }
 export interface SavedExpedition {
   version: 2;

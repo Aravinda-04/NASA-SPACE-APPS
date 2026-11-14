@@ -3,12 +3,13 @@ import { ArrowDown, ArrowLeft, ArrowRight, ExternalLink, FileText } from "lucide
 import { getPlayableMission, type ChronologicalArtifact } from "../../data/chronologicalArtifacts";
 import { ArtifactAtlasPreview } from "./ArtifactAtlasPreview";
 
-export function ArtifactDossierPage({ artifact, recordNumber, onExplore, onBack, focusOnOpen }: {
+export function ArtifactDossierPage({ artifact, recordNumber, onExplore, onBack, focusOnOpen, launchId = 'artifact-launch' }: {
   artifact: ChronologicalArtifact;
   recordNumber: number;
   onExplore: () => void;
   onBack: () => void;
   focusOnOpen: boolean;
+  launchId?: string;
 }) {
   const heading = useRef<HTMLHeadingElement>(null);
   const notes = useRef<HTMLDivElement>(null);
@@ -50,7 +51,7 @@ export function ArtifactDossierPage({ artifact, recordNumber, onExplore, onBack,
       </div>
     </div>
     <div className="artifact-actions">
-      {getPlayableMission(artifact) ? <button id="artifact-launch" className="ow-button archive-launch" onClick={onExplore}>Enter 3D field investigation <ArrowRight size={17} aria-hidden="true" /></button>
+      {getPlayableMission(artifact) ? <button id={launchId} className="ow-button archive-launch" onClick={onExplore}>Enter 3D field investigation <ArrowRight size={17} aria-hidden="true" /></button>
         : <button className="ow-button archive-source-action" onClick={() => {
           const firstSource = notes.current?.querySelector<HTMLAnchorElement>('.artifact-sources a');
           firstSource?.focus();

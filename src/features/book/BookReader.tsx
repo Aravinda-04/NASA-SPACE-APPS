@@ -4,7 +4,7 @@ import { getBook } from "../../data/books";
 import { Brand, BookCover } from "../library/ExpeditionLibrary";
 import { STORY_MEDIA } from "../../data/bookStories";
 import { BookInvestigation } from "../science/BookInvestigation";
-import { ChronologicalContentsSpread } from "./ChronologicalContentsSpread";
+import { OpenedExpeditionJournal } from "./OpenedExpeditionJournal";
 import { getChronologicalArtifacts } from "../../data/chronologicalArtifacts";
 import "./book.css";
 import type {
@@ -42,7 +42,7 @@ export function BookReader({
   const context = savedContext ?? { view: 'contents', artifactId: getChronologicalArtifacts(mission.id)[0].id, panel: 'contents' };
   const isContents = context.view === 'contents';
   const explore = () => {
-    if (isContents) onContext({ ...context, panel: 'dossier' });
+    if (isContents) onContext({ ...context, panel: 'atlas' });
     onExplore();
   };
   const goPage = (next: number) => {
@@ -113,7 +113,7 @@ export function BookReader({
           {isContents ? `${book.volume} / The archive opens here.` : book.title}
         </h1>
       </section>
-      {isContents ? <ChronologicalContentsSpread volumeId={mission.id} context={context} onContext={onContext} onExplore={explore} onLibrary={onLibrary} /> : page === 0 ? (
+      {isContents ? <OpenedExpeditionJournal volumeId={mission.id} context={context} onContext={onContext} onExplore={explore} onLibrary={onLibrary} suspended={suspended} /> : page === 0 ? (
         <section className="reader-introduction">
           <BookCover book={book} />
           <div>
@@ -240,7 +240,7 @@ export function BookReader({
           Previous
         </button>
         <span>
-          {isContents ? 'Contents / Artifact dossier' : `${page + 1} / 4 · ${labels[page]}`}
+          {isContents ? 'Atlas / Chronological contents' : `${page + 1} / 4 · ${labels[page]}`}
         </span>
         <button
           className="ow-button ow-primary"

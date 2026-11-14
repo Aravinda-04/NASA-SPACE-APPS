@@ -1,5 +1,9 @@
 # Interactive chronological contents
 
+The primary spread layout in this earlier handoff is superseded by
+[the interactive-atlas implementation](implementation-interactive-atlas.md).
+The historical data, trajectory and save-compatibility foundations remain in use.
+
 The active reader previously opened one of four numbered reading pages and had
 no historical artifact selection. `BookReader` now adds a separate Contents view
 with an interactive curved index and synchronized artifact dossier. The library,

@@ -6,11 +6,13 @@ export function ModalFrame({
   onClose,
   children,
   className = "",
+  closeLabel = "Close Space Backpack or reward",
 }: {
   titleId: string;
   onClose: () => void;
   children: ReactNode;
   className?: string;
+  closeLabel?: string;
 }) {
   const dialog = useRef<HTMLDialogElement>(null);
   const close = useRef(onClose);
@@ -45,7 +47,7 @@ export function ModalFrame({
       <button
         className="ow-button modal-close"
         onClick={onClose}
-        aria-label="Close Space Backpack or reward"
+        aria-label={closeLabel}
       >
         <X size={18} />
         Close
