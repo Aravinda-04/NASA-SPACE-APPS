@@ -53,11 +53,24 @@ condition, or colocated hardware. Outer Space uses launch years throughout.
   landing press kit](https://www.jpl.nasa.gov/news/press_kits/ingenuity/landing/quick_facts/).
   It is explicitly labelled regional; it is neither the exact first-flight
   waypoint nor the helicopter's final position.
-- The 3D Solar System is a mission-context schematic. Rings, sizes, angles,
-  connections and body positions are illustrative, not ephemerides. Selection
-  focuses Pioneer 10's historical Jupiter encounter, NEAR's Eros context, Dawn's
-  Ceres context or Kepler's heliocentric observatory context. No live spacecraft
-  position or reconstructed transfer geometry is claimed.
+- The 3D Solar System uses a single [NASA/JPL Horizons](https://ssd.jpl.nasa.gov/horizons/manual.html)
+  reference snapshot: **30 October 2018, 00:00 TDB**, JD 2458421.5, heliocentric
+  geometric elements in the J2000 ecliptic frame. All eight planets are included.
+  Eros, Vesta and Ceres are labelled minor bodies; Kepler is spacecraft −227,
+  from its final JPL trajectory solution at its retirement date. Per-body query
+  URLs and target/model identities are retained in `src/data/solarEphemeris.ts`;
+  `node scripts/update-solar-ephemeris.mjs` refreshes the static data sequentially.
+  Coordinates are reconstructed from the supplied true anomaly and osculating
+  elements, with **one world unit = one AU**, without radial compression.
+  Ellipses include eccentricity, inclination, node and periapsis direction.
+  They are instantaneous orbit guides, not integrated mission trajectories.
+- Body symbols are enlarged for visibility and explicitly have no physical size
+  scale. Inner/full-system views change camera magnification, not distance ratios.
+  Crowded labels are suppressed; the accessible distance key lists all planets.
+  Selection fits the Sun and associated orbit, rather than fabricating a flight
+  path from Earth. Pioneer, NEAR and Dawn markers identify destination bodies at
+  the reference epoch, not historical encounter-time or current probe positions.
+  Kepler's distant observation targets are never shown as visited destinations.
 - The small SVG dossier previews remain labelled schematic reconstructions. Their
   coordinate grid is equirectangular and shows no measured terrain. Kepler's
   “Starlight” label denotes an observation, not a visited destination.

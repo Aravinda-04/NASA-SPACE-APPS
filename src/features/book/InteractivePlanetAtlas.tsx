@@ -5,12 +5,13 @@ import type { OrbitControls as OrbitControlsImpl } from "three-stdlib";
 import * as THREE from "three";
 import { ArrowDown, ArrowLeft, ArrowRight, ArrowUp, Eye, Focus, Minus, Plus, RotateCcw } from "lucide-react";
 import type { ChronologicalArtifact } from "../../data/chronologicalArtifacts";
-import { PLANET_TEXTURES, SOLAR_ATLAS_BODIES } from "../../data/atlas";
+import { PLANET_TEXTURES, SOLAR_ATLAS_BODIES, SOLAR_REFERENCE_DATE } from "../../data/atlas";
+import { orbitExtent, solarViewDistance } from "../../utils/solarOrbits";
 import { easeAtlasFocus, planetCoordinateToVector, shortestAngleDelta, type AtlasMotionState } from "../../utils/planetCoordinates";
 import { useReducedMotion } from "../../hooks/useReducedMotion";
 import { ArtifactAtlasPreview } from "./ArtifactAtlasPreview";
 
-type AtlasAction = "focus" | "overview" | "zoom-in" | "zoom-out" | "left" | "right" | "up" | "down";
+type AtlasAction = "focus" | "overview" | "inner-system" | "zoom-in" | "zoom-out" | "left" | "right" | "up" | "down";
 interface Command { action: AtlasAction; serial: number }
 interface AtlasProps {
   artifact: ChronologicalArtifact;
@@ -112,37 +113,87 @@ function Planet({ artifact, artifacts, onSelect, labels, onTextureStatus }: Atla
   </>;
 }
 
+type SolarBody = typeof SOLAR_ATLAS_BODIES[number];
+
+function SolarMarker({ body, selected, onSelect }: { body: SolarBody; selected: boolean; onSelect: () => void }) {
+  const marker = useRef<THREE.Group>(null);
+  const halo = useRef<THREE.Mesh>(null);
+  const point = useMemo(() => new THREE.Vector3(...body.position), [body]);
+  useFrame(({ camera, size }) => {
+    // Symbols stay legible in pixels; their centres retain their true AU positions.
+    const unitsPerPixel = 2 * camera.position.distanceTo(point) * Math.tan(20 * Math.PI / 180) / size.height;
+    const orbitRadius = body.elements?.semiMajorAxis ?? .15;
+    const pixels = Math.min(body.markerPixels, Math.max(body.id === 'sun' ? 4 : 2, orbitRadius / unitsPerPixel * .08));
+    marker.current?.scale.setScalar(unitsPerPixel * pixels / body.markerPixels);
+    halo.current?.quaternion.copy(camera.quaternion);
+  });
+  return <group ref={marker} position={body.position}>
+    <mesh onClick={(event: ThreeEvent<MouseEvent>) => { event.stopPropagation(); if (event.delta < 5) onSelect(); }}>
+      <sphereGeometry args={[body.markerPixels, 24, 16]} />
+      <meshBasicMaterial color={body.color} />
+    </mesh>
+    {selected && <mesh ref={halo}>
+      <ringGeometry args={[body.markerPixels + 4, body.markerPixels + 5, 48]} />
+      <meshBasicMaterial color="#ffe0a1" side={THREE.DoubleSide} depthTest={false} />
+    </mesh>}
+  </group>;
+}
+
+function SolarLabels({ selectedId }: { selectedId?: string }) {
+  const container = useRef<HTMLDivElement>(null);
+  const bodies = useMemo(() => [...SOLAR_ATLAS_BODIES].sort((a, b) =>
+    Number(b.id === selectedId) - Number(a.id === selectedId) || Number(b.id === 'sun') - Number(a.id === 'sun') ||
+    Number(b.kind === 'planet') - Number(a.kind === 'planet')), [selectedId]);
+  const projected = useMemo(() => new THREE.Vector3(), []);
+  useFrame(({ camera, size }) => {
+    const occupied: { x: number; y: number; width: number; height: number }[] = [];
+    bodies.forEach((body, index) => {
+      const label = container.current?.children[index] as HTMLElement | undefined;
+      if (!label) return;
+      projected.set(...body.position).project(camera);
+      const x = (projected.x + 1) * size.width / 2;
+      const y = (1 - projected.y) * size.height / 2;
+      const width = label.offsetWidth, height = label.offsetHeight;
+      let placement: { x: number; y: number; width: number; height: number } | undefined;
+      const unitsPerPixel = 2 * camera.position.length() * Math.tan(20 * Math.PI / 180) / size.height;
+      const crowdedInnerBody = body.id !== selectedId && body.id !== 'sun' && body.elements && body.elements.semiMajorAxis / unitsPerPixel < 22;
+      if (!crowdedInnerBody && projected.z > -1 && projected.z < 1 && x > 0 && x < size.width && y > 38 && y < size.height - 40) {
+        const gap = body.markerPixels + 7;
+        for (const [dx, dy] of [[gap, -height / 2], [-width / 2, -gap - height], [-width - gap, -height / 2], [-width / 2, gap]]) {
+          const candidate = { x: x + dx, y: y + dy, width, height };
+          if (candidate.x < 5 || candidate.x + width > size.width - 5 || candidate.y < 38 || candidate.y + height > size.height - 40) continue;
+          if (occupied.some(box => candidate.x < box.x + box.width + 4 && candidate.x + width + 4 > box.x && candidate.y < box.y + box.height + 3 && candidate.y + height + 3 > box.y)) continue;
+          placement = candidate; break;
+        }
+      }
+      label.style.visibility = placement ? 'visible' : 'hidden';
+      if (placement) {
+        occupied.push(placement);
+        label.style.transform = `translate(${placement.x}px, ${placement.y}px)`;
+      }
+    });
+  });
+  return <Html fullscreen zIndexRange={[1, 0]} style={{ pointerEvents: 'none' }}>
+    <div ref={container} className="solar-label-layer" aria-hidden="true">
+      {bodies.map(body => <span key={body.id} data-solar-label={body.id} className={`solar-body-label ${selectedId === body.id ? 'is-selected' : ''}`}>{body.name}</span>)}
+    </div>
+  </Html>;
+}
+
 function SolarAtlas({ artifact, artifacts, onSelect, labels }: AtlasProps & { labels: boolean }) {
-  const selected = SOLAR_ATLAS_BODIES.find(body => body.id === artifact.spaceFocus);
-  const earth = SOLAR_ATLAS_BODIES.find(body => body.id === 'earth')!;
-  const destination = selected?.position ?? [0, 0, 0];
-  const connection = useMemo(() => [
-    [...earth.position] as [number, number, number],
-    [destination[0] * .4, .6, destination[2] * .4] as [number, number, number],
-    [...destination] as [number, number, number],
-  ], [destination]);
   return <>
-    {[1.35, 2.08, 3.58, 5].map(radius => <mesh key={radius} rotation={[-Math.PI / 2, 0, 0]}>
-      <ringGeometry args={[radius - .006, radius + .006, 128]} />
-      <meshBasicMaterial color="#96a8b3" side={THREE.DoubleSide} transparent opacity={.28} />
-    </mesh>)}
-    <Line points={connection} color="#e1bc7b" lineWidth={1.5} dashed dashSize={.1} gapSize={.12} />
-    {SOLAR_ATLAS_BODIES.map(body => <group key={body.id} position={[...body.position]}>
-      <mesh onClick={(event: ThreeEvent<MouseEvent>) => {
-        event.stopPropagation();
-        const record = artifacts.find(item => item.spaceFocus === body.id);
-        if (record && event.delta < 5) onSelect(record.id);
-      }}>
-        <sphereGeometry args={[body.size, 28, 20]} />
-        {body.id === 'sun' ? <meshBasicMaterial color={body.color} /> : <meshStandardMaterial color={body.color} roughness={.85} />}
-      </mesh>
-      {selected?.id === body.id && <mesh rotation={[-Math.PI / 2, 0, 0]}>
-        <ringGeometry args={[body.size + .13, body.size + .15, 48]} /><meshBasicMaterial color="#ffe0a1" side={THREE.DoubleSide} />
-      </mesh>}
-      {labels && <Html center position={[0, body.size + .25, 0]} style={{ pointerEvents: 'none' }}>
-        <span className={`solar-body-label ${selected?.id === body.id ? 'is-selected' : ''}`}>{body.name}</span>
-      </Html>}
-    </group>)}
+    {SOLAR_ATLAS_BODIES.map(body => {
+      const selected = body.id === artifact.spaceFocus;
+      const showOrbit = body.kind === 'planet' || selected || artifact.spaceFocus === 'ceres' && body.id === 'vesta';
+      return <group key={body.id}>
+        {body.orbit && showOrbit && <Line points={body.orbit} color={selected ? '#e1bc7b' : '#96a8b3'} transparent opacity={selected ? .8 : .28} lineWidth={selected ? 1.2 : .7} />}
+        <SolarMarker body={body} selected={selected} onSelect={() => {
+          const record = artifacts.find(item => item.spaceFocus === body.id);
+          if (record) onSelect(record.id);
+        }} />
+      </group>;
+    })}
+    {labels && <SolarLabels selectedId={artifact.spaceFocus} />}
   </>;
 }
 
@@ -157,13 +208,14 @@ function AtlasScene({ artifact, artifacts, onSelect, command, labels, reduced, o
   onMode: (state: AtlasMotionState) => void; onTextureStatus: (status: string) => void;
   onUnavailable: () => void;
 }) {
-  const { camera, invalidate, gl } = useThree();
+  const { camera, invalidate, gl, size } = useThree();
   const controls = useRef<OrbitControlsImpl>(null);
   const light = useRef<THREE.DirectionalLight>(null);
   const transition = useRef<Transition | null>(null);
   const lastRecord = useRef('');
   const lastFocusRequest = useRef(-1);
   const isSpace = artifact.volumeId === 'pioneer';
+  const solarAspect = isSpace ? size.width / size.height : 1;
   const scratch = useMemo(() => ({ spherical: new THREE.Spherical(), target: new THREE.Vector3(), offset: new THREE.Vector3(), lightOffset: new THREE.Vector3(2, 2, 1) }), []);
   const publishCamera = () => {
     gl.domElement.dataset.cameraPosition = camera.position.toArray().map(value => value.toFixed(5)).join(',');
@@ -191,19 +243,20 @@ function AtlasScene({ artifact, artifacts, onSelect, command, labels, reduced, o
     const to = from.clone();
     const toTarget = fromTarget.clone();
     let finish: AtlasMotionState = 'idle';
-    if (action === 'overview' || action === 'focus') {
+    if (action === 'overview' || action === 'focus' || action === 'inner-system') {
       toTarget.set(0, 0, 0);
       if (isSpace) {
         const body = SOLAR_ATLAS_BODIES.find(item => item.id === artifact.spaceFocus);
-        if (action === 'focus' && body) toTarget.set(body.position[0], body.position[1], body.position[2]);
-        to.setFromVector3(new THREE.Vector3(action === 'overview' ? 7 : 2.6, action === 'overview' ? 8 : 2.4, action === 'overview' ? 10 : 3.4));
+        const extent = action === 'overview' ? Math.max(...SOLAR_ATLAS_BODIES.map(item => item.elements ? orbitExtent(item.elements) : 0))
+          : action === 'inner-system' ? 1.8 : body?.elements ? orbitExtent(body.elements) : 1.8;
+        to.setFromVector3(new THREE.Vector3(0, 1, .28).normalize().multiplyScalar(solarViewDistance(extent, solarAspect)));
       } else if (action === 'focus' && artifact.coordinateData) {
         const coordinate = artifact.coordinateData;
         to.setFromVector3(new THREE.Vector3(...planetCoordinateToVector(coordinate.latitude, coordinate.longitude, 4.7)));
       } else to.setFromVector3(new THREE.Vector3(0, .45, 5.7));
       finish = action === 'focus' ? 'focused' : 'idle';
     } else if (action === 'zoom-in' || action === 'zoom-out') {
-      to.radius = THREE.MathUtils.clamp(from.radius * (action === 'zoom-in' ? .8 : 1.25), isSpace ? 1.2 : 2.1, isSpace ? 22 : 8);
+      to.radius = THREE.MathUtils.clamp(from.radius * (action === 'zoom-in' ? .8 : 1.25), isSpace ? .6 : 2.1, isSpace ? 350 : 8);
     } else {
       if (action === 'left' || action === 'right') to.theta += (action === 'left' ? -1 : 1) * Math.PI / 8;
       else to.phi = THREE.MathUtils.clamp(to.phi + (action === 'up' ? -1 : 1) * Math.PI / 12, .04, Math.PI - .04);
@@ -213,7 +266,7 @@ function AtlasScene({ artifact, artifacts, onSelect, command, labels, reduced, o
     transition.current = { fromTarget, toTarget, from, to, elapsed: reduced ? 1.1 : 0, finish };
     onMode(action === 'overview' ? 'resetting' : 'focusing');
     invalidate();
-  }, [artifact.id, command.serial, focusRequest, reduced, camera, invalidate, isSpace, onMode]);
+  }, [artifact.id, command.serial, focusRequest, reduced, camera, invalidate, isSpace, solarAspect, onMode]);
 
   useFrame((_, delta) => {
     const orbit = controls.current;
@@ -239,7 +292,7 @@ function AtlasScene({ artifact, artifacts, onSelect, command, labels, reduced, o
         onMode(movement.finish);
         gl.domElement.dataset.focusedRecord = artifact.id;
         publishCamera();
-        orbit.autoRotate = movement.finish === 'idle' && command.action === 'overview' && !reduced;
+        orbit.autoRotate = !isSpace && movement.finish === 'idle' && command.action === 'overview' && !reduced;
       }
       invalidate();
     } else if (orbit.autoRotate && !reduced) invalidate();
@@ -249,7 +302,7 @@ function AtlasScene({ artifact, artifacts, onSelect, command, labels, reduced, o
     <directionalLight ref={light} position={[4, 3, 5]} intensity={2.1} />
     {isSpace ? <SolarAtlas artifact={artifact} artifacts={artifacts} onSelect={onSelect} labels={labels} />
       : <Planet artifact={artifact} artifacts={artifacts} onSelect={onSelect} labels={labels} onTextureStatus={onTextureStatus} />}
-    <OrbitControls ref={controls} makeDefault enablePan={false} minDistance={isSpace ? 1.2 : 2.1} maxDistance={isSpace ? 22 : 8}
+    <OrbitControls ref={controls} makeDefault enablePan={false} minDistance={isSpace ? .6 : 2.1} maxDistance={isSpace ? 350 : 8}
       enableDamping dampingFactor={.09} rotateSpeed={.55} zoomSpeed={.65} autoRotateSpeed={.3}
       onStart={() => {
         transition.current = null;
@@ -282,15 +335,16 @@ export function InteractivePlanetAtlas({ artifact, artifacts, onSelect, suspende
   const coordinate = artifact.coordinateData;
   const coordinatesText = coordinate ? `${coordinate.precision === 'region' ? 'Approx. ' : ''}${Math.abs(coordinate.latitude)}°${coordinate.latitude < 0 ? 'S' : 'N'} / ${Math.abs(coordinate.longitude)}°${coordinate.longitude < 0 ? 'W' : 'E'}` : 'No verified surface pin';
   return <div className="interactive-planet-atlas" data-motion-state={mode} data-selected-record={artifact.id} data-paused={suspended || hidden}>
-    <div className="planet-atlas-viewport" tabIndex={0} role="region" aria-label={isSpace ? 'Interactive Solar System schematic' : `Interactive ${body} globe`}
+    {isSpace && <p className="solar-reference-date">Reference snapshot · {SOLAR_REFERENCE_DATE}</p>}
+    <div className="planet-atlas-viewport" tabIndex={0} role="region" aria-label={isSpace ? 'Interactive Solar System reference atlas' : `Interactive ${body} globe`}
       aria-describedby="atlas-gestures" onKeyDown={(event) => {
         if (event.target !== event.currentTarget || !available) return;
         const action = ({ ArrowLeft: 'left', ArrowRight: 'right', ArrowUp: 'up', ArrowDown: 'down', '+': 'zoom-in', '=': 'zoom-in', '-': 'zoom-out', Home: 'overview' } as Record<string, AtlasAction>)[event.key];
         if (action) { event.preventDefault(); act(action); }
       }}>
-      <div className="atlas-viewport-labels"><span>{isSpace ? 'Solar System / mission context' : `${body} / surface atlas`}</span><span>{isSpace ? 'Schematic' : 'NASA mosaic'}</span></div>
+      <div className="atlas-viewport-labels"><span>{isSpace ? 'Solar System / mission context' : `${body} / surface atlas`}</span><span>{isSpace ? 'NASA/JPL' : 'NASA mosaic'}</span></div>
       {available ? <AtlasBoundary fallback={<AtlasUnavailable artifact={artifact} />}>
-        <Canvas frameloop={suspended || hidden ? 'never' : 'demand'} dpr={[1, 1.5]} camera={{ position: [0, 1, isSpace ? 12 : 5.25], fov: 40, near: .05, far: 100 }}
+        <Canvas frameloop={suspended || hidden ? 'never' : 'demand'} dpr={[1, 1.5]} camera={{ position: [0, 1, isSpace ? 22 : 5.25], fov: 40, near: .01, far: isSpace ? 600 : 100 }}
           gl={{ antialias: true, alpha: false, powerPreference: 'low-power' }}
           onCreated={({ gl }) => {
             gl.setClearColor('#111f25');
@@ -299,7 +353,7 @@ export function InteractivePlanetAtlas({ artifact, artifacts, onSelect, suspende
           <AtlasScene artifact={artifact} artifacts={artifacts} onSelect={onSelect} command={command} labels={labels} reduced={reduced} onMode={setMotionMode} onTextureStatus={setImageryStatus} onUnavailable={unavailable} focusRequest={focusRequest} />
         </Canvas>
       </AtlasBoundary> : <AtlasUnavailable artifact={artifact} />}
-      <div className="atlas-viewport-bottom"><span>{isSpace ? 'Illustrative placements · no live position' : coordinatesText}</span><span aria-live="polite">{available ? mode === 'focusing' ? 'Focusing…' : mode === 'focused' ? (isSpace || coordinate ? 'Location in view' : 'Overview in view') : mode === 'resetting' ? 'Returning to overview…' : 'Drag to explore' : 'Archive mode'}</span></div>
+      <div className="atlas-viewport-bottom"><span>{isSpace ? 'Linear AU · symbols enlarged' : coordinatesText}</span><span aria-live="polite">{available ? mode === 'focusing' ? 'Focusing…' : mode === 'focused' ? (isSpace ? 'Orbit in view' : coordinate ? 'Location in view' : 'Overview in view') : mode === 'resetting' ? 'Returning to overview…' : 'Drag to explore' : 'Archive mode'}</span></div>
     </div>
     {available && <div className="planet-atlas-controls" role="group" aria-label="Atlas controls">
       <button onClick={() => act('left')} aria-label="Rotate atlas left"><ArrowLeft size={15} /></button>
@@ -312,11 +366,26 @@ export function InteractivePlanetAtlas({ artifact, artifacts, onSelect, suspende
       <button onClick={() => act('focus')} className="atlas-focus-control"><Focus size={15} />{isSpace || coordinate ? 'Focus mission' : 'Overview'}</button>
       <button onClick={() => setLabels(value => !value)} aria-label="Toggle atlas labels" aria-pressed={labels}><Eye size={15} /></button>
     </div>}
+    {available && isSpace && <div className="solar-view-controls" role="group" aria-label="Solar System views">
+      <button onClick={() => act('inner-system')}>Inner system</button>
+      <button onClick={() => act('overview')}>All 8 planets</button>
+    </div>}
+    {isSpace && <p className="solar-scale-note">Inner planets cluster at full scale. Use Inner system for a closer view.</p>}
     <p id="atlas-gestures" className="atlas-gestures">{available ? 'Drag to rotate · scroll to zoom · arrow keys or buttons to explore.' : 'Choose another record from the timeline or the locations below.'}</p>
     <div className="atlas-location-buttons" role="group" aria-label="Select an atlas location">
       {artifacts.filter(record => record.coordinateData || record.spaceFocus).map(record => <button key={record.id} aria-pressed={record.id === artifact.id} onClick={() => onSelect(record.id)}>{record.title}</button>)}
     </div>
-    <p className="atlas-provenance">{isSpace ? 'Historical journey schematic. Orbital rings, body sizes, angles and connecting paths are illustrative, not to scale and not ephemerides.' : textureStatus}{!isSpace && coordinate?.event ? ` · ${coordinate.event}` : ''}</p>
+    <p className="atlas-provenance">{isSpace ? 'NASA/JPL Horizons · heliocentric J2000 ecliptic frame. Distances use a uniform AU scale; body symbols are enlarged, not physical sizes. Curves are osculating orbit guides at the reference date, not mission trajectories or live positions.' : textureStatus}{!isSpace && coordinate?.event ? ` · ${coordinate.event}` : ''}</p>
+    {isSpace && <>
+      <a className="atlas-imagery-source" href="https://ssd.jpl.nasa.gov/horizons/manual.html" target="_blank" rel="noopener noreferrer">Position and orbit source: NASA/JPL Horizons</a>
+      <details className="solar-distance-key">
+        <summary>Eight planets · distances from the Sun</summary>
+        <dl>{SOLAR_ATLAS_BODIES.filter(item => item.kind === 'planet').map(item => <div key={item.id}>
+          <dt><span style={{ backgroundColor: item.color }} />{item.name}</dt><dd>{Math.hypot(...item.position).toFixed(3)} AU</dd>
+        </div>)}</dl>
+        <p>At the reference date. 1 AU = 149,597,870.7 km. Small-body and spacecraft symbols mark Eros, Vesta, Ceres and Kepler; these are not planets.</p>
+      </details>
+    </>}
     {!isSpace && <a className="atlas-imagery-source" href={PLANET_TEXTURES[body].source} target="_blank" rel="noopener noreferrer">Surface map: {PLANET_TEXTURES[body].credit}</a>}
   </div>;
 }

@@ -20,8 +20,10 @@ dialog. This extends the active `BookReader` and App callbacks.
   camera focus, on-demand rendering, texture ownership and WebGL fallback.
 - `planetCoordinates.ts`: east-positive coordinate conversion, longitude
   wrapping, shortest angular interpolation and bounded focus easing.
-- `atlas.ts`: local NASA texture references and explicitly schematic Solar System
-  display geometry. These presentation points are not astronomical coordinates.
+- `atlas.ts` / `solarEphemeris.ts`: local NASA textures and a static, sourced
+  NASA/JPL Solar System snapshot with all eight planets, three minor bodies and
+  Kepler. `solarOrbits.ts` reconstructs positions and inclined osculating ellipses
+  on a uniform AU scale; `update-solar-ephemeris.mjs` reproduces the dataset.
 - `chronologicalArtifacts.ts`: the existing 13 histories, now with sourced site or
   regional pins and separate deep-space context targets. Playability continues
   to derive from the three existing mission registry entries.
@@ -33,7 +35,8 @@ dialog. This extends the active `BookReader` and App callbacks.
 
 One transition ref owns movement. The camera's spherical angles and radius
 interpolate with cubic easing; longitude uses the shortest wrapped angular
-distance. The OrbitControls target also interpolates for schematic space targets.
+distance. Solar focus fits the Sun and selected orbit; Inner system and All 8
+planets magnify the same AU geometry. Fitting respects the viewport aspect ratio.
 Globe focus keeps the selected coordinate on the camera-facing hemisphere and
 uses a bounded distance outside the sphere. Lighting follows the viewer for a
 legible exhibit rather than pretending to reconstruct the Sun at an event time.
@@ -66,8 +69,12 @@ The [source ledger](design/chronological-source-ledger.md) documents pins,
 planetocentric coordinates, approximate regions and missing coordinates. The
 [asset ledger](../public/images/atlas/README.md) documents the actual NASA maps.
 Lunar relief is illustrative bump shading, not calibrated terrain. Outer Space
-uses a labelled mission-context schematic, not invented ephemerides. Kepler's
-observation targets are never treated as visited destinations.
+uses NASA/JPL geometric positions at 30 October 2018, 00:00 TDB, in the heliocentric
+J2000 ecliptic frame. Orbit curves are osculating guides at that epoch, not
+propagated trajectories; body symbols are enlarged and the chart says so. No
+invented Earth-to-mission connection remains. Body targets for historical missions
+are distinguished from spacecraft locations. Kepler's observation targets are
+never treated as visited destinations. The source ledger records all conventions.
 
 The established DM Serif Display / DM Sans fonts, paper, cover art and volume
 palette are retained. The existing Figma file was reviewed (library inventory and
@@ -79,8 +86,10 @@ the YAML ramp; these are the same locally hosted faces, not new font choices.
 
 - `npm test`: existing scientific/progress/reward checks, 13 histories, source
   contracts, trajectory geometry, sourced coordinate conversion, wrapping/poles,
-  shortest-path/easing bounds, valid schematic targets, local texture existence
-  and additive atlas context migration.
+  shortest-path/easing bounds, dated targets, local texture existence, additive
+  atlas context migration, all eight planets, perihelion/aphelion, inclined closed
+  orbit geometry, an independent Horizons Earth vector, Kepler identity, uniform
+  AU scaling and aspect-aware camera fitting.
 - `npm run build`: TypeScript and Vite production build. The shared lazy Three.js
   controls/renderer chunk remains above Vite's 500kB advisory threshold. Library
   selection does not load an interactive mission or background 3D scene.
@@ -89,7 +98,8 @@ the YAML ramp; these are the same locally hosted faces, not new font choices.
   original `check-book-browser.mjs` entry point delegates to this current suite.
 - Browser coverage includes centring, background transformation, keyboard/Escape,
   opening, correct left/right order, all 13 synchronized records and dossiers,
-  actual Gale focus coordinates, schematic Jupiter focus, zoom/labels, real drag
+  actual Gale focus coordinates, Sun-centred Jupiter orbit focus, inner/full
+  Solar System views and nonoverlapping labels, zoom/labels, real drag
   interruption and refocus, wheel zoom, Backpack pause, mission launch/return,
   reload, original science pages, citations and WebGL-unavailable fallback.
 - Widths: 1440, 1024, 768, 390 and 320px. Assertions check HTML/SVG alignment,

@@ -141,8 +141,27 @@ export async function verifyAtlasJourney(runnerPage, { baseURL, outputDirectory 
         assert.ok(Math.abs(Math.atan2(-z,x)*180/Math.PI - 137.4417)<.0001,'Gale east longitude faces the camera');
       }
       if (id==='pioneer') {
-        assert.deepEqual(initialCamera.target,[4.1,0,2.85],'Pioneer focuses the labelled schematic Jupiter encounter');
-        assert.match(await page.locator('.atlas-provenance').innerText(),/illustrative.*not to scale.*not ephemerides/);
+        assert.deepEqual(initialCamera.target,[0,0,0],'Mission focus retains the Sun and destination orbit in one AU reference frame');
+        assert.match(await page.locator('.solar-reference-date').innerText(),/30 Oct 2018.*00:00 TDB/);
+        assert.match(await page.locator('.atlas-provenance').innerText(),/uniform AU scale.*symbols are enlarged.*not mission trajectories or live positions/);
+        await page.getByRole('button',{name:'All 8 planets',exact:true}).click();
+        await page.waitForFunction(()=>document.querySelector('.interactive-planet-atlas').dataset.motionState==='idle');
+        assert.ok(radius(await camera())>100,'Overview accommodates Neptune at its real distance');
+        await page.locator('.solar-distance-key summary').click();
+        assert.equal(await page.locator('.solar-distance-key dt').count(),8);
+        await assertSolarLabels(page);
+        await page.screenshot({path:path.join(outputDirectory,'solar-full-system.png'),fullPage:true,animations:'disabled'});
+        await page.getByRole('button',{name:'Inner system',exact:true}).click();
+        await page.waitForFunction(()=> {
+          const canvas=document.querySelector('.planet-atlas-viewport canvas');
+          return Math.hypot(...(canvas?.dataset.cameraPosition?.split(',').map(Number)??[100]))<10 && document.querySelector('.interactive-planet-atlas').dataset.motionState==='idle';
+        });
+        assert.ok(radius(await camera())<10,'Inner view magnifies the same AU model');
+        await assertSolarLabels(page);
+        await page.screenshot({path:path.join(outputDirectory,'solar-inner-system.png'),fullPage:true,animations:'disabled'});
+        await page.locator('.solar-distance-key summary').click();
+        await page.getByRole('button',{name:'Focus mission',exact:true}).click();
+        await waitFocused('pioneer-10');
       }
       await page.getByRole('button',{name:'Zoom atlas in',exact:true}).click();
       await page.waitForFunction(()=>document.querySelector('.interactive-planet-atlas').dataset.motionState==='idle');
@@ -231,6 +250,31 @@ export async function verifyAtlasJourney(runnerPage, { baseURL, outputDirectory 
     assert.equal(await page.locator('.contents-active-path').evaluate(e=>getComputedStyle(e).transitionDuration),'0s');
     assert.deepEqual(errors,[],'No unexpected console or runtime errors');
     results.push('1440/1024/768/390/320px, mobile focus/back, reduced motion and exact reward/progress preservation');
+    await page.getByRole('button',{name:'Expedition Library',exact:true}).click();
+    await open('Outer Space');
+    await page.locator('#contents-pioneer-10').click();
+    await waitFocused('pioneer-10');
+    for (const width of [390,320]) {
+      await page.setViewportSize({width,height:900});
+      await page.getByRole('button',{name:'All 8 planets',exact:true}).click();
+      await page.waitForFunction(()=> {
+        const canvas=document.querySelector('.planet-atlas-viewport canvas');
+        return Math.hypot(...(canvas?.dataset.cameraPosition?.split(',').map(Number)??[0]))>100 && document.querySelector('.interactive-planet-atlas').dataset.motionState==='idle';
+      });
+      await assertLayout();
+      await assertSolarLabels(page);
+      await page.locator('.planet-atlas-viewport').screenshot({path:path.join(outputDirectory,`solar-full-${width}.png`),animations:'disabled'});
+      await page.getByRole('button',{name:'Inner system',exact:true}).click();
+      await page.waitForFunction(()=> {
+        const canvas=document.querySelector('.planet-atlas-viewport canvas');
+        return Math.hypot(...(canvas?.dataset.cameraPosition?.split(',').map(Number)??[100]))<20 && document.querySelector('.interactive-planet-atlas').dataset.motionState==='idle';
+      });
+      await assertLayout();
+      await assertSolarLabels(page);
+      await page.locator('.planet-atlas-viewport').screenshot({path:path.join(outputDirectory,`solar-inner-${width}.png`),animations:'disabled'});
+    }
+    assert.deepEqual(errors,[],'Solar views have no console or runtime errors');
+    results.push('Solar System: dated JPL reference, eight-planet distance key, true-scale full/inner views and collision-free labels at desktop/390/320px');
   } finally { await context.close(); }
 
   const fallbackContext=await browser.newContext({viewport:{width:1280,height:900},reducedMotion:'reduce'});
@@ -249,4 +293,21 @@ export async function verifyAtlasJourney(runnerPage, { baseURL, outputDirectory 
     results.push('WebGL unavailable: useful location fallback, synchronized selection, full dossier and playable navigation remain accessible');
   } finally {await fallbackContext.close();}
   return {passed:results,consoleErrors:errors};
+}
+
+async function assertSolarLabels(page) {
+  const issues = await page.locator('.planet-atlas-viewport').evaluate(viewport => {
+    const bounds = viewport.getBoundingClientRect();
+    const labels = [...viewport.querySelectorAll('.solar-body-label')].filter(label => getComputedStyle(label).visibility === 'visible');
+    const boxes = labels.map(label => ({ name:label.textContent, rect:label.getBoundingClientRect() }));
+    const failures = [];
+    for (const {name,rect} of boxes) if (rect.left < bounds.left || rect.right > bounds.right || rect.top < bounds.top+35 || rect.bottom > bounds.bottom-35) failures.push(`${name}: clipped label`);
+    boxes.forEach((box,i) => boxes.slice(i+1).forEach(other => {
+      const a=box.rect,b=other.rect;
+      if (a.left < b.right && a.right > b.left && a.top < b.bottom && a.bottom > b.top) failures.push(`${box.name}/${other.name}: overlap`);
+    }));
+    return {failures,visible:labels.length};
+  });
+  assert.deepEqual(issues.failures,[]);
+  assert.ok(issues.visible>=4,'Visible planets have legible labels');
 }

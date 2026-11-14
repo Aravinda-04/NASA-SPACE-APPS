@@ -334,7 +334,7 @@ assert.equal(easeAtlasFocus(-1), 0); assert.equal(easeAtlasFocus(2), 1);
 for (const record of artifacts.filter(item => item.volumeId === 'pioneer')) {
   assert.equal(record.coordinateData, undefined);
   assert.ok(solarBodies.some(body => body.id === record.spaceFocus));
-  assert.match(record.atlasContext, /schematic|illustrative/i);
+  assert.match(record.atlasContext, /reference snapshot of 30 October 2018/i);
 }
 const curiosityPin = artifacts.find(item => item.id === 'curiosity-rover').coordinateData;
 assert.equal(curiosityPin.latitude, -4.5895); assert.equal(curiosityPin.longitude, 137.4417);
@@ -346,4 +346,41 @@ for (const [body, texture] of Object.entries(PLANET_TEXTURES)) {
 }
 const atlasSave = { ...contextSave, readingContexts: { curiosity: { view: 'contents', artifactId: 'curiosity-rover', panel: 'atlas' } } };
 assert.deepEqual(normalizeSave(atlasSave, missions), atlasSave, 'Atlas panel is an additive v2 context');
-console.log('Passed: sourced globe pins, coordinate/texture orientation, longitude wrapping, pole conversion, shortest-path focus, bounded easing, schematic deep-space targets, local NASA textures and atlas save migration.');
+console.log('Passed: sourced globe pins, coordinate/texture orientation, longitude wrapping, pole conversion, shortest-path focus, bounded easing, dated deep-space targets, local NASA textures and atlas save migration.');
+
+const { orbitPosition, sampleOrbit, orbitExtent, solarViewDistance } = await loadTs('../src/utils/solarOrbits.ts');
+const planets = solarBodies.filter(body => body.kind === 'planet');
+assert.deepEqual(planets.map(body => body.id), ['mercury','venus','earth','mars','jupiter','saturn','uranus','neptune']);
+assert.deepEqual(solarBodies.find(body => body.id === 'sun').position, [0,0,0]);
+for (const body of solarBodies.filter(body => body.elements)) {
+  const { elements } = body;
+  const source = new URL(body.source);
+  assert.equal(source.hostname, 'ssd.jpl.nasa.gov');
+  assert.equal(source.searchParams.get('TLIST'), '2458421.5', `${body.id}: same epoch`);
+  assert.equal(source.searchParams.get('CENTER'), '500@10', `${body.id}: Sun centre`);
+  assert.equal(source.searchParams.get('REF_PLANE'), 'ECLIPTIC');
+  assert.equal(source.searchParams.get('OUT_UNITS'), 'AU-D');
+  assert.ok(elements.eccentricity >= 0 && elements.eccentricity < 1);
+  closeTo(Math.hypot(...orbitPosition(elements, 0)), elements.semiMajorAxis * (1 - elements.eccentricity));
+  closeTo(Math.hypot(...orbitPosition(elements, 180)), orbitExtent(elements));
+  const orbit = sampleOrbit(elements);
+  orbit[0].forEach((value,i) => closeTo(value, orbit.at(-1)[i]));
+  assert.ok(Math.hypot(...body.position) <= orbitExtent(elements) + 1e-10);
+}
+// Independent Horizons VECTORS result at the same epoch (geometric, no aberration).
+// This catches rotation/sign/angle mistakes rather than just reusing our formula.
+const earthState = [0.8008872864447559, -0.00002836965313889635, -0.5873060315328166];
+solarBodies.find(body => body.id === 'earth').position.forEach((value,i) => closeTo(value, earthState[i]));
+const tilted = { semiMajorAxis: 2, eccentricity: .5, inclination: 90, ascendingNode: 0, argumentOfPeriapsis: 0, trueAnomaly: 90 };
+orbitPosition(tilted).forEach((value,i) => closeTo(value, [0,1.5,0][i]));
+const flat = { ...tilted, inclination: 0, eccentricity: 0, trueAnomaly: 90 };
+orbitPosition(flat).forEach((value,i) => closeTo(value, [0,0,-2][i]));
+assert.ok(planets.at(-1).elements.semiMajorAxis / planets[2].elements.semiMajorAxis > 30, 'No compressed outer distances');
+assert.ok(Math.max(...sampleOrbit(solarBodies.find(body => body.id === 'eros').elements).map(point => Math.abs(point[1]))) > .1, 'Inclined minor-body orbit');
+const kepler = solarBodies.find(body => body.id === 'heliocentric');
+assert.equal(kepler.kind, 'spacecraft');
+assert.equal(new URL(kepler.source).searchParams.get('COMMAND'), '-227');
+assert.ok(Math.hypot(...kepler.position.map((value,i) => value - earthState[i])) > .1, 'Kepler is separate from Earth');
+assert.ok(solarViewDistance(31, .8) > solarViewDistance(31, 2), 'Portrait fit respects the narrower dimension');
+assert.ok(solarViewDistance(31, 2) > solarViewDistance(1.8, 2) * 17, 'Full and inner views use the same AU scale');
+console.log('Passed: all eight planets, single JPL epoch/frame/centre, independent Earth state vector, AU scale, perihelion/aphelion, closed inclined ellipses, Kepler identity and aspect-aware camera fit.');
