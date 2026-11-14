@@ -5,7 +5,7 @@ import {
   useState,
   type CSSProperties,
 } from "react";
-import { ArrowLeft, ArrowRight, Check } from "lucide-react";
+import { ArrowRight, Check } from "lucide-react";
 import { BOOKS, type BookDefinition } from "../../data/books";
 import type { ExpeditionProgress, MissionId } from "../../types/expedition";
 import { useReducedMotion } from "../../hooks/useReducedMotion";
@@ -165,9 +165,6 @@ export function ExpeditionLibrary({
               }}
             >
               <BookCover book={item} />
-              {selected === item.id && (
-                <span className="volume-selected">SELECTED</span>
-              )}
             </button>
             {progress[item.id].completed && (
               <p>
@@ -185,11 +182,7 @@ export function ExpeditionLibrary({
           key={book.id}
           aria-live="polite"
         >
-          <div>
-            <p className="ow-eyebrow">YOUR NEXT EXPEDITION / {book.volume}</p>
-            <h2>{book.title}</h2>
-            <p>{book.spacecraft} · Real equipment. Lasting discoveries.</p>
-          </div>
+          <div />
           <button
             className="ow-button ow-primary"
             onClick={() => onOpen(book.id)}
@@ -199,13 +192,6 @@ export function ExpeditionLibrary({
           </button>
         </section>
       )}
-      <footer className="library-footer">
-        {selected ? (
-          <button className="ow-button" onClick={() => choose(null)}>
-            <ArrowLeft size={16} /> View all volumes
-          </button>
-        ) : null}
-      </footer>
     </main>
   );
 }
