@@ -29,7 +29,7 @@ export function BookReader({
   progress: MissionProgress;
   page: number;
   onPage: (page: number) => void;
-  onExplore: () => void;
+  onExplore: (targetId?: string) => void;
   onLibrary: () => void;
   context?: BookReadingContext;
   onContext: (context: BookReadingContext) => void;
@@ -41,9 +41,9 @@ export function BookReader({
   const heading = useRef<HTMLHeadingElement>(null);
   const context = savedContext ?? { view: 'contents', artifactId: getChronologicalArtifacts(mission.id)[0].id, panel: 'contents' };
   const isContents = context.view === 'contents';
-  const explore = () => {
+  const explore = (targetId?: string) => {
     if (isContents) onContext({ ...context, panel: 'atlas' });
-    onExplore();
+    onExplore(targetId);
   };
   const goPage = (next: number) => {
     onContext({ ...context, view: 'reading' });
@@ -56,7 +56,7 @@ export function BookReader({
   }, [page, isContents]);
   useEffect(() => {
     if (restoreMissionFocus) {
-      const target = document.getElementById('artifact-launch') ?? document.querySelector<HTMLElement>('.reader-pagination .ow-primary');
+      const target = document.getElementById('artifact-launch') ?? document.getElementById('artifact-open-dossier') ?? document.querySelector<HTMLElement>('.reader-pagination .ow-primary');
       target?.focus({ preventScroll: true });
       target?.scrollIntoView({ block: 'nearest' });
     }

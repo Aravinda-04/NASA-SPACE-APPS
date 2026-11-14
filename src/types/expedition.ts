@@ -16,6 +16,7 @@ export interface Discovery {
   title: string;
   component: string;
   position: [number, number, number];
+  cameraPosition?: [number, number, number];
   summary: string;
   story: string;
   science: string;

@@ -17,7 +17,11 @@ interface ExplorationExperienceProps {
 }
 
 type ViewMode = 'surface' | 'orbit';
-interface CameraCommand { serial: number; target: [number, number, number] }
+interface CameraCommand {
+  serial: number;
+  target: [number, number, number];
+  cameraPosition?: [number, number, number];
+}
 interface NearbyDiscovery { id: string; distance: number }
 
 function unlockPointer() {
@@ -61,7 +65,9 @@ function ExplorerCamera({ mission, mode, paused, command, onNearby }: {
     dragging.current = false;
     const target = command?.target ?? [0, isSpace ? 1 : 0.5, 0];
     if (mode === 'orbit') {
-      camera.position.set(target[0] + 15, target[1] + 13, target[2] + 18);
+      camera.position.set(target[0] + 5, target[1] + 3.8, target[2] + 5.5);
+    } else if (command?.cameraPosition) {
+      camera.position.set(command.cameraPosition[0], command.cameraPosition[1], command.cameraPosition[2]);
     } else if (command) {
       camera.position.set(target[0] + 2.5, isSpace ? target[1] + 2 : 1.7, target[2] + 4.5);
     } else {
@@ -269,7 +275,11 @@ export function ExplorationExperience({ mission, progress, onDiscover, onComplet
   const goTo = (discovery: Discovery) => {
     setResumeRequired(false);
     unlockPointer(); setSelectedId(null); setShowTask(false); setShowHelp(false);
-    setCommand({ serial: ++commandSerial.current, target: discovery.position });
+    setCommand({
+      serial: ++commandSerial.current,
+      target: discovery.position,
+      cameraPosition: discovery.cameraPosition,
+    });
   };
   const nextDiscovery = mission.discoveries.find(item => !progress.discovered.includes(item.id)) ?? mission.discoveries[0];
   const leave = () => { unlockPointer(); onExit(); };

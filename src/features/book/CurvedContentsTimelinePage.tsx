@@ -72,7 +72,7 @@ export function CurvedContentsTimelinePage({ volumeId, artifacts, selectedId, on
                 <span className="contents-record-date">{artifact.dateLabel}<span className="contents-dotted-rule" /><span aria-label={`Record ${index + 1}`}>R{String(index + 1).padStart(2, '0')}</span></span>
                 <strong>{artifact.title}<ArrowRight size={15} aria-hidden="true" /></strong>
                 <span className="contents-synopsis">{artifact.synopsis}</span>
-                {getPlayableMission(artifact) && <span className="contents-playable">3D expedition</span>}
+                {(getPlayableMission(artifact) || artifact.id === 'viking-1') && <span className="contents-playable">3D expedition</span>}
               </span>
             </button>
           </li>;

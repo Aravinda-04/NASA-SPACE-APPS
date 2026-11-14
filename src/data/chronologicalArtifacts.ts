@@ -197,3 +197,43 @@ export const getChronologicalArtifacts = (id: MissionId) => CHRONOLOGICAL_ARTIFA
 /** The registry is the authority on whether a linked episode actually exists. */
 export const getPlayableMission = (artifact: ChronologicalArtifact) => EXPEDITION_MISSIONS
   .find((item) => item.id === artifact.playableMissionId && item.id === artifact.volumeId);
+
+export type SimulationTarget = 'surveyor' | 'curiosity' | 'pioneer' | 'viking' | 'ingenuity';
+
+export interface ArtifactSimulationInfo {
+  targetId: SimulationTarget;
+  label: string;
+  title: string;
+}
+
+/**
+ * Maps each historical artifact to its specific interactive 3D simulation.
+ * Prevents generic or incorrect fallback linking to the Curiosity rover.
+ */
+export const getArtifactSimulation = (artifact: ChronologicalArtifact): ArtifactSimulationInfo | null => {
+  // 1. Viking 1 (and sister lander Viking 2) -> Chryse Planitia Viking 3D Simulation
+  if (artifact.id === 'viking-1' || artifact.id === 'viking-2') {
+    return { targetId: 'viking', label: 'Enter 3D simulation', title: 'Viking 1' };
+  }
+  // 2. Ingenuity Helicopter -> Jezero Crater Ingenuity 3D Simulation
+  if (artifact.id === 'ingenuity') {
+    return { targetId: 'ingenuity', label: 'Enter 3D simulation', title: 'Ingenuity Helicopter' };
+  }
+  // 3. Curiosity Rover & John Klein drill rock -> Gale Crater Curiosity 3D Simulation
+  if (artifact.id === 'curiosity-rover' || artifact.id === 'john-klein') {
+    return { targetId: 'curiosity', label: 'Enter 3D simulation', title: 'Curiosity Rover' };
+  }
+  // 4. Surveyor 3, Apollo 12, & Surveyor camera -> Ocean of Storms Surveyor 3 3D Simulation
+  if (artifact.id === 'surveyor-3' || artifact.id === 'apollo-12' || artifact.id === 'surveyor-camera') {
+    return { targetId: 'surveyor', label: 'Enter 3D simulation', title: 'Surveyor 3' };
+  }
+  // 5. Pioneer 10 -> Deep Space Pioneer 10 3D Simulation
+  if (artifact.id === 'pioneer-10') {
+    return { targetId: 'pioneer', label: 'Enter 3D simulation', title: 'Pioneer 10' };
+  }
+  // 6. Fallback for any other playable mission if configured
+  if (artifact.playableMissionId) {
+    return { targetId: artifact.playableMissionId as SimulationTarget, label: 'Enter 3D simulation', title: artifact.title };
+  }
+  return null;
+};

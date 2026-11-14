@@ -3,6 +3,7 @@ import { Billboard, Line, useGLTF } from '@react-three/drei';
 import * as THREE from 'three';
 import type { MissionWorldProps } from '../../types/expedition';
 import { getFourStepGradientMap } from '../../utils/celShading';
+import { VikingProceduralFallback } from '../../components/VikingHardwareRig';
 
 // The decoder is shipped with the demo so neither model needs a third-party CDN.
 const DECODER_PATH = '/vendor/draco/';
@@ -204,6 +205,120 @@ function MarsArtifacts() {
   </group>;
 }
 
+function ChryseArtifacts() {
+  return <group>
+    {/* Landmark "Big Joe" boulder at [-6.5, 0.45, -4.8] (flat-shaded low-poly vesicular basalt rock) */}
+    <group position={[-6.5, 0.45, -4.8]} rotation={[0.15, 0.65, -0.1]}>
+      <mesh scale={[1.85, 0.95, 1.45]} castShadow receiveShadow>
+        <dodecahedronGeometry args={[1, 0]} />
+        <meshToonMaterial color="#3E2723" gradientMap={getFourStepGradientMap()} />
+      </mesh>
+    </group>
+    {/* Sandy Flats Soil Trench excavated by surface sampler */}
+    <group position={[1.75, 0.012, 0.12]} rotation={[-Math.PI / 2, 0, 0.15]}>
+      <mesh receiveShadow>
+        <planeGeometry args={[0.9, 0.28]} />
+        <meshToonMaterial color="#582318" gradientMap={getFourStepGradientMap()} />
+      </mesh>
+    </group>
+    {/* Illustrative guide dashed line leading to trench */}
+    <Line points={[[1.0, 0.018, 0.12], [1.75, 0.018, 0.12]]} color="#e5bb80" lineWidth={1} transparent opacity={0.4} dashed dashSize={0.15} gapSize={0.15} />
+    {/* Illustrative facsimile camera panoramic sightline fanning toward Big Joe */}
+    <Line points={[[-0.77, 1.05, 0.77], [-3.5, 0.75, -2.0], [-6.5, 0.45, -4.8]]} color="#00f0ff" lineWidth={1} transparent opacity={0.35} dashed dashSize={0.2} gapSize={0.25} />
+  </group>;
+}
+
+export function IngenuityProceduralFallback() {
+  const legs = [
+    [-0.32, 0.05, -0.32],
+    [0.32, 0.05, -0.32],
+    [-0.32, 0.05, 0.32],
+    [0.32, 0.05, 0.32],
+  ] as const;
+  return (
+    <group>
+      {/* Fuselage core cube */}
+      <mesh position={[0, 0.24, 0]} castShadow receiveShadow>
+        <boxGeometry args={[0.22, 0.18, 0.22]} />
+        <meshToonMaterial color="#c59b48" gradientMap={getFourStepGradientMap()} />
+      </mesh>
+      {/* Sensor pod / downward NAVCAM */}
+      <mesh position={[0.06, 0.12, 0]} castShadow>
+        <boxGeometry args={[0.07, 0.06, 0.07]} />
+        <meshToonMaterial color="#2d3338" />
+      </mesh>
+      {/* 4 Carbon-composite landing legs & footpads */}
+      {legs.map(([x, y, z], i) => (
+        <group key={i}>
+          <Strut from={[x * 0.3, 0.22, z * 0.3]} to={[x, y, z]} radius={0.016} color="#1b1e22" />
+          <mesh position={[x, y * 0.5, z]} receiveShadow>
+            <cylinderGeometry args={[0.035, 0.035, 0.015, 8]} />
+            <meshToonMaterial color="#33383d" />
+          </mesh>
+        </group>
+      ))}
+      {/* Coaxial rotor mast */}
+      <Strut from={[0, 0.28, 0]} to={[0, 0.67, 0]} radius={0.02} color="#a6b0b5" />
+      {/* Lower counter-rotating rotor pair */}
+      <mesh position={[0, 0.42, 0]} castShadow>
+        <boxGeometry args={[1.2, 0.012, 0.06]} />
+        <meshToonMaterial color="#1b1e22" gradientMap={getFourStepGradientMap()} />
+      </mesh>
+      {/* Upper counter-rotating rotor pair */}
+      <mesh position={[0, 0.54, 0]} rotation={[0, Math.PI / 2, 0]} castShadow>
+        <boxGeometry args={[1.2, 0.012, 0.06]} />
+        <meshToonMaterial color="#1b1e22" gradientMap={getFourStepGradientMap()} />
+      </mesh>
+      {/* Solar panel array on top */}
+      <mesh position={[0, 0.68, 0]} castShadow receiveShadow>
+        <boxGeometry args={[0.42, 0.015, 0.32]} />
+        <meshToonMaterial color="#1b2533" gradientMap={getFourStepGradientMap()} />
+      </mesh>
+    </group>
+  );
+}
+
+function JezeroArtifacts() {
+  return (
+    <group>
+      {/* Wright Brothers Field (Airfield 1) circular takeoff marker at [2.2, 0.012, 1.8] */}
+      <group position={[2.2, 0.012, 1.8]} rotation={[-Math.PI / 2, 0, 0]}>
+        <mesh receiveShadow>
+          <ringGeometry args={[0.7, 0.78, 36]} />
+          <meshToonMaterial color="#e5bb80" transparent opacity={0.7} />
+        </mesh>
+        <mesh receiveShadow>
+          <circleGeometry args={[0.15, 18]} />
+          <meshToonMaterial color="#e5bb80" transparent opacity={0.6} />
+        </mesh>
+      </group>
+      {/* Autonomous visual odometry flight corridor / HUD overlay dashed track */}
+      <Line
+        points={[
+          [0, 0.018, 0],
+          [1.2, 0.018, -1.0],
+          [2.8, 0.018, -2.4],
+          [4.5, 0.018, -3.8],
+        ]}
+        color="#e5bb80"
+        lineWidth={1}
+        transparent
+        opacity={0.4}
+        dashed
+        dashSize={0.2}
+        gapSize={0.2}
+      />
+      {/* Neretva Vallis sand ripple dune at Flight 72 final landing site */}
+      <group position={[-5.5, 0.18, -4.8]} rotation={[0.08, 0.45, -0.05]}>
+        <mesh scale={[2.8, 0.45, 1.6]} castShadow receiveShadow>
+          <dodecahedronGeometry args={[1, 1]} />
+          <meshToonMaterial color="#a86848" gradientMap={getFourStepGradientMap()} />
+        </mesh>
+      </group>
+    </group>
+  );
+}
+
 function PioneerSchematic() {
   return <group>
     <mesh position={[0, 0.5, 0]} rotation={[Math.PI / 2, 0, 0]}><cylinderGeometry args={[1.35, 0.35, 0.38, 40, 1, true]} /><meshToonMaterial color="#dfdccb" side={THREE.DoubleSide} gradientMap={getFourStepGradientMap()} /></mesh>
@@ -245,6 +360,14 @@ export function MissionWorld({ mission, selectedId, discoveredIds, onSelect }: M
     {mission.id === 'curiosity' ? <>
       <ModelFallback fallback={<CuriositySchematic />}><Suspense fallback={<CuriositySchematic />}><NormalizedModel path="/models/curiosity.glb" span={3.3} /></Suspense></ModelFallback>
       <MarsArtifacts />
+    </> : null}
+    {(mission.id as string) === 'viking' ? <>
+      <ModelFallback fallback={<VikingProceduralFallback />}><Suspense fallback={<VikingProceduralFallback />}><NormalizedModel path="/models/Viking Lander.glb" span={3.6} /></Suspense></ModelFallback>
+      <ChryseArtifacts />
+    </> : null}
+    {(mission.id as string) === 'ingenuity' ? <>
+      <ModelFallback fallback={<IngenuityProceduralFallback />}><Suspense fallback={<IngenuityProceduralFallback />}><NormalizedModel path="/models/ingenuity.glb" span={1.4} /></Suspense></ModelFallback>
+      <JezeroArtifacts />
     </> : null}
     {space ? <ModelFallback fallback={<PioneerSchematic />}><Suspense fallback={<PioneerSchematic />}><NormalizedModel path="/models/pioneer.glb" span={8} grounded={false} /></Suspense></ModelFallback> : null}
     {mission.discoveries.map((discovery) => <DiscoveryMarker key={discovery.id} position={discovery.position} selected={selectedId === discovery.id} discovered={discoveredIds.includes(discovery.id)} accent={mission.accent} onClick={() => onSelect(discovery.id)} />)}
