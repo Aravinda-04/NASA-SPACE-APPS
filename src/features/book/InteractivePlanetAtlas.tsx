@@ -43,7 +43,7 @@ class AtlasBoundary extends Component<{ children: ReactNode; fallback: ReactNode
   render() { return this.state.failed ? this.props.fallback : this.props.children; }
 }
 
-function usePlanetTextures(body: 'moon' | 'mars', onStatus: (status: string) => void) {
+function usePlanetTextures(body: 'moon' | 'mars') {
   const [textures, setTextures] = useState<{ color?: THREE.Texture; relief?: THREE.Texture }>({});
   useEffect(() => {
     let cancelled = false;
@@ -53,7 +53,6 @@ function usePlanetTextures(body: 'moon' | 'mars', onStatus: (status: string) => 
       const texture = loader.load(url, resolve, undefined, reject);
       owned.push(texture);
     });
-    onStatus('Loading surface imagery…');
     const definition = PLANET_TEXTURES[body];
     Promise.all([load(definition.color), definition.relief ? load(definition.relief).catch(() => undefined) : undefined])
       .then(([color, relief]) => {
@@ -61,18 +60,15 @@ function usePlanetTextures(body: 'moon' | 'mars', onStatus: (status: string) => 
         color.colorSpace = THREE.SRGBColorSpace;
         color.anisotropy = 4;
         setTextures({ color, relief });
-        onStatus('NASA surface mosaic · illustrative lighting');
-      }).catch(() => {
-        if (!cancelled) onStatus('Surface imagery unavailable · interactive schematic sphere');
-      });
+      }).catch(() => {});
     return () => { cancelled = true; owned.forEach(texture => texture.dispose()); };
-  }, [body, onStatus]);
+  }, [body]);
   return textures;
 }
 
-function Planet({ artifact, artifacts, onSelect, labels, onTextureStatus }: AtlasProps & { labels: boolean; onTextureStatus: (status: string) => void }) {
+function Planet({ artifact, artifacts, onSelect, labels }: AtlasProps & { labels: boolean }) {
   const body = artifact.volumeId === 'surveyor' ? 'moon' : 'mars';
-  const { color, relief } = usePlanetTextures(body, onTextureStatus);
+  const { color, relief } = usePlanetTextures(body);
   const markerRecords = artifacts.filter(record => record.coordinateData?.body === body)
     .sort((a, b) => Number(a.id === artifact.id) - Number(b.id === artifact.id));
   return <>
@@ -152,9 +148,9 @@ interface Transition {
   elapsed: number; finish: AtlasMotionState;
 }
 
-function AtlasScene({ artifact, artifacts, onSelect, command, labels, reduced, onMode, onTextureStatus, onUnavailable, focusRequest = 0 }: AtlasProps & {
+function AtlasScene({ artifact, artifacts, onSelect, command, labels, reduced, onMode, onUnavailable, focusRequest = 0 }: AtlasProps & {
   command: Command; labels: boolean; reduced: boolean;
-  onMode: (state: AtlasMotionState) => void; onTextureStatus: (status: string) => void;
+  onMode: (state: AtlasMotionState) => void;
   onUnavailable: () => void;
 }) {
   const { camera, invalidate, gl } = useThree();
@@ -248,7 +244,7 @@ function AtlasScene({ artifact, artifacts, onSelect, command, labels, reduced, o
     <ambientLight intensity={.6} />
     <directionalLight ref={light} position={[4, 3, 5]} intensity={2.1} />
     {isSpace ? <SolarAtlas artifact={artifact} artifacts={artifacts} onSelect={onSelect} labels={labels} />
-      : <Planet artifact={artifact} artifacts={artifacts} onSelect={onSelect} labels={labels} onTextureStatus={onTextureStatus} />}
+      : <Planet artifact={artifact} artifacts={artifacts} onSelect={onSelect} labels={labels} />}
     <OrbitControls ref={controls} makeDefault enablePan={false} minDistance={isSpace ? 1.2 : 2.1} maxDistance={isSpace ? 22 : 8}
       enableDamping dampingFactor={.09} rotateSpeed={.55} zoomSpeed={.65} autoRotateSpeed={.3}
       onStart={() => {
@@ -265,11 +261,9 @@ export function InteractivePlanetAtlas({ artifact, artifacts, onSelect, suspende
   const [available, setAvailable] = useState(supportsWebGL2);
   const [labels, setLabels] = useState(true);
   const [mode, setMode] = useState<AtlasMotionState>('idle');
-  const [textureStatus, setTextureStatus] = useState('NASA surface mosaic');
   const [hidden, setHidden] = useState(document.hidden);
   const [command, setCommand] = useState<Command>({ action: 'focus', serial: 0 });
   const setMotionMode = useCallback((state: AtlasMotionState) => setMode(state), []);
-  const setImageryStatus = useCallback((status: string) => setTextureStatus(status), []);
   const unavailable = useCallback(() => setAvailable(false), []);
   const act = (action: AtlasAction) => setCommand(previous => ({ action, serial: previous.serial + 1 }));
   useEffect(() => {
@@ -283,7 +277,7 @@ export function InteractivePlanetAtlas({ artifact, artifacts, onSelect, suspende
   const coordinatesText = coordinate ? `${coordinate.precision === 'region' ? 'Approx. ' : ''}${Math.abs(coordinate.latitude)}°${coordinate.latitude < 0 ? 'S' : 'N'} / ${Math.abs(coordinate.longitude)}°${coordinate.longitude < 0 ? 'W' : 'E'}` : 'No verified surface pin';
   return <div className="interactive-planet-atlas" data-motion-state={mode} data-selected-record={artifact.id} data-paused={suspended || hidden}>
     <div className="planet-atlas-viewport" tabIndex={0} role="region" aria-label={isSpace ? 'Interactive Solar System schematic' : `Interactive ${body} globe`}
-      aria-describedby="atlas-gestures" onKeyDown={(event) => {
+      onKeyDown={(event) => {
         if (event.target !== event.currentTarget || !available) return;
         const action = ({ ArrowLeft: 'left', ArrowRight: 'right', ArrowUp: 'up', ArrowDown: 'down', '+': 'zoom-in', '=': 'zoom-in', '-': 'zoom-out', Home: 'overview' } as Record<string, AtlasAction>)[event.key];
         if (action) { event.preventDefault(); act(action); }
@@ -296,7 +290,7 @@ export function InteractivePlanetAtlas({ artifact, artifacts, onSelect, suspende
             gl.setClearColor('#111f25');
             gl.domElement.setAttribute('aria-hidden', 'true');
           }} fallback={<AtlasUnavailable artifact={artifact} />}>
-          <AtlasScene artifact={artifact} artifacts={artifacts} onSelect={onSelect} command={command} labels={labels} reduced={reduced} onMode={setMotionMode} onTextureStatus={setImageryStatus} onUnavailable={unavailable} focusRequest={focusRequest} />
+          <AtlasScene artifact={artifact} artifacts={artifacts} onSelect={onSelect} command={command} labels={labels} reduced={reduced} onMode={setMotionMode} onUnavailable={unavailable} focusRequest={focusRequest} />
         </Canvas>
       </AtlasBoundary> : <AtlasUnavailable artifact={artifact} />}
       <div className="atlas-viewport-bottom"><span>{isSpace ? 'Illustrative placements · no live position' : coordinatesText}</span><span aria-live="polite">{available ? mode === 'focusing' ? 'Focusing…' : mode === 'focused' ? (isSpace || coordinate ? 'Location in view' : 'Overview in view') : mode === 'resetting' ? 'Returning to overview…' : 'Drag to explore' : 'Archive mode'}</span></div>
@@ -312,11 +306,5 @@ export function InteractivePlanetAtlas({ artifact, artifacts, onSelect, suspende
       <button onClick={() => act('focus')} className="atlas-focus-control"><Focus size={15} />{isSpace || coordinate ? 'Focus mission' : 'Overview'}</button>
       <button onClick={() => setLabels(value => !value)} aria-label="Toggle atlas labels" aria-pressed={labels}><Eye size={15} /></button>
     </div>}
-    <p id="atlas-gestures" className="atlas-gestures">{available ? 'Drag to rotate · scroll to zoom · arrow keys or buttons to explore.' : 'Choose another record from the timeline or the locations below.'}</p>
-    <div className="atlas-location-buttons" role="group" aria-label="Select an atlas location">
-      {artifacts.filter(record => record.coordinateData || record.spaceFocus).map(record => <button key={record.id} aria-pressed={record.id === artifact.id} onClick={() => onSelect(record.id)}>{record.title}</button>)}
-    </div>
-    <p className="atlas-provenance">{isSpace ? 'Historical journey schematic. Orbital rings, body sizes, angles and connecting paths are illustrative, not to scale and not ephemerides.' : textureStatus}{!isSpace && coordinate?.event ? ` · ${coordinate.event}` : ''}</p>
-    {!isSpace && <a className="atlas-imagery-source" href={PLANET_TEXTURES[body].source} target="_blank" rel="noopener noreferrer">Surface map: {PLANET_TEXTURES[body].credit}</a>}
   </div>;
 }

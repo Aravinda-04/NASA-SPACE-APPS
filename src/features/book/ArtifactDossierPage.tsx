@@ -1,15 +1,13 @@
 import { useEffect, useRef } from "react";
-import { ArrowDown, ArrowLeft, ArrowRight, ExternalLink, FileText } from "lucide-react";
-import { getPlayableMission, type ChronologicalArtifact } from "../../data/chronologicalArtifacts";
+import { ArrowDown, ArrowLeft, ExternalLink, FileText } from "lucide-react";
+import type { ChronologicalArtifact } from "../../data/chronologicalArtifacts";
 import { ArtifactAtlasPreview } from "./ArtifactAtlasPreview";
 
-export function ArtifactDossierPage({ artifact, recordNumber, onExplore, onBack, focusOnOpen, launchId = 'artifact-launch' }: {
+export function ArtifactDossierPage({ artifact, recordNumber, onBack, focusOnOpen }: {
   artifact: ChronologicalArtifact;
   recordNumber: number;
-  onExplore: () => void;
   onBack: () => void;
   focusOnOpen: boolean;
-  launchId?: string;
 }) {
   const heading = useRef<HTMLHeadingElement>(null);
   const notes = useRef<HTMLDivElement>(null);
@@ -51,12 +49,11 @@ export function ArtifactDossierPage({ artifact, recordNumber, onExplore, onBack,
       </div>
     </div>
     <div className="artifact-actions">
-      {getPlayableMission(artifact) ? <button id={launchId} className="ow-button archive-launch" onClick={onExplore}>Enter 3D field investigation <ArrowRight size={17} aria-hidden="true" /></button>
-        : <button className="ow-button archive-source-action" onClick={() => {
-          const firstSource = notes.current?.querySelector<HTMLAnchorElement>('.artifact-sources a');
-          firstSource?.focus();
-          firstSource?.scrollIntoView({ block: 'nearest' });
-        }}>View historical sources <ExternalLink size={15} aria-hidden="true" /></button>}
+      <button className="ow-button archive-source-action" onClick={() => {
+        const firstSource = notes.current?.querySelector<HTMLAnchorElement>('.artifact-sources a');
+        firstSource?.focus();
+        firstSource?.scrollIntoView({ block: 'nearest' });
+      }}>View historical sources <ExternalLink size={15} aria-hidden="true" /></button>
     </div>
     <footer className="archive-page-footer"><span>p. 02 — Field dossier</span><span>Off-world / Evidence archive</span></footer>
   </article>;

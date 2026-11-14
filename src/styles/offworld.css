@@ -199,6 +199,27 @@
     repeating-linear-gradient(84deg, #ffffff04 0 1px, transparent 1px 3px),
     linear-gradient(90deg, #0004, transparent 14%, #ffffff03 99%, #0004);
 }
+.volume-cover::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(
+    90deg,
+    rgba(0, 0, 0, 0.34),
+    rgba(255, 255, 255, 0.08) 4%,
+    transparent 11%,
+    transparent 98%,
+    rgba(0, 0, 0, 0.22)
+  );
+}
+.volume-cover-art {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: inherit;
+}
 .volume-binding {
   position: absolute;
   left: 0;
@@ -847,27 +868,67 @@
 .cinematic-library[data-theme="pioneer"] .library-environment-image { background-image: url('/images/history/pioneer-concept.webp'); opacity: .18; }
 .cinematic-library[data-theme="curiosity"] .library-environment-light { background-color: #5828184d; }
 .cinematic-library[data-theme="pioneer"] .library-environment-light { background-color: #14245280; }
-.cinematic-library .ow-header,.cinematic-library .ow-intro,.cinematic-library .library-footer { position: relative; z-index: 1; }
-.cinematic-library .library-books { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: clamp(22px,4vw,58px); align-items: start; position: relative; width: min(1080px,100%); margin: 0 auto; padding-block: 12px 46px; }
+.cinematic-library .ow-header,.cinematic-library .ow-intro,.cinematic-library .library-books,.cinematic-library .library-footer { position: relative; z-index: 1; }
+.library-starfield { position: fixed; inset: 0; width: 100vw; height: 100vh; pointer-events: none; z-index: 0; opacity: 1; transition: filter 0.42s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.42s cubic-bezier(0.16, 1, 0.3, 1); }
+.cinematic-library.library-selected .library-starfield { filter: blur(8px); opacity: 0.35; }
+.cinematic-library .library-books { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: clamp(22px,4vw,58px); align-items: start; position: relative; width: min(1080px,100%); margin: 0 auto; padding-block: 12px 32px; }
 .cinematic-library .library-option { width: 100%; max-width: 320px; justify-self: center; order: 0; transform-origin: center; transition: transform 600ms cubic-bezier(.16,1,.3,1),opacity 550ms ease,filter 600ms ease; }
 .cinematic-library .library-option.is-selected { z-index: 3; order: 0; transform: translateX(var(--focus-x)) scale(1.035); filter: none; opacity: 1; }
+.cinematic-library .library-option.is-selected > p { opacity: 0; transition: opacity 280ms ease; }
 .cinematic-library.library-selected .library-option:not(.is-selected) { display: block; transform: scale(.86); opacity: .12; filter: blur(3px); pointer-events: none; }
 .cinematic-library .volume-button { perspective: 1600px; }
 .cinematic-library .volume-cover { transform-origin: left center; backface-visibility: hidden; transition: box-shadow 400ms ease; }
 .cinematic-library .volume-button:hover .volume-cover { box-shadow: 0 28px 50px #0008; }
-.cinematic-library .library-invitation { position: relative; z-index: 4; flex-direction: column; text-align: center; justify-content: center; gap: 16px; border: 0; padding: 8px 0 30px; min-height: 180px; }
-.cinematic-library .library-invitation h2 { font-size: 30px; }
-.cinematic-library .library-invitation .ow-eyebrow { margin-bottom: 8px !important; }
-.cinematic-library .library-invitation .ow-button { min-width: 210px; }
+.cinematic-library .library-intro-stage {
+  position: absolute;
+  left: var(--panel-left, 50%);
+  top: 48%;
+  width: var(--panel-width, 460px);
+  z-index: 4;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  text-align: left;
+  gap: 0;
+  border: 0;
+  padding: 0;
+  min-height: 0;
+  transform: translateY(-50%);
+  animation: library-intro-enter 560ms cubic-bezier(.16,1,.3,1) 100ms both;
+}
+.cinematic-library .library-intro-stage .ow-eyebrow { margin-bottom: 10px !important; }
+.cinematic-library .library-intro-stage h2 { font-size: clamp(28px, 3vw, 38px); line-height: 1.12; margin-bottom: 16px; }
+.cinematic-library .library-intro-summary { font-size: 16px; line-height: 1.65; color: var(--ow-text); margin: 0 0 22px; }
+.cinematic-library .library-intro-actions { display: flex; align-items: center; gap: 14px; margin-bottom: 16px; }
+.cinematic-library .library-intro-stage .ow-button { min-width: 190px; }
+.cinematic-library .library-intro-stage .ow-muted { margin: 0; }
 .cinematic-library[data-phase="opening"] .is-selected .volume-cover { animation: cinematic-cover-open 650ms cubic-bezier(.3,0,.2,1) forwards; }
 .cinematic-library[data-phase="opening"] .volume-selected { opacity: 0; }
-.cinematic-library[data-phase="opening"] .library-invitation { opacity: .35; transition: opacity 450ms; }
+.cinematic-library[data-phase="opening"] .library-intro-stage { opacity: .28; transition: opacity 450ms; }
 .cinematic-library[data-phase="opening"] .volume-button { background: #f3ecd9; border: 5px solid #293332; box-shadow: 0 20px 60px #0009; }
 @keyframes cinematic-cover-open { from { transform: rotateY(0); } to { transform: rotateY(-118deg); opacity: .1; } }
+@keyframes library-intro-enter {
+  from { opacity: 0; transform: translateY(-50%) translateX(22px); }
+  to { opacity: 1; transform: translateY(-50%) translateX(0); }
+}
 @media (max-width: 800px) {
   .cinematic-library .library-books { gap: 18px; }
   .cinematic-library .volume-name { font-size: clamp(19px,4.5vw,36px); }
   .cinematic-library .volume-spacecraft { font-size: clamp(9px,1.8vw,14px); }
+}
+@media (max-width: 759px) {
+  .cinematic-library .library-intro-stage {
+    position: relative;
+    left: auto;
+    top: auto;
+    width: 100%;
+    grid-column: 1 / -1;
+    transform: none;
+    align-items: center;
+    text-align: center;
+    margin-top: 12px;
+    animation: ow-enter 420ms ease both;
+  }
 }
 @media (max-width: 520px) {
   .cinematic-library .library-books { grid-template-columns: minmax(0,1fr); max-width: 280px; gap: 34px; }
@@ -875,9 +936,9 @@
   .cinematic-library .library-option.is-selected { transform: scale(1.015); }
   .cinematic-library .volume-name { font-size: 44px; }
   .cinematic-library .volume-spacecraft { font-size: 16px; }
-  .cinematic-library .library-invitation h2 { font-size: 28px; }
+  .cinematic-library .library-intro-stage h2 { font-size: 26px; }
 }
 @media (prefers-reduced-motion: reduce) {
-  .cinematic-library .library-option,.library-environment-image,.library-environment-light { transition: none; }
+  .cinematic-library .library-option,.library-environment-image,.library-environment-light,.library-starfield,.cinematic-library .library-intro-stage { transition: none; animation: none; }
   .cinematic-library[data-phase="opening"] .is-selected .volume-cover { animation: none; }
 }

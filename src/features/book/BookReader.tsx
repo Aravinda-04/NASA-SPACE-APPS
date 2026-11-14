@@ -1,7 +1,7 @@
 import { useEffect, useRef } from "react";
 import { ArrowLeft, ArrowRight, Check, ExternalLink } from "lucide-react";
 import { getBook } from "../../data/books";
-import { Brand, BookCover } from "../library/ExpeditionLibrary";
+import { Brand } from "../library/ExpeditionLibrary";
 import { STORY_MEDIA } from "../../data/bookStories";
 import { BookInvestigation } from "../science/BookInvestigation";
 import { OpenedExpeditionJournal } from "./OpenedExpeditionJournal";
@@ -62,11 +62,12 @@ export function BookReader({
     }
   }, []);
   const labels = [
-    "Introduction",
+    "",
     "Mission story",
     "Scientific investigation",
     "Field briefing",
   ];
+  const activePage = Math.max(1, page);
   return (
     <main
       className={`ow-shell reader ${isContents ? 'reader-with-contents' : ''}`}
@@ -82,29 +83,28 @@ export function BookReader({
         )
           return;
         if (isContents || event.defaultPrevented || (event.target as HTMLElement).closest('button,a,.artifact-field-notes,[role="slider"]') || (event.target as HTMLElement).isContentEditable) return;
-        if (event.key === "ArrowLeft" && page > 0) {
+        if (event.key === "ArrowLeft") {
           event.preventDefault();
-          goPage(page - 1);
+          if (activePage <= 1) onContext({ ...context, view: 'contents', panel: 'contents' });
+          else goPage(activePage - 1);
         }
-        if (event.key === "ArrowRight" && page < 3) {
+        if (event.key === "ArrowRight" && activePage < 3) {
           event.preventDefault();
-          goPage(page + 1);
+          goPage(activePage + 1);
         }
       }}
     >
       <header className="ow-header">
         <Brand />
         <p>
-          {book.volume} / {isContents ? 'Chronological contents' : labels[page]}
+          {book.volume} / {isContents ? 'Chronological contents' : labels[activePage]}
         </p>
-        <button className="ow-button" onClick={onLibrary}>
-          <ArrowLeft size={16} /> Expedition Library
-        </button>
+        {isContents && (
+          <button className="ow-button" onClick={onLibrary}>
+            <ArrowLeft size={16} /> Expedition Library
+          </button>
+        )}
       </header>
-      <nav className="reader-sections" aria-label="Book sections">
-        <button aria-current={isContents ? 'page' : undefined} onClick={() => onContext({ ...context, view: 'contents', panel: 'contents' })}>Contents</button>
-        {labels.map((label, index) => <button key={label} aria-current={!isContents && page === index ? 'page' : undefined} onClick={() => goPage(index)}>{label}</button>)}
-      </nav>
       <section className={`ow-intro ${isContents ? 'reader-contents-intro' : ''}`}>
         <p className="ow-eyebrow">
           {book.number} / {book.volume} · {isContents ? 'EXPEDITION ARCHIVE' : 'FIELD NOTES'}
@@ -113,40 +113,21 @@ export function BookReader({
           {isContents ? `${book.volume} / The archive opens here.` : book.title}
         </h1>
       </section>
-      {isContents ? <OpenedExpeditionJournal volumeId={mission.id} context={context} onContext={onContext} onExplore={explore} onLibrary={onLibrary} suspended={suspended} /> : page === 0 ? (
-        <section className="reader-introduction">
-          <BookCover book={book} />
-          <div>
-            <p className="ow-eyebrow">OPEN A NEW CHAPTER</p>
-            <h2>Some journeys leave more than footprints.</h2>
-            <p>{mission.introduction}</p>
-            <button className="ow-button ow-primary" onClick={() => goPage(1)}>
-              Begin reading <ArrowRight size={18} />
-            </button>
-            <p className="ow-muted">
-              Historical records guide an imagined future expedition.
-            </p>
-          </div>
-        </section>
-      ) : page === 2 ? (
+      {isContents ? <OpenedExpeditionJournal volumeId={mission.id} context={context} onContext={onContext} onExplore={explore} onLibrary={onLibrary} suspended={suspended} /> : activePage === 2 ? (
         <BookInvestigation key={mission.id} missionId={mission.id} suspended={suspended} />
       ) : (
-        <section className="reader-spread" key={page}>
+        <section className="reader-spread" key={activePage}>
           <article className="reader-page">
             <p className="ow-eyebrow">{mission.name}</p>
             <h2>
-              {page === 1
+              {activePage === 1
                 ? "An object becomes evidence."
-                : page === 2
-                  ? "Follow the science."
-                  : "Your expedition starts here."}
+                : "Your expedition starts here."}
             </h2>
             <p>
-              {page === 1
+              {activePage === 1
                 ? mission.introduction
-                : page === 2
-                  ? mission.legacy
-                  : mission.arrival}
+                : mission.arrival}
             </p>
             <blockquote>
               <span className="ow-eyebrow">YOUR INVESTIGATION</span>
@@ -166,16 +147,9 @@ export function BookReader({
                 <dd>{mission.coordinatesLabel}</dd>
               </div>
             </dl>
-            <button
-              className="ow-button ow-paper-action"
-              onClick={page < 3 ? () => goPage(page + 1) : explore}
-            >
-              {page < 3 ? "Continue investigation" : "Explore this mission"}
-              <ArrowRight size={18} />
-            </button>
           </article>
           <article className="reader-page">
-            {page === 1 ? (
+            {activePage === 1 ? (
               <figure>
                 <img className="reader-photo" src={media.src} alt={media.alt} />
                 <figcaption className="ow-caption">
@@ -189,7 +163,7 @@ export function BookReader({
               <>
                 <div className="reader-art">
                   <img
-                    src={book.cover}
+                    src={book.schematic}
                     width="300"
                     height="220"
                     alt={`Schematic illustration of ${mission.name}; not to scale`}
@@ -234,21 +208,23 @@ export function BookReader({
         <button
           className="ow-button"
           disabled={isContents}
-          onClick={() => page === 0 ? onContext({ ...context, view: 'contents', panel: 'contents' }) : goPage(page - 1)}
+          onClick={() => activePage <= 1 ? onContext({ ...context, view: 'contents', panel: 'contents' }) : goPage(activePage - 1)}
         >
           <ArrowLeft size={16} />
           Previous
         </button>
         <span>
-          {isContents ? 'Atlas / Chronological contents' : `${page + 1} / 4 · ${labels[page]}`}
+          {isContents ? 'Atlas / Chronological contents' : `${activePage} / 3 · ${labels[activePage]}`}
         </span>
-        <button
-          className="ow-button ow-primary"
-          onClick={isContents ? () => goPage(page) : page < 3 ? () => goPage(page + 1) : explore}
-        >
-          {isContents ? (page === 0 ? 'Continue reading' : `Resume ${labels[page].toLowerCase()}`) : page < 3 ? "Next page" : "Enter mission"}
-          <ArrowRight size={16} />
-        </button>
+        {(isContents || activePage < 3) && (
+          <button
+            className="ow-button ow-primary"
+            onClick={isContents ? () => goPage(page >= 1 ? page : 1) : () => goPage(activePage + 1)}
+          >
+            {isContents ? 'Continue reading' : "Next page"}
+            <ArrowRight size={16} />
+          </button>
+        )}
       </nav>
     </main>
   );

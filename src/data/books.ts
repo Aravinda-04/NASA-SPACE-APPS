@@ -8,6 +8,7 @@ export interface BookDefinition {
   title: string;
   subtitle: string;
   cover: string;
+  schematic: string;
   theme: string;
 }
 export const BOOKS: BookDefinition[] = [
@@ -18,7 +19,8 @@ export const BOOKS: BookDefinition[] = [
     spacecraft: "Surveyor 3 / Apollo 12",
     title: "The camera that came back",
     subtitle: "Returned equipment",
-    cover: "/images/covers/moon.svg",
+    cover: "/images/covers/moon.jpeg",
+    schematic: "/images/covers/moon.svg",
     theme: "#454a48",
   },
   {
@@ -28,7 +30,8 @@ export const BOOKS: BookDefinition[] = [
     spacecraft: "Curiosity",
     title: "The journey to the surface",
     subtitle: "A landing in stages",
-    cover: "/images/covers/mars.svg",
+    cover: "/images/covers/mars.jpeg",
+    schematic: "/images/covers/mars.svg",
     theme: "#783d2c",
   },
   {
@@ -38,7 +41,8 @@ export const BOOKS: BookDefinition[] = [
     spacecraft: "Pioneer 10",
     title: "A message from humanity",
     subtitle: "A signal through space",
-    cover: "/images/covers/outer-space.svg",
+    cover: "/images/covers/outer_space.jpeg",
+    schematic: "/images/covers/outer-space.svg",
     theme: "#172b43",
   },
 ];

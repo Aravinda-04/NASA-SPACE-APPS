@@ -1,8 +1,10 @@
 import { useEffect, useLayoutEffect, useRef, useState, type CSSProperties } from "react";
 import { ArrowLeft, ArrowRight, Check } from "lucide-react";
 import { BOOKS, type BookDefinition } from "../../data/books";
+import { EXPEDITION_MISSIONS } from "../../data/expeditionMissions";
 import type { ExpeditionProgress, MissionId } from "../../types/expedition";
 import { useReducedMotion } from "../../hooks/useReducedMotion";
+import GlitterWrap from "../../components/GlitterWrap";
 
 export function Brand() {
   return (
@@ -17,24 +19,13 @@ export function BookCover({ book }: { book: BookDefinition }) {
       className="volume-cover"
       style={{ "--volume-cover": book.theme } as CSSProperties}
     >
-      <span className="volume-binding" aria-hidden="true" />
-      <span className="volume-foil" aria-hidden="true" />
-      <span className="volume-cover-copy">
-        <span className="ow-eyebrow">OFF-WORLD / EXPEDITION {book.number}</span>
-        <span className="volume-name">{book.volume}</span>
-        <span className="volume-spacecraft">{book.spacecraft}</span>
-      </span>
       <img
-        className="volume-art"
+        className="volume-cover-art"
         src={book.cover}
-        alt=""
-        width="300"
-        height="220"
+        alt={`Cover of ${book.volume}: ${book.title}`}
+        width="723"
+        height="1024"
       />
-      <span className="volume-foot">
-        <span>{book.title}</span>
-        <span>AN EXPEDITION JOURNAL</span>
-      </span>
     </span>
   );
 }
@@ -55,7 +46,11 @@ export function ExpeditionLibrary({
   const buttons = useRef<(HTMLButtonElement | null)[]>([]);
   const shelf = useRef<HTMLDivElement>(null);
   const [phase, setPhase] = useState<'browsing' | 'focusing' | 'focused' | 'opening'>(initialSelection ? 'focused' : 'browsing');
-  const [offsets, setOffsets] = useState<Record<string, number>>({});
+  const [stageLayout, setStageLayout] = useState<{
+    offsets: Record<string, number>;
+    panelLeft: number;
+    panelWidth: number;
+  }>({ offsets: {}, panelLeft: 480, panelWidth: 460 });
   const openCallback = useRef(onOpen);
   openCallback.current = onOpen;
   const reduced = useReducedMotion();
@@ -71,11 +66,29 @@ export function ExpeditionLibrary({
   useLayoutEffect(() => {
     const element = shelf.current;
     if (!element) return;
-    const measure = () => setOffsets(Object.fromEntries(
-      Array.from(element.querySelectorAll<HTMLElement>('.library-option')).map(node => [
-        node.dataset.book!, element.clientWidth / 2 - node.offsetLeft - node.offsetWidth / 2,
-      ]),
-    ));
+    const measure = () => {
+      const nodes = Array.from(element.querySelectorAll<HTMLElement>('.library-option'));
+      const width = element.clientWidth;
+      const isWide = width >= 760;
+      const sampleBookWidth = nodes[0]?.offsetWidth || 300;
+      const gap = 52;
+      const panelWidth = Math.min(480, Math.max(320, Math.round(width * 0.45)));
+      const stageWidth = sampleBookWidth + gap + panelWidth;
+      const stageStart = (width - stageWidth) / 2;
+      const offsets = Object.fromEntries(
+        nodes.map(node => [
+          node.dataset.book!,
+          isWide
+            ? stageStart + node.offsetWidth / 2 - (node.offsetLeft + node.offsetWidth / 2)
+            : width / 2 - node.offsetLeft - node.offsetWidth / 2,
+        ]),
+      );
+      setStageLayout({
+        offsets,
+        panelLeft: stageStart + sampleBookWidth + gap,
+        panelWidth,
+      });
+    };
     measure();
     const observer = new ResizeObserver(measure);
     observer.observe(element);
@@ -93,6 +106,7 @@ export function ExpeditionLibrary({
     return () => window.clearTimeout(timer);
   }, [phase, selected, reduced, suspended]);
   const book = BOOKS.find((item) => item.id === selected);
+  const selectedMission = EXPEDITION_MISSIONS.find((item) => item.id === selected);
   return (
     <main
       className={`ow-shell library cinematic-library ${selected ? "library-selected" : ""}`}
@@ -103,6 +117,18 @@ export function ExpeditionLibrary({
       }}
     >
       <div className="library-environment" aria-hidden="true"><div className="library-environment-image" /><div className="library-environment-light" /></div>
+      <div className="library-starfield" aria-hidden="true">
+        <GlitterWrap
+          particleCount={180}
+          density={35}
+          trailAmount={0}
+          speed={reduced ? 0 : 4}
+          glitterIntensity={reduced ? 0 : 3}
+          color1="#ffffff"
+          color2="#ffffff"
+          color3="#ffffff"
+        />
+      </div>
       <header className="ow-header">
         <Brand />
         <p>Three volumes · One expedition</p>
@@ -125,7 +151,7 @@ export function ExpeditionLibrary({
             key={item.id}
             data-book={item.id}
             className={`library-option ${selected === item.id ? "is-selected" : ""}`}
-            style={{ '--focus-x': `${offsets[item.id] ?? 0}px` } as CSSProperties}
+            style={{ '--focus-x': `${stageLayout.offsets[item.id] ?? 0}px` } as CSSProperties}
           >
             <button
               ref={(node) => {
@@ -156,9 +182,6 @@ export function ExpeditionLibrary({
               }}
             >
               <BookCover book={item} />
-              {selected === item.id && (
-                <span className="volume-selected">SELECTED</span>
-              )}
             </button>
             <p>
               {item.number} · {item.subtitle}
@@ -170,28 +193,38 @@ export function ExpeditionLibrary({
             </p>
           </div>
         ))}
-      </div>
-      {book && (
-        <section
-          className="library-invitation"
-          key={book.id}
-          aria-live="polite"
-        >
-          <div>
-            <p className="ow-eyebrow">YOUR NEXT EXPEDITION / {book.volume}</p>
-            <h2>{book.title}</h2>
-            <p>{book.spacecraft} · Real equipment. Lasting discoveries.</p>
-          </div>
-          <button
-            className="ow-button ow-primary"
-            disabled={phase === 'focusing' || phase === 'opening'}
-            onClick={() => reduced ? onOpen(book.id) : setPhase('opening')}
+
+        {book && selectedMission && (
+          <section
+            className="library-invitation library-intro-stage"
+            key={book.id}
+            aria-live="polite"
+            style={
+              {
+                "--panel-left": `${stageLayout.panelLeft}px`,
+                "--panel-width": `${stageLayout.panelWidth}px`,
+              } as CSSProperties
+            }
           >
-            {phase === 'opening' ? 'Opening journal…' : `Open ${book.volume}`}
-            <ArrowRight size={20} />
-          </button>
-        </section>
-      )}
+            <p className="ow-eyebrow">OPEN A NEW CHAPTER</p>
+            <h2>Some journeys leave more than footprints.</h2>
+            <p className="library-intro-summary">{selectedMission.introduction}</p>
+            <div className="library-intro-actions">
+              <button
+                className="ow-button ow-primary"
+                disabled={phase === 'opening'}
+                onClick={() => (reduced ? onOpen(book.id) : setPhase('opening'))}
+              >
+                {phase === 'opening' ? 'Opening journal…' : 'Begin reading'}
+                <ArrowRight size={20} />
+              </button>
+            </div>
+            <p className="ow-muted">
+              Historical records guide an imagined future expedition.
+            </p>
+          </section>
+        )}
+      </div>
       <footer className="library-footer">
         <p>Three playable missions · Your progress stays on this device.</p>
         {selected ? (

@@ -1,6 +1,6 @@
 import { Suspense, lazy, useEffect, useRef, useState } from "react";
-import { ArrowLeft, ArrowRight, BookOpen, Compass, ExternalLink } from "lucide-react";
-import { getChronologicalArtifacts, getPlayableMission } from "../../data/chronologicalArtifacts";
+import { ArrowLeft, ArrowRight, BookOpen, Compass } from "lucide-react";
+import { getChronologicalArtifacts } from "../../data/chronologicalArtifacts";
 import { getBook } from "../../data/books";
 import { ModalFrame } from "../../components/ModalFrame";
 import { CurvedContentsTimelinePage } from "./CurvedContentsTimelinePage";
@@ -69,27 +69,19 @@ export function OpenedExpeditionJournal({ volumeId, context, onContext, onExplor
           <InteractivePlanetAtlas artifact={artifact} artifacts={artifacts} onSelect={select} suspended={suspended || context.panel === 'dossier'} focusRequest={focusRequest} />
         </Suspense>}
         <section className="atlas-mission-summary" id="selected-mission-summary" aria-labelledby="selected-mission-title">
-          <div className="atlas-summary-meta"><span>{artifact.dateLabel}</span><span>Documented history</span></div>
           <h3 id="selected-mission-title">{artifact.title}</h3>
-          <p className="atlas-summary-location">{artifact.coordinatesLabel}</p>
           <p>{artifact.purpose}</p>
-          {artifact.atlasContext && <p className="atlas-context-note">{artifact.atlasContext}</p>}
-          <details className="atlas-summary-details"><summary>Science &amp; what remains</summary>
-            <h4>What did we learn?</h4><p>{artifact.scientificContribution}</p>
-            <h4>What happened to the equipment?</h4><p>{artifact.currentStatus}</p>
-          </details>
           <div className="atlas-summary-actions">
             <button id="artifact-open-dossier" className="ow-button atlas-dossier-action" onClick={() => onContext({ ...context, artifactId: artifact.id, panel: 'dossier' })}><BookOpen size={15} />Open artifact dossier</button>
-            {getPlayableMission(artifact) && <button id="artifact-launch" className="ow-button archive-launch" onClick={onExplore}>Enter 3D field investigation <ArrowRight size={15} /></button>}
+            <button id="artifact-launch" className="ow-button archive-launch" onClick={onExplore}>Enter 3D simulation <ArrowRight size={15} /></button>
           </div>
-          <a className="atlas-summary-source" href={artifact.sources[0].url} target="_blank" rel="noopener noreferrer">{artifact.sources[0].credit} · View historical source <ExternalLink size={11} aria-hidden="true" /></a>
         </section>
         <footer className="archive-page-footer"><span>p. 01 — {volumeId === 'pioneer' ? 'Space atlas' : 'Planetary atlas'}</span><span>History, located.</span></footer>
       </article>
       <CurvedContentsTimelinePage volumeId={volumeId} artifacts={artifacts} selectedId={artifact.id} onSelect={select} onLibrary={onLibrary} controlledId="selected-mission-summary" folio="02" />
     </section>
     {context.panel === 'dossier' && <ModalFrame titleId="artifact-heading" onClose={closeDossier} closeLabel="Close artifact dossier" className={`atlas-dossier-dialog dossier-${volumeId}`}>
-      <ArtifactDossierPage artifact={artifact} recordNumber={artifacts.indexOf(artifact) + 1} onExplore={onExplore} onBack={closeDossier} focusOnOpen launchId="dossier-launch" />
+      <ArtifactDossierPage artifact={artifact} recordNumber={artifacts.indexOf(artifact) + 1} onBack={closeDossier} focusOnOpen />
     </ModalFrame>}
   </>;
 }
