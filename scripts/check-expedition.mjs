@@ -2,18 +2,25 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import ts from "typescript";
 
-const loadTs = async (path) => {
-  const source = readFileSync(new URL(path, import.meta.url), "utf8");
+const compiledModules = new Map();
+const moduleUrl = (url) => {
+  if (compiledModules.has(url.href)) return compiledModules.get(url.href);
+  const source = readFileSync(url, "utf8");
   const { outputText } = ts.transpileModule(source, {
     compilerOptions: {
       target: ts.ScriptTarget.ES2020,
       module: ts.ModuleKind.ES2020,
     },
   });
-  return import(
-    `data:text/javascript;base64,${Buffer.from(outputText).toString("base64")}`
-  );
+  const resolved = outputText.replace(/from (["'])(\.[^"']+)\1/g, (_, quote, path) => {
+    const dependency = new URL(path.endsWith('.ts') ? path : `${path}.ts`, url);
+    return `from ${quote}${moduleUrl(dependency)}${quote}`;
+  });
+  const result = `data:text/javascript;base64,${Buffer.from(resolved).toString("base64")}`;
+  compiledModules.set(url.href, result);
+  return result;
 };
+const loadTs = (path) => import(moduleUrl(new URL(path, import.meta.url)));
 const { EXPEDITION_MISSIONS: missions } = await loadTs(
   "../src/data/expeditionMissions.ts",
 );
@@ -250,3 +257,49 @@ assert.ok(
 console.log(
   "Passed: 3 missions, 12 sourced discoveries, tasks, v1 migration, v2 roundtrip, content resilience, denied/corrupt storage, repeat-safe 3-card rewards, artwork, optional questions and numerical light-time checks.",
 );
+
+const { CHRONOLOGICAL_ARTIFACTS: artifacts, getChronologicalArtifacts, getPlayableMission } = await loadTs('../src/data/chronologicalArtifacts.ts');
+const { createContentsTrajectory } = await loadTs('../src/utils/contentsTrajectory.ts');
+assert.equal(new Set(artifacts.map(item => item.id)).size, artifacts.length);
+assert.deepEqual(missions.map(m => getChronologicalArtifacts(m.id).length), [4, 5, 4]);
+assert.deepEqual(artifacts.filter(getPlayableMission).map(item => item.playableMissionId).sort(), ['curiosity', 'pioneer', 'surveyor']);
+for (const item of artifacts) {
+  assert.ok(missions.some(m => m.id === item.volumeId));
+  for (const field of ['overview', 'purpose', 'operation', 'scientificContribution', 'currentStatus', 'synopsis']) assert.ok(item[field]?.length > 20, `${item.id}: ${field}`);
+  assert.ok(item.sources.length, `${item.id}: sources required`);
+  for (const source of item.sources) {
+    const url = new URL(source.url);
+    assert.equal(url.protocol, 'https:');
+    assert.match(url.hostname, /(^|\.)nasa\.gov$/);
+  }
+  if (item.coordinateData) {
+    assert.ok(Math.abs(item.coordinateData.latitude) <= 90);
+    assert.ok(Math.abs(item.coordinateData.longitude) <= 180);
+    assert.ok(['moon', 'mars'].includes(item.coordinateData.body));
+  }
+  if (item.journey) { assert.equal(item.coordinateData, undefined); assert.equal(item.journey.length, 3); }
+}
+assert.equal(getPlayableMission({ ...artifacts[0], playableMissionId: 'invented' }), undefined);
+assert.equal(getPlayableMission({ ...artifacts[0], playableMissionId: 'pioneer' }), undefined, 'Do not launch another volume by accident');
+for (const m of missions) {
+  const list = getChronologicalArtifacts(m.id);
+  assert.deepEqual(list.map(item => item.chronologicalOrder), list.map(item => item.chronologicalOrder).sort((a,b) => a-b));
+}
+for (const count of [0, 1, 2, 4, 5, 9]) {
+  const { nodes, path } = createContentsTrajectory(count);
+  assert.equal(nodes.length, count);
+  assert.ok(!path.includes('NaN') && !path.includes('Infinity'));
+  assert.equal((path.match(/C /g) ?? []).length, Math.max(0, count - 1));
+  nodes.forEach((node, i) => {
+    assert.ok(Math.abs(node.y / 560 - (i + .5) / count) < 1e-12, 'SVG and HTML row centres align');
+    assert.ok(node.x > 0 && node.x < 132);
+    if (i) { assert.notEqual(node.x, nodes[i-1].x); assert.ok(node.y > nodes[i-1].y); }
+  });
+}
+const contextSave = { ...v2, readingContexts: { surveyor: { view: 'contents', artifactId: 'surveyor-camera', panel: 'dossier' }, pioneer: { view: 'reading', artifactId: 'kepler', panel: 'contents' } } };
+assert.deepEqual(normalizeSave(contextSave, missions), contextSave, 'Additive reading context survives a v2 roundtrip');
+assert.deepEqual(normalizeSave(contextSave, missions).readingLocations, v2.readingLocations, 'No reading-page renumbering');
+assert.deepEqual(normalizeSave(contextSave, missions).collection, v2.collection, 'Opening dossiers does not award or erase cards');
+assert.equal(normalizeSave({ ...v2, readingContexts: { surveyor: { view: 'wrong', artifactId: 'anything', panel: 'dossier' } } }, missions).readingContexts, undefined);
+assert.equal(normalizeSave({ ...v2, readingContexts: { surveyor: { view: 'contents', artifactId: '<script>', panel: 'dossier' } } }, missions).readingContexts, undefined);
+console.log('Passed: 13 sourced chronological records, exactly 3 playable links, chronology, coordinate bounds, 0/1/2/4/5/9-node Bézier geometry, additive reading-context migration and reward preservation.');

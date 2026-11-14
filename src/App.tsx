@@ -39,6 +39,7 @@ export function App() {
     null,
   );
   const [bookId, setBookId] = useState<MissionId | null>(null);
+  const [restoreReadingFocus, setRestoreReadingFocus] = useState(false);
   const [backpackOpen, setBackpackOpen] = useState(false);
   const [reward, setReward] = useState<{
     id: MissionId;
@@ -69,6 +70,7 @@ export function App() {
     setReward(null);
     setActiveMissionId(null);
     setBookId(id);
+    setRestoreReadingFocus(false);
     commit({ ...saveRef.current, lastMissionId: id });
     window.scrollTo(0, 0);
   };
@@ -133,6 +135,10 @@ export function App() {
   const hasNew = Object.values(save.collection).some(
     (meta) => meta?.origin === "mission-completion" && !meta.firstViewedAt,
   );
+  const returnToBook = () => {
+    setRestoreReadingFocus(true);
+    setActiveMissionId(null);
+  };
   return (
     <>
       {activeMission ? (
@@ -142,7 +148,7 @@ export function App() {
               <span className="app-loading-orbit" aria-hidden="true" />
               <h1>Preparing your expedition</h1>
               <p>Opening the {activeMission.destination} reconstruction.</p>
-              <button onClick={() => setActiveMissionId(null)}>
+              <button onClick={returnToBook}>
                 Return to book
               </button>
             </main>
@@ -154,7 +160,7 @@ export function App() {
             progress={save.progress[activeMission.id]}
             onDiscover={discover}
             onComplete={complete}
-            onExit={() => setActiveMissionId(null)}
+            onExit={returnToBook}
             suspended={backpackOpen || reward !== null}
           />
         </Suspense>
@@ -165,6 +171,12 @@ export function App() {
           mission={EXPEDITION_MISSIONS.find((m) => m.id === bookId)!}
           progress={save.progress[bookId]}
           page={save.readingLocations[bookId]}
+          context={save.readingContexts?.[bookId]}
+          restoreMissionFocus={restoreReadingFocus}
+          onContext={(context) => {
+            const current = saveRef.current;
+            commit({ ...current, readingContexts: { ...current.readingContexts, [bookId]: context } });
+          }}
           onPage={(page) => {
             const current = saveRef.current;
             commit({
@@ -173,6 +185,7 @@ export function App() {
             });
           }}
           onExplore={() => {
+            setRestoreReadingFocus(false);
             setActiveMissionId(bookId);
             window.scrollTo(0, 0);
           }}

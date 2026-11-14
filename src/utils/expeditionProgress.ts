@@ -95,6 +95,14 @@ export function normalizeSave(
       page = saved.readingLocations?.[id];
     if (Number.isInteger(page) && page >= 0 && page <= 3)
       result.readingLocations[id] = page;
+    const context = saved.readingContexts?.[id];
+    if (context && (context.view === "contents" || context.view === "reading") &&
+      (context.panel === "contents" || context.panel === "dossier") &&
+      typeof context.artifactId === "string" && /^[a-z0-9-]{1,80}$/.test(context.artifactId)) {
+      result.readingContexts = { ...result.readingContexts, [id]: {
+        view: context.view, panel: context.panel, artifactId: context.artifactId,
+      } };
+    }
     if (result.progress[id].completed) {
       const meta = saved.collection?.[cardId];
       result.collection[cardId] = {

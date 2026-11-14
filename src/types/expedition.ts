@@ -74,11 +74,18 @@ export interface OptionalAttempt {
   attempts: number;
   correct: boolean;
 }
+/** Additive to the v2 save; readingLocations keeps its original 0–3 meaning. */
+export interface BookReadingContext {
+  view: "contents" | "reading";
+  artifactId: string;
+  panel: "contents" | "dossier";
+}
 export interface SavedExpedition {
   version: 2;
   progress: ExpeditionProgress;
   lastMissionId?: MissionId;
   readingLocations: Record<MissionId, number>;
+  readingContexts?: Partial<Record<MissionId, BookReadingContext>>;
   collection: Partial<Record<CardId, CollectionMetadata>>;
   optionalAttempts: Partial<Record<MissionId, OptionalAttempt>>;
 }
