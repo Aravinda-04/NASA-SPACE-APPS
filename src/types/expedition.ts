@@ -1,4 +1,11 @@
-export type MissionId = "surveyor" | "curiosity" | "pioneer";
+export type BookId = "surveyor" | "curiosity" | "pioneer";
+export type MissionId =
+  | BookId
+  | "viking"
+  | "ingenuity"
+  | "near"
+  | "dawn"
+  | "kepler";
 export type EvidenceKind =
   | "Historical record"
   | "Reconstruction"
@@ -64,7 +71,12 @@ export type ExpeditionProgress = Record<MissionId, MissionProgress>;
 export type CardId =
   | "surveyor-camera"
   | "curiosity-skycrane"
-  | "pioneer-messenger";
+  | "pioneer-messenger"
+  | "viking-laboratory"
+  | "ingenuity-first-flight"
+  | "near-asteroid-lander"
+  | "dawn-two-worlds"
+  | "kepler-transit-hunter";
 export interface CollectionMetadata {
   earnedAt: string | null;
   firstViewedAt: string | null;
@@ -85,8 +97,8 @@ export interface SavedExpedition {
   version: 2;
   progress: ExpeditionProgress;
   lastMissionId?: MissionId;
-  readingLocations: Record<MissionId, number>;
-  readingContexts?: Partial<Record<MissionId, BookReadingContext>>;
+  readingLocations: Record<BookId, number>;
+  readingContexts?: Partial<Record<BookId, BookReadingContext>>;
   collection: Partial<Record<CardId, CollectionMetadata>>;
   optionalAttempts: Partial<Record<MissionId, OptionalAttempt>>;
 }

@@ -8,7 +8,7 @@ import type { ExpeditionMission } from '../types/expedition';
  * Final Flight (Sol 1035 / Flight 72): 18 January 2024
  */
 export const INGENUITY_MISSION: ExpeditionMission = {
-  id: 'ingenuity' as any,
+  id: 'ingenuity',
   chapter: 2,
   destination: 'Mars · Jezero Crater',
   name: 'Ingenuity Mars Helicopter',

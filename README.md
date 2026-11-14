@@ -50,8 +50,13 @@ The original `Visual-Testing/` sandbox is retained locally as a separate, ignore
 ## Demonstration episodes
 
 - **Moon — Surveyor 3 / Apollo 12:** the camera returned to Earth became scientific evidence.
+- **Mars — Viking 1:** interpret the instruments and the limits of its life-detection evidence.
 - **Mars — Curiosity:** discarded landing hardware enabled a laboratory to investigate ancient habitability.
-- **Deep space — Pioneer 10:** inspect the spacecraft and distinguish continued travel from communication and scientific legacy.
+- **Mars — Ingenuity:** inspect the systems behind powered, autonomous flight on another world.
+- **Deep space — Pioneer 10:** distinguish continued travel from communication and scientific legacy.
+- **Asteroid 433 Eros — NEAR Shoemaker:** investigate an orbiter that completed the first asteroid landing.
+- **Asteroid belt — Dawn:** compare Vesta and Ceres and inspect the ion propulsion that made a two-world orbital mission possible.
+- **Solar orbit — Kepler / K2:** follow tiny repeating dips in starlight and investigate how engineers recovered a planet-hunting telescope.
 
 Mission selections remain provisional until the competition briefing. The future astronaut, encounter conditions, terrain and inspection layouts are fictional or schematic where labeled. Scientific descriptions link directly to NASA/JPL records. No live telemetry or georeferenced reconstruction is claimed.
 

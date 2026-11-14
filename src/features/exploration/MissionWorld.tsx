@@ -1,5 +1,5 @@
 import React, { Suspense, useEffect, useMemo } from 'react';
-import { Billboard, Line, useGLTF } from '@react-three/drei';
+import { Billboard, Line, useGLTF, useTexture } from '@react-three/drei';
 import * as THREE from 'three';
 import type { MissionWorldProps } from '../../types/expedition';
 import { getFourStepGradientMap } from '../../utils/celShading';
@@ -7,6 +7,10 @@ import { VikingProceduralFallback } from '../../components/VikingHardwareRig';
 
 // The decoder is shipped with the demo so neither model needs a third-party CDN.
 const DECODER_PATH = '/vendor/draco/';
+const CERES_GLOBE_IMAGE = new URL(
+  '../../../Provided Resources/Dawn/images/pia20182_ceres_globe.jpg',
+  import.meta.url,
+).href;
 
 function seeded(seed: number) {
   return () => {
@@ -319,6 +323,291 @@ function JezeroArtifacts() {
   );
 }
 
+export function NearShoemakerProceduralFallback() {
+  return (
+    <group>
+      {/* Central rectangular bus with gold thermal insulation */}
+      <mesh position={[0, 0, 0]} castShadow receiveShadow>
+        <boxGeometry args={[1.7, 1.4, 1.7]} />
+        <meshToonMaterial color="#c89f4b" gradientMap={getFourStepGradientMap()} />
+      </mesh>
+      {/* 1.5m parabolic high-gain dish on top (+Y) */}
+      <mesh position={[0, 0.95, 0]} rotation={[Math.PI / 2, 0, 0]} castShadow>
+        <cylinderGeometry args={[0.75, 0.15, 0.25, 24, 1, true]} />
+        <meshToonMaterial color="#dfdccb" side={THREE.DoubleSide} gradientMap={getFourStepGradientMap()} />
+      </mesh>
+      <Strut from={[0, 0.7, 0]} to={[0, 1.35, 0]} radius={0.025} color="#9fa3a6" />
+      {/* 4 Gallium-arsenide solar array panels (5.6m wingspan) */}
+      <mesh position={[-2.4, 0.1, 0]} castShadow>
+        <boxGeometry args={[2.0, 0.02, 1.1]} />
+        <meshToonMaterial color="#1a324b" gradientMap={getFourStepGradientMap()} />
+      </mesh>
+      <mesh position={[2.4, 0.1, 0]} castShadow>
+        <boxGeometry args={[2.0, 0.02, 1.1]} />
+        <meshToonMaterial color="#1a324b" gradientMap={getFourStepGradientMap()} />
+      </mesh>
+      <mesh position={[0, 0.1, -2.4]} castShadow>
+        <boxGeometry args={[1.1, 0.02, 2.0]} />
+        <meshToonMaterial color="#1a324b" gradientMap={getFourStepGradientMap()} />
+      </mesh>
+      <mesh position={[0, 0.1, 2.4]} castShadow>
+        <boxGeometry args={[1.1, 0.02, 2.0]} />
+        <meshToonMaterial color="#1a324b" gradientMap={getFourStepGradientMap()} />
+      </mesh>
+      {/* Forward science instrument deck and sensors */}
+      <mesh position={[0.7, -0.6, 0.7]} castShadow>
+        <boxGeometry args={[0.45, 0.35, 0.45]} />
+        <meshToonMaterial color="#4a4f55" />
+      </mesh>
+    </group>
+  );
+}
+
+function ErosAsteroid() {
+  const geometry = useMemo(() => {
+    const radius = 9.5;
+    const geom = new THREE.IcosahedronGeometry(radius, 2);
+    const pos = geom.attributes.position;
+
+    function pnoise(x: number, y: number, z: number) {
+      return (
+        Math.sin(x * 0.45 + y * 0.25) * Math.cos(y * 0.35 + z * 0.45) +
+        Math.sin(z * 0.55 + x * 0.35) * 0.5
+      );
+    }
+
+    for (let i = 0; i < pos.count; i++) {
+      const x0 = pos.getX(i);
+      const y0 = pos.getY(i);
+      const z0 = pos.getZ(i);
+      const len = Math.hypot(x0, y0, z0) || 1;
+      const dx = x0 / len;
+      const dy = y0 / len;
+      const dz = z0 / len;
+
+      // Elongate along X (Eros 3.1 : 1.0 : 1.0 aspect ratio)
+      let lx = dx * radius * 2.2;
+      let ly = dy * radius * 0.85;
+      let lz = dz * radius * 0.95;
+
+      // Waist / saddle indentation at center (creates iconic peanut shape of Eros)
+      const waist = 1.0 - 0.32 * Math.exp(-(lx * lx) / (radius * radius * 0.7));
+      ly *= waist;
+      lz *= waist;
+
+      // Subtle arc curvature along body
+      ly += Math.sin((lx / (radius * 2.2)) * Math.PI) * (radius * 0.18);
+
+      // Chiseled rocky facet displacement
+      const n = pnoise(lx * 0.25, ly * 0.25, lz * 0.25) * 1.6;
+      lx += dx * n;
+      ly += dy * n;
+      lz += dz * n;
+
+      // Impact crater depression (Shoemaker crater)
+      const cDist = Math.hypot(lx - radius * 0.8, ly - radius * 0.2, lz - radius * 0.5);
+      if (cDist < radius * 0.5) {
+        const depth = Math.cos((cDist / (radius * 0.5)) * (Math.PI / 2)) * 2.2;
+        lx -= dx * depth;
+        ly -= dy * depth;
+        lz -= dz * depth;
+      }
+
+      pos.setXYZ(i, lx, ly, lz);
+    }
+
+    geom.computeVertexNormals();
+    return geom;
+  }, []);
+
+  return (
+    <group position={[14, -22, -32]} rotation={[0.4, 0.6, -0.3]}>
+      {/* Faceted celestial asteroid 433 Eros */}
+      <mesh geometry={geometry} castShadow receiveShadow>
+        <meshToonMaterial
+          color="#6e675b"
+          gradientMap={getFourStepGradientMap()}
+        />
+      </mesh>
+      {/* Flat regolith "dust pond" inside the crater */}
+      <mesh position={[7.5, 2.2, 3.8]} rotation={[-0.4, 0.8, 0.2]}>
+        <circleGeometry args={[2.0, 16]} />
+        <meshToonMaterial color="#4d473d" />
+      </mesh>
+      {/* Small micro-meteorite rocks drifting in orbital proximity */}
+      {[-8, -3, 6, 12].map((x, i) => (
+        <mesh
+          key={i}
+          position={[x * 1.5, 8 + (i % 3) * 3, -4 + i * 2]}
+          rotation={[0.3 * i, 0.7 * i, 0.1]}
+          scale={0.45 + (i % 2) * 0.35}
+        >
+          <dodecahedronGeometry args={[1, 0]} />
+          <meshToonMaterial color="#554e44" gradientMap={getFourStepGradientMap()} />
+        </mesh>
+      ))}
+      {/* Illustrative gold orbital approach arc */}
+      <Line
+        points={[
+          [-28, 12, 10],
+          [-14, 16, 5],
+          [0, 18, 14],
+          [16, 15, 8],
+          [28, 8, -2],
+        ]}
+        color="#c9a04a"
+        lineWidth={1}
+        transparent
+        opacity={0.3}
+        dashed
+        dashSize={0.4}
+        gapSize={0.3}
+      />
+    </group>
+  );
+}
+
+function CeresContext() {
+  const texture = useTexture(CERES_GLOBE_IMAGE);
+  useEffect(() => {
+    texture.colorSpace = THREE.SRGBColorSpace;
+    texture.anisotropy = 8;
+    texture.needsUpdate = true;
+  }, [texture]);
+  return <group>
+    {/* NASA enhanced-color globe composite. Its black field blends into the scene;
+        a shaded sphere behind it keeps a dimensional silhouette from side views. */}
+    <mesh position={[7, -4, -10.45]}>
+      <sphereGeometry args={[5.45, 64, 48]} />
+      <meshStandardMaterial color="#393b38" roughness={1} metalness={0} />
+    </mesh>
+    <mesh position={[7, -4, -4.9]}>
+      <planeGeometry args={[17.78, 10]} />
+      <shaderMaterial
+        uniforms={{ ceresMap: { value: texture } }}
+        transparent
+        depthWrite={false}
+        toneMapped={false}
+        vertexShader={`
+          varying vec2 vUv;
+          void main() {
+            vUv = uv;
+            gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+          }
+        `}
+        fragmentShader={`
+          uniform sampler2D ceresMap;
+          varying vec2 vUv;
+          void main() {
+            vec4 texel = texture2D(ceresMap, vUv);
+            float brightness = max(texel.r, max(texel.g, texel.b));
+            float keyedAlpha = smoothstep(0.025, 0.085, brightness);
+            if (keyedAlpha < 0.02) discard;
+            gl_FragColor = vec4(texel.rgb, keyedAlpha);
+            #include <colorspace_fragment>
+          }
+        `}
+      />
+    </mesh>
+    {/* A restrained highlight sits over Occator's visible bright deposit. The
+        mission discovery marker is placed at this same world-space point. */}
+    <mesh position={[4.85, -4.3, -4.75]}>
+      <ringGeometry args={[0.24, 0.36, 28]} />
+      <meshBasicMaterial color="#dff8ff" transparent opacity={0.72} depthTest={false} />
+    </mesh>
+    <Line points={[[-10, 7, -2], [-3, 10, -6], [4, 8, -9], [10, 3, -8], [15, -4, -4]]} color="#8fb8c9" lineWidth={1} transparent opacity={0.28} dashed dashSize={0.4} gapSize={0.3} />
+  </group>;
+}
+
+function DawnProceduralFallback() {
+  return <group>
+    <mesh castShadow receiveShadow>
+      <boxGeometry args={[1.5, 1.7, 1.4]} />
+      <meshToonMaterial color="#b9a66e" gradientMap={getFourStepGradientMap()} />
+    </mesh>
+    {[-3.4, 3.4].map((x) => <mesh key={x} position={[x, 0, 0]} castShadow>
+      <boxGeometry args={[4.8, 0.06, 1.35]} />
+      <meshToonMaterial color="#243e61" gradientMap={getFourStepGradientMap()} />
+    </mesh>)}
+    <mesh position={[0, 1.15, 0]} rotation={[Math.PI / 2, 0, 0]}>
+      <cylinderGeometry args={[0.7, 0.16, 0.22, 24, 1, true]} />
+      <meshToonMaterial color="#d6d5ca" side={THREE.DoubleSide} gradientMap={getFourStepGradientMap()} />
+    </mesh>
+    <mesh position={[0, -1, -0.65]} rotation={[Math.PI / 2, 0, 0]}>
+      <cylinderGeometry args={[0.22, 0.32, 0.5, 20]} />
+      <meshToonMaterial color="#626b72" gradientMap={getFourStepGradientMap()} />
+    </mesh>
+    <mesh position={[0, -1.35, -1.4]} rotation={[Math.PI / 2, 0, 0]}>
+      <coneGeometry args={[0.32, 1.5, 18, 1, true]} />
+      <meshBasicMaterial color="#7bd9ed" transparent opacity={0.3} side={THREE.DoubleSide} />
+    </mesh>
+  </group>;
+}
+
+function KeplerProceduralFallback() {
+  return <group>
+    <mesh rotation={[Math.PI / 2, 0, 0]} castShadow receiveShadow>
+      <cylinderGeometry args={[1.15, 0.8, 2.8, 24]} />
+      <meshToonMaterial color="#c8b784" gradientMap={getFourStepGradientMap()} />
+    </mesh>
+    <mesh position={[0, 1.45, 0]} rotation={[Math.PI / 2, 0, 0]}>
+      <cylinderGeometry args={[1.2, 1.2, 0.12, 32]} />
+      <meshToonMaterial color="#343b43" gradientMap={getFourStepGradientMap()} />
+    </mesh>
+    <mesh position={[0, -1.35, 0]}>
+      <boxGeometry args={[1.55, 0.65, 1.45]} />
+      <meshToonMaterial color="#a38b56" gradientMap={getFourStepGradientMap()} />
+    </mesh>
+    {[-2.8, 2.8].map((x) => <mesh key={x} position={[x, -1.25, 0]}>
+      <boxGeometry args={[4.2, 0.05, 1.25]} />
+      <meshToonMaterial color="#263d61" gradientMap={getFourStepGradientMap()} />
+    </mesh>)}
+  </group>;
+}
+
+function KeplerObservationField() {
+  const geometry = useMemo(() => {
+    const random = seeded(2009);
+    const vertices: number[] = [];
+    const colors: number[] = [];
+    for (let i = 0; i < 260; i++) {
+      const depth = -15 - random() * 22;
+      const spread = 5 + Math.abs(depth + 15) * 0.18;
+      vertices.push((random() - 0.5) * spread * 2, (random() - 0.5) * spread * 1.35 + 2, depth);
+      const warmth = random();
+      colors.push(0.72 + warmth * 0.28, 0.78 + warmth * 0.2, 0.9 + (1 - warmth) * 0.1);
+    }
+    const result = new THREE.BufferGeometry();
+    result.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
+    result.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
+    return result;
+  }, []);
+  useEffect(() => () => geometry.dispose(), [geometry]);
+  const orbit = useMemo(() => Array.from({ length: 49 }, (_, index) => {
+    const angle = index / 48 * Math.PI * 2;
+    return [Math.cos(angle) * 1.05, 1.8 + Math.sin(angle) * 0.42, -9.5] as [number, number, number];
+  }), []);
+  return <group>
+    <points geometry={geometry}>
+      <pointsMaterial vertexColors size={0.1} sizeAttenuation transparent opacity={0.9} depthWrite={false} />
+    </points>
+    {[
+      [-7, -2, -25], [7, -2, -25], [-7, 7, -25], [7, 7, -25],
+    ].map((target, index) => <Line key={index} points={[[0, 1.4, -0.8], target as [number, number, number]]} color="#648fbb" lineWidth={1} transparent opacity={0.18} dashed dashSize={0.35} gapSize={0.4} />)}
+    <mesh position={[0, 1.8, -9.5]}>
+      <sphereGeometry args={[0.48, 24, 18]} />
+      <meshBasicMaterial color="#fff0b0" />
+    </mesh>
+    <Line points={orbit} color="#9bc7e8" lineWidth={1} transparent opacity={0.7} />
+    <mesh position={[1.05, 1.8, -9.5]}>
+      <sphereGeometry args={[0.13, 16, 12]} />
+      <meshToonMaterial color="#5f83a3" gradientMap={getFourStepGradientMap()} />
+    </mesh>
+    <Line points={[[0, -3.1, 1.6], [2.6, -3.1, 1.6], [4.2, -3.1, 1.6]]} color="#f7d27c" lineWidth={2} transparent opacity={0.55} />
+    <Line points={[[0, -3.45, 1.1], [2.6, -3.45, 1.1], [4.2, -3.45, 1.1]]} color="#f7d27c" lineWidth={2} transparent opacity={0.38} />
+  </group>;
+}
+
 function PioneerSchematic() {
   return <group>
     <mesh position={[0, 0.5, 0]} rotation={[Math.PI / 2, 0, 0]}><cylinderGeometry args={[1.35, 0.35, 0.38, 40, 1, true]} /><meshToonMaterial color="#dfdccb" side={THREE.DoubleSide} gradientMap={getFourStepGradientMap()} /></mesh>
@@ -346,7 +635,10 @@ function DiscoveryMarker({ position, selected, discovered, accent, onClick }: {
 }
 
 export function MissionWorld({ mission, selectedId, discoveredIds, onSelect }: MissionWorldProps) {
-  const space = mission.id === 'pioneer';
+  const isNear = mission.id === 'near';
+  const isDawn = mission.id === 'dawn';
+  const isKepler = mission.id === 'kepler';
+  const space = mission.id === 'pioneer' || isNear || isDawn || isKepler;
   const moon = mission.id === 'surveyor';
   return <>
     <color attach="background" args={[space ? '#090f1b' : moon ? '#111820' : '#c69273']} />
@@ -361,15 +653,29 @@ export function MissionWorld({ mission, selectedId, discoveredIds, onSelect }: M
       <ModelFallback fallback={<CuriositySchematic />}><Suspense fallback={<CuriositySchematic />}><NormalizedModel path="/models/curiosity.glb" span={3.3} /></Suspense></ModelFallback>
       <MarsArtifacts />
     </> : null}
-    {(mission.id as string) === 'viking' ? <>
+    {mission.id === 'viking' ? <>
       <ModelFallback fallback={<VikingProceduralFallback />}><Suspense fallback={<VikingProceduralFallback />}><NormalizedModel path="/models/Viking Lander.glb" span={3.6} /></Suspense></ModelFallback>
       <ChryseArtifacts />
     </> : null}
-    {(mission.id as string) === 'ingenuity' ? <>
+    {mission.id === 'ingenuity' ? <>
       <ModelFallback fallback={<IngenuityProceduralFallback />}><Suspense fallback={<IngenuityProceduralFallback />}><NormalizedModel path="/models/ingenuity.glb" span={1.4} /></Suspense></ModelFallback>
       <JezeroArtifacts />
     </> : null}
-    {space ? <ModelFallback fallback={<PioneerSchematic />}><Suspense fallback={<PioneerSchematic />}><NormalizedModel path="/models/pioneer.glb" span={8} grounded={false} /></Suspense></ModelFallback> : null}
+    {mission.id === 'pioneer' ? <ModelFallback fallback={<PioneerSchematic />}><Suspense fallback={<PioneerSchematic />}><NormalizedModel path="/models/pioneer.glb" span={8} grounded={false} /></Suspense></ModelFallback> : null}
+    {isNear ? (
+      <>
+        <ModelFallback fallback={<NearShoemakerProceduralFallback />}><Suspense fallback={<NearShoemakerProceduralFallback />}><NormalizedModel path="/models/NEAR Shoemaker.glb" span={5.5} grounded={false} /></Suspense></ModelFallback>
+        <ErosAsteroid />
+      </>
+    ) : null}
+    {isDawn ? <>
+      <ModelFallback fallback={<DawnProceduralFallback />}><Suspense fallback={<DawnProceduralFallback />}><NormalizedModel path="/models/Dawn.glb" span={8} grounded={false} /></Suspense></ModelFallback>
+      <CeresContext />
+    </> : null}
+    {isKepler ? <>
+      <ModelFallback fallback={<KeplerProceduralFallback />}><Suspense fallback={<KeplerProceduralFallback />}><NormalizedModel path="/models/Kepler (A).glb" span={7} grounded={false} /></Suspense></ModelFallback>
+      <KeplerObservationField />
+    </> : null}
     {mission.discoveries.map((discovery) => <DiscoveryMarker key={discovery.id} position={discovery.position} selected={selectedId === discovery.id} discovered={discoveredIds.includes(discovery.id)} accent={mission.accent} onClick={() => onSelect(discovery.id)} />)}
   </>;
 }

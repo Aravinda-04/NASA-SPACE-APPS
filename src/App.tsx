@@ -14,9 +14,8 @@ import {
 } from "./features/collection/BackpackExperience";
 import { MissionRewardExperience } from "./features/rewards/MissionRewardExperience";
 import { EXPEDITION_MISSIONS } from "./data/expeditionMissions";
-import { VIKING_MISSION } from "./data/vikingMission";
-import { INGENUITY_MISSION } from "./data/ingenuityMission";
-import type { CardId, MissionId, MissionProgress, SavedExpedition } from "./types/expedition";
+import { BOOK_BY_MISSION } from "./data/books";
+import type { BookId, CardId, MissionId, SavedExpedition } from "./types/expedition";
 import {
   CARD_BY_MISSION,
   completeMission,
@@ -40,23 +39,7 @@ export function App() {
   const [activeMissionId, setActiveMissionId] = useState<MissionId | null>(
     null,
   );
-  const [vikingActive, setVikingActive] = useState(false);
-  const [vikingProgress, setVikingProgress] = useState<MissionProgress>(() => {
-    try {
-      const raw = localStorage.getItem("viking_expedition_progress");
-      if (raw) return JSON.parse(raw);
-    } catch {}
-    return { discovered: [], completed: false };
-  });
-  const [ingenuityActive, setIngenuityActive] = useState(false);
-  const [ingenuityProgress, setIngenuityProgress] = useState<MissionProgress>(() => {
-    try {
-      const raw = localStorage.getItem("ingenuity_expedition_progress");
-      if (raw) return JSON.parse(raw);
-    } catch {}
-    return { discovered: [], completed: false };
-  });
-  const [bookId, setBookId] = useState<MissionId | null>(null);
+  const [bookId, setBookId] = useState<BookId | null>(null);
   const [restoreReadingFocus, setRestoreReadingFocus] = useState(false);
   const [backpackOpen, setBackpackOpen] = useState(false);
   const [reward, setReward] = useState<{
@@ -83,19 +66,20 @@ export function App() {
     persist(save);
   }, [save, persist]);
   const openBook = (id: MissionId, fromLibrary = false) => {
+    const targetBookId = BOOK_BY_MISSION[id];
     if (document.pointerLockElement) document.exitPointerLock();
     setBackpackOpen(false);
     setReward(null);
     setActiveMissionId(null);
-    setBookId(id);
+    setBookId(targetBookId);
     setRestoreReadingFocus(false);
     const current = saveRef.current;
-    const readingContext = current.readingContexts?.[id];
+    const readingContext = current.readingContexts?.[targetBookId];
     commit({
       ...current,
       lastMissionId: id,
       ...(fromLibrary && readingContext ? {
-        readingContexts: { ...current.readingContexts, [id]: { ...readingContext, view: 'contents' as const, panel: 'contents' as const } },
+        readingContexts: { ...current.readingContexts, [targetBookId]: { ...readingContext, view: 'contents' as const, panel: 'contents' as const } },
       } : {}),
     });
     window.scrollTo(0, 0);
@@ -164,108 +148,10 @@ export function App() {
   const returnToBook = () => {
     setRestoreReadingFocus(true);
     setActiveMissionId(null);
-    setVikingActive(false);
-    setIngenuityActive(false);
   };
   return (
     <>
-      {ingenuityActive ? (
-        <Suspense
-          fallback={
-            <main className="app-loading" aria-live="polite">
-              <span className="app-loading-orbit" aria-hidden="true" />
-              <h1>Preparing your expedition</h1>
-              <p>Opening the Jezero Crater reconstruction.</p>
-              <button onClick={returnToBook}>Return to book</button>
-            </main>
-          }
-        >
-          <ExplorationExperience
-            key={INGENUITY_MISSION.name}
-            mission={INGENUITY_MISSION}
-            progress={ingenuityProgress}
-            onDiscover={(id) => {
-              setIngenuityProgress((prev) => {
-                const next = {
-                  ...prev,
-                  discovered: prev.discovered.includes(id)
-                    ? prev.discovered
-                    : [...prev.discovered, id],
-                };
-                try {
-                  localStorage.setItem(
-                    "ingenuity_expedition_progress",
-                    JSON.stringify(next),
-                  );
-                } catch {}
-                return next;
-              });
-            }}
-            onComplete={() => {
-              setIngenuityProgress((prev) => {
-                const next = { ...prev, completed: true };
-                try {
-                  localStorage.setItem(
-                    "ingenuity_expedition_progress",
-                    JSON.stringify(next),
-                  );
-                } catch {}
-                return next;
-              });
-            }}
-            onExit={returnToBook}
-            suspended={backpackOpen || reward !== null}
-          />
-        </Suspense>
-      ) : vikingActive ? (
-        <Suspense
-          fallback={
-            <main className="app-loading" aria-live="polite">
-              <span className="app-loading-orbit" aria-hidden="true" />
-              <h1>Preparing your expedition</h1>
-              <p>Opening the Chryse Planitia reconstruction.</p>
-              <button onClick={returnToBook}>Return to book</button>
-            </main>
-          }
-        >
-          <ExplorationExperience
-            key={VIKING_MISSION.name}
-            mission={VIKING_MISSION}
-            progress={vikingProgress}
-            onDiscover={(id) => {
-              setVikingProgress((prev) => {
-                const next = {
-                  ...prev,
-                  discovered: prev.discovered.includes(id)
-                    ? prev.discovered
-                    : [...prev.discovered, id],
-                };
-                try {
-                  localStorage.setItem(
-                    "viking_expedition_progress",
-                    JSON.stringify(next),
-                  );
-                } catch {}
-                return next;
-              });
-            }}
-            onComplete={() => {
-              setVikingProgress((prev) => {
-                const next = { ...prev, completed: true };
-                try {
-                  localStorage.setItem(
-                    "viking_expedition_progress",
-                    JSON.stringify(next),
-                  );
-                } catch {}
-                return next;
-              });
-            }}
-            onExit={returnToBook}
-            suspended={backpackOpen || reward !== null}
-          />
-        </Suspense>
-      ) : activeMission ? (
+      {activeMission ? (
         <Suspense
           fallback={
             <main className="app-loading" aria-live="polite">
@@ -310,21 +196,9 @@ export function App() {
           }}
           onExplore={(targetId?: string) => {
             setRestoreReadingFocus(false);
-            if (targetId === 'viking') {
-              setVikingActive(true);
-              setIngenuityActive(false);
-              setActiveMissionId(null);
-            } else if (targetId === 'ingenuity') {
-              setIngenuityActive(true);
-              setVikingActive(false);
-              setActiveMissionId(null);
-            } else if (targetId && EXPEDITION_MISSIONS.some((m) => m.id === targetId)) {
-              setVikingActive(false);
-              setIngenuityActive(false);
+            if (targetId && EXPEDITION_MISSIONS.some((m) => m.id === targetId)) {
               setActiveMissionId(targetId as MissionId);
             } else {
-              setVikingActive(false);
-              setIngenuityActive(false);
               setActiveMissionId(bookId);
             }
             window.scrollTo(0, 0);
@@ -338,7 +212,7 @@ export function App() {
         <ExpeditionLibrary
           suspended={backpackOpen || reward !== null}
           progress={save.progress}
-          initialSelection={save.lastMissionId}
+          initialSelection={save.lastMissionId ? BOOK_BY_MISSION[save.lastMissionId] : undefined}
           onOpen={(id) => openBook(id, true)}
         />
       )}

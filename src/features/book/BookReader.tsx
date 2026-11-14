@@ -37,7 +37,7 @@ export function BookReader({
   suspended?: boolean;
 }) {
   const book = getBook(mission.id);
-  const media = STORY_MEDIA[mission.id];
+  const media = STORY_MEDIA[book.id];
   const heading = useRef<HTMLHeadingElement>(null);
   const context = savedContext ?? { view: 'contents', artifactId: getChronologicalArtifacts(mission.id)[0].id, panel: 'contents' };
   const isContents = context.view === 'contents';

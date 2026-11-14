@@ -1,4 +1,9 @@
 import type { ExpeditionMission } from '../types/expedition';
+import { VIKING_MISSION } from './vikingMission';
+import { INGENUITY_MISSION } from './ingenuityMission';
+import { NEAR_MISSION } from './nearMission';
+import { DAWN_MISSION } from './dawnMission';
+import { KEPLER_MISSION } from './keplerMission';
 
 // Provisional demonstration content. Replace these records after the competition
 // briefing; book and exploration components must not embed mission-specific facts.
@@ -188,4 +193,9 @@ export const EXPEDITION_MISSIONS: ExpeditionMission[] = [
       { id: 'pioneer-model', title: 'Pioneer 10 official 3D model', url: 'https://science.nasa.gov/3d-resources/pioneer/', credit: 'NASA/JPL/Eyes on the Solar System' },
     ],
   },
+  VIKING_MISSION,
+  INGENUITY_MISSION,
+  NEAR_MISSION,
+  DAWN_MISSION,
+  KEPLER_MISSION,
 ];

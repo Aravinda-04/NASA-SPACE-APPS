@@ -8,7 +8,7 @@ import type { ExpeditionMission } from '../types/expedition';
  * Final Transmission: 11 November 1982 (2,245 Martian Sols)
  */
 export const VIKING_MISSION: ExpeditionMission = {
-  id: 'viking' as any,
+  id: 'viking',
   chapter: 2,
   destination: 'Mars',
   name: 'Viking 1 · Thomas A. Mutch Station',

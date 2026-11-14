@@ -41,6 +41,8 @@ function NoWebGL() {
   return <div className="exp-scene-fallback"><Compass size={38} /><p>Historical records are ready.</p><span>This browser cannot display the 3D environment. Use the discovery list to continue.</span></div>;
 }
 
+const isSpaceMission = (id: string) => id === 'pioneer' || id === 'near' || id === 'dawn' || id === 'kepler';
+
 function ExplorerCamera({ mission, mode, paused, command, onNearby }: {
   mission: ExpeditionMission;
   mode: ViewMode;
@@ -55,7 +57,7 @@ function ExplorerCamera({ mission, mode, paused, command, onNearby }: {
   const pitch = useRef(0);
   const frameClock = useRef(0);
   const lastNearby = useRef('');
-  const isSpace = mission.id === 'pioneer';
+  const isSpace = isSpaceMission(mission.id);
   const rotation = useMemo(() => new THREE.Euler(0, 0, 0, 'YXZ'), []);
   const movement = useMemo(() => new THREE.Vector3(), []);
   const orbitTarget: [number, number, number] = command?.target ?? [0, isSpace ? 1 : 0.8, 0];
@@ -212,6 +214,7 @@ export function ExplorationExperience({ mission, progress, onDiscover, onComplet
   const count = mission.discoveries.filter(item => progress.discovered.includes(item.id)).length;
   const allDiscovered = count === mission.discoveries.length;
   const correct = answer === mission.task.correctIndex;
+  const isSpace = isSpaceMission(mission.id);
   const paused = selectedId !== null || showTask || showHelp || suspended || resumeRequired;
   useEffect(() => { if (suspended) { unlockPointer(); setResumeRequired(true); } }, [suspended]);
   const unavailable = useCallback(() => setFailedMissionId(mission.id), [mission.id]);
@@ -303,7 +306,7 @@ export function ExplorationExperience({ mission, progress, onDiscover, onComplet
   return <main className={`exp-experience exp-${mission.id}`} style={{ '--exp-accent': mission.accent } as React.CSSProperties} aria-label={`${mission.name} exploration`}>
     <div className="exp-scene" aria-label="Reconstructed mission environment">
       <SceneBoundary key={mission.id} onUnavailable={unavailable}>
-        <Canvas frameloop={suspended ? 'never' : 'always'} shadows dpr={[1, 1.5]} camera={{ position: [0, mission.id === 'pioneer' ? 3 : 1.7, 14], fov: 58, near: 0.1, far: 180 }} onCreated={({ gl }) => { canvasRef.current = gl.domElement; setFailedMissionId(null); }} fallback={<NoWebGL />}>
+        <Canvas frameloop={suspended ? 'never' : 'always'} shadows dpr={[1, 1.5]} camera={{ position: [0, isSpace ? 3 : 1.7, 14], fov: 58, near: 0.1, far: 180 }} onCreated={({ gl }) => { canvasRef.current = gl.domElement; setFailedMissionId(null); }} fallback={<NoWebGL />}>
           <Suspense fallback={null}><MissionWorld mission={mission} selectedId={selectedId} discoveredIds={progress.discovered} onSelect={inspect} /></Suspense>
           <ExplorerCamera mission={mission} mode={mode} paused={paused} command={command} onNearby={setNearby} />
         </Canvas>
@@ -312,11 +315,11 @@ export function ExplorationExperience({ mission, progress, onDiscover, onComplet
     <div className="exp-vignette" aria-hidden="true" />
     <header className="exp-topbar">
       <button className="exp-back-button" onClick={leave}><ArrowLeft size={17} /> Back to journal</button>
-      <div className="exp-mission-heading"><h1>{mission.name}</h1><span>{mission.destination} · {mission.id === 'pioneer' ? 'Jetpack expedition' : 'Surface expedition'}</span></div>
+      <div className="exp-mission-heading"><h1>{mission.name}</h1><span>{mission.destination} · {isSpace ? 'Jetpack expedition' : 'Surface expedition'}</span></div>
       <button className="exp-journal-toggle" onClick={() => { unlockPointer(); setShowList(value => !value); }} aria-expanded={showList} aria-controls="exp-discovery-list"><BookOpen size={18} /> {count}/{mission.discoveries.length} records {progress.completed && <Check size={16} />}</button>
     </header>
 
-    <div className="exp-context"><span className="exp-fiction-dot" /> Fictional future expedition <span>·</span> {mode === 'orbit' ? 'Orbit inspection' : mission.id === 'pioneer' ? 'First-person EVA' : 'First-person explorer'}</div>
+    <div className="exp-context"><span className="exp-fiction-dot" /> Fictional future expedition <span>·</span> {mode === 'orbit' ? 'Orbit inspection' : isSpace ? 'First-person EVA' : 'First-person explorer'}</div>
 
     {showList && <aside className="exp-discoveries" id="exp-discovery-list" aria-label="Mission discovery journal">
       <div className="exp-list-heading"><h2>Your discoveries</h2><button className="exp-icon-button" aria-label="Hide discovery list" onClick={() => setShowList(false)}><ChevronDown size={18} /></button></div>
@@ -345,7 +348,7 @@ export function ExplorationExperience({ mission, progress, onDiscover, onComplet
       </div>
     </aside>}
 
-    {showHelp && <aside className="exp-archive" aria-label="Exploration controls"><div className="exp-archive-toolbar"><span><Move size={16} /> Explore at your own pace</span><button className="exp-icon-button exp-ink-button" onClick={() => setShowHelp(false)} aria-label="Close controls"><X size={19} /></button></div><div className="exp-archive-body"><h2>Your expedition controls</h2><dl className="exp-controls-list"><dt>Move</dt><dd>W A S D</dd><dt>Look around</dt><dd>Capture mouse, or drag the environment</dd>{mission.id === 'pioneer' && <><dt>Jetpack up / down</dt><dd>E / Q · Space / Control</dd></>}<dt>Move faster</dt><dd>Hold Shift</dd><dt>Inspect nearby object</dt><dd>F</dd><dt>Switch camera</dt><dd>C</dd><dt>Show discovery list</dt><dd>J</dd><dt>Release mouse / close record</dt><dd>Escape</dd></dl><p>Orbit view supports dragging to rotate and scrolling to zoom. The discovery list opens every record without walking or jetpacking.</p><h3>About this environment</h3><p>{mission.sceneNote}</p><p>Movement speeds, travel shortcuts, and the future astronaut visit are fictional interface choices.</p></div></aside>}
+    {showHelp && <aside className="exp-archive" aria-label="Exploration controls"><div className="exp-archive-toolbar"><span><Move size={16} /> Explore at your own pace</span><button className="exp-icon-button exp-ink-button" onClick={() => setShowHelp(false)} aria-label="Close controls"><X size={19} /></button></div><div className="exp-archive-body"><h2>Your expedition controls</h2><dl className="exp-controls-list"><dt>Move</dt><dd>W A S D</dd><dt>Look around</dt><dd>Capture mouse, or drag the environment</dd>{isSpace && <><dt>Jetpack up / down</dt><dd>E / Q · Space / Control</dd></>}<dt>Move faster</dt><dd>Hold Shift</dd><dt>Inspect nearby object</dt><dd>F</dd><dt>Switch camera</dt><dd>C</dd><dt>Show discovery list</dt><dd>J</dd><dt>Release mouse / close record</dt><dd>Escape</dd></dl><p>Orbit view supports dragging to rotate and scrolling to zoom. The discovery list opens every record without walking or jetpacking.</p><h3>About this environment</h3><p>{mission.sceneNote}</p><p>Movement speeds, travel shortcuts, and the future astronaut visit are fictional interface choices.</p></div></aside>}
 
     <footer className="exp-bottom-bar">
       <div className="exp-view-controls"><button onClick={() => { unlockPointer(); setMode(value => value === 'surface' ? 'orbit' : 'surface'); }} aria-label="Switch camera view"><Compass size={17} />{mode === 'orbit' ? 'First person' : 'Orbit view'}<kbd>C</kbd></button>{!sceneUnavailable && <button onClick={startLooking}><Maximize2 size={16} />{locked ? 'Mouse captured · Esc to release' : 'Capture mouse'}</button>}<button onClick={() => { unlockPointer(); setSelectedId(null); setShowTask(false); setShowHelp(value => !value); }} aria-expanded={showHelp}><Move size={16} />Controls</button></div>

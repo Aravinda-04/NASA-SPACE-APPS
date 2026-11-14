@@ -13,7 +13,7 @@ WebP conversion used Pillow: maximum 900 × 1050 for rewards, 1000 × 900 for hi
 
 Fine spacecraft-art review and verification of the pre-existing Curiosity model’s exact origin remain release checks. These images and sources do not certify the fictional scene’s geography.
 
-All three exploration scenes are illustrative reconstructions in a fictional future expedition. Local arrangement, pose, lighting, debris condition, terrain and inspection-marker placement are authored for the demonstration, not georeferenced observations. No simulated future visit is NASA footage or a prediction.
+All exploration scenes are illustrative reconstructions in a fictional future expedition. Local arrangement, pose, lighting, debris condition, terrain and inspection-marker placement are authored for the demonstration, not georeferenced observations. No simulated future visit is NASA footage or a prediction.
 
 ## Pioneer 10
 
@@ -33,6 +33,23 @@ All three exploration scenes are illustrative reconstructions in a fictional fut
 - Runtime transformations: clone hierarchy and replace only cloned materials; center and ground model, normalize displayed maximum dimension to 3.3 scene units. Source geometry and embedded textures remain unchanged.
 - Heat-shield exhibit and drill-target rock are authored schematic geometry. They are isolated educational exhibits, not an accurately co-located reconstruction of landing debris and Yellowknife Bay.
 - Light dashed lines near the rover are illustrative navigation overlays, not an imported historical traverse or a measured wheel-track dataset.
+
+## Dawn
+
+- Asset: existing `/models/Dawn.glb` (927,020 bytes), supplied locally with the expanded mission resources.
+- Its exact original download, license record and checksum have not yet been verified. Do not claim provenance verification from its filename.
+- Reference mission and spacecraft pages: https://science.nasa.gov/mission/dawn/ and https://science.nasa.gov/mission/dawn/technology/spacecraft/
+- Ceres context image: `Provided Resources/Dawn/images/pia20182_ceres_globe.jpg`, a NASA/JPL-Caltech/UCLA/MPS/DLR/IDA enhanced-color Dawn composite supplied with the project resources. It is bundled by Vite for the Dawn scene; black image space blends into the authored star field.
+- Runtime transformations: clone the hierarchy, apply cel-shaded materials, center the spacecraft and normalize its displayed maximum dimension to 8 scene units. Scale, pose, Ceres distance and orbital path are illustrative.
+- If the model fails, an original simplified bus, solar-array, antenna and ion-plume schematic remains available. The Ceres image is historical mission imagery, but its scene distance, scale, plane presentation, Occator highlight and inspection marker are authored context—not georeferenced terrain or live observations.
+
+## Kepler / K2
+
+- Asset: existing `/models/Kepler (A).glb` (2,003,276 bytes), supplied locally with the expanded mission resources.
+- Its exact original download, license record and checksum have not yet been verified. Do not claim provenance verification from its filename.
+- Reference mission and spacecraft pages: https://science.nasa.gov/mission/kepler/ and https://science.nasa.gov/resource/kepler-spacecraft/
+- Runtime transformations: clone the hierarchy, apply cel-shaded materials, center the spacecraft and normalize its displayed maximum dimension to 7 scene units. Scale, pose, star locations, observing cone and transit system are illustrative.
+- If the model fails, an original simplified telescope, bus and solar-array schematic remains available. Target stars, orbit line, sunlight-pressure guides and the transiting planet are explanatory geometry, not a reconstructed Kepler target field or live observation.
 
 ## Surveyor 3 and Apollo 12
 

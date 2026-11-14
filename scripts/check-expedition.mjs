@@ -35,8 +35,8 @@ const {
   EXPEDITION_STORAGE_KEY,
   LEGACY_STORAGE_KEY,
 } = await loadTs("../src/utils/expeditionProgress.ts");
-assert.equal(missions.length, 3);
-assert.equal(new Set(missions.map((m) => m.id)).size, 3);
+assert.equal(missions.length, 8);
+assert.equal(new Set(missions.map((m) => m.id)).size, 8);
 for (const mission of missions) {
   assert.equal(
     mission.discoveries.length,
@@ -165,6 +165,18 @@ assert.equal(
   true,
   "Corrupt v2 can recover a valid legacy backup.",
 );
+const viking = missions.find(mission => mission.id === 'viking');
+const standaloneStorage = new Map([
+  ['viking_expedition_progress', JSON.stringify({
+    discovered: viking.discoveries.map(discovery => discovery.id),
+    completed: true,
+  })],
+]);
+globalThis.localStorage = { getItem: key => standaloneStorage.get(key) ?? null };
+const standaloneMigrated = readSavedExpedition(missions);
+assert.equal(standaloneMigrated.progress.viking.completed, true);
+assert.equal(standaloneMigrated.collection['viking-laboratory'].origin, 'legacy-completion');
+assert.equal(standaloneMigrated.collection['viking-laboratory'].earnedAt, null);
 const invalid = normalizeSave(
   {
     version: 2,
@@ -207,8 +219,8 @@ for (const mission of missions) {
     "Replay is idempotent and preserves the earned timestamp.",
   );
 }
-assert.equal(collectionCount(journey), 3);
-assert.equal(Object.keys(journey.collection).length, 3);
+assert.equal(collectionCount(journey), 8);
+assert.equal(Object.keys(journey.collection).length, 8);
 assert.equal(
   normalizeSave(
     { ...journey, collection: { ...journey.collection, future: {} } },
@@ -222,6 +234,13 @@ const { COLLECTIBLE_CARDS: cards } = await loadTs(
 const { OPTIONAL_QUESTIONS: questions } = await loadTs(
   "../src/data/optionalQuestions.ts",
 );
+const { BOOK_BY_MISSION: bookByMission } = await loadTs(
+  "../src/data/books.ts",
+);
+assert.deepEqual(bookByMission, {
+  surveyor: 'surveyor', curiosity: 'curiosity', pioneer: 'pioneer',
+  viking: 'curiosity', ingenuity: 'curiosity', near: 'pioneer', dawn: 'pioneer', kepler: 'pioneer',
+});
 for (const card of cards) {
   assert.ok(missions.some((m) => m.id === card.missionId));
   assert.equal(new URL(card.source).protocol, "https:");
@@ -230,7 +249,9 @@ for (const card of cards) {
       0,
   );
 }
-assert.equal(new Set(cards.map((c) => c.id)).size, 3);
+assert.equal(cards.length, missions.length);
+assert.equal(new Set(cards.map((c) => c.id)).size, 8);
+assert.equal(new Set(cards.map((c) => c.missionId)).size, 8);
 for (const mission of missions) {
   const q = questions[mission.id];
   assert.ok(q.correctIndex >= 0 && q.correctIndex < q.options.length);
@@ -255,14 +276,18 @@ assert.ok(
     0.001,
 );
 console.log(
-  "Passed: 3 missions, 12 sourced discoveries, tasks, v1 migration, v2 roundtrip, content resilience, denied/corrupt storage, repeat-safe 3-card rewards, artwork, optional questions and numerical light-time checks.",
+  "Passed: 8 missions, 32 sourced discoveries, tasks, legacy migration, v2 roundtrip, content resilience, denied/corrupt storage, repeat-safe 8-card rewards, artwork, optional questions and numerical light-time checks.",
 );
 
-const { CHRONOLOGICAL_ARTIFACTS: artifacts, getChronologicalArtifacts, getPlayableMission } = await loadTs('../src/data/chronologicalArtifacts.ts');
+const { CHRONOLOGICAL_ARTIFACTS: artifacts, getChronologicalArtifacts, getPlayableMission, getArtifactSimulation } = await loadTs('../src/data/chronologicalArtifacts.ts');
 const { createContentsTrajectory } = await loadTs('../src/utils/contentsTrajectory.ts');
 assert.equal(new Set(artifacts.map(item => item.id)).size, artifacts.length);
-assert.deepEqual(missions.map(m => getChronologicalArtifacts(m.id).length), [4, 5, 4]);
+assert.deepEqual(['surveyor', 'curiosity', 'pioneer'].map(id => getChronologicalArtifacts(id).length), [4, 5, 4]);
 assert.deepEqual(artifacts.filter(getPlayableMission).map(item => item.playableMissionId).sort(), ['curiosity', 'pioneer', 'surveyor']);
+assert.deepEqual(
+  [...new Set(artifacts.map(getArtifactSimulation).filter(Boolean).map(target => target.targetId))].sort(),
+  ['curiosity', 'dawn', 'ingenuity', 'kepler', 'near', 'pioneer', 'surveyor', 'viking'],
+);
 for (const item of artifacts) {
   assert.ok(missions.some(m => m.id === item.volumeId));
   for (const field of ['overview', 'purpose', 'operation', 'scientificContribution', 'currentStatus', 'synopsis']) assert.ok(item[field]?.length > 20, `${item.id}: ${field}`);
@@ -281,8 +306,8 @@ for (const item of artifacts) {
 }
 assert.equal(getPlayableMission({ ...artifacts[0], playableMissionId: 'invented' }), undefined);
 assert.equal(getPlayableMission({ ...artifacts[0], playableMissionId: 'pioneer' }), undefined, 'Do not launch another volume by accident');
-for (const m of missions) {
-  const list = getChronologicalArtifacts(m.id);
+for (const id of ['surveyor', 'curiosity', 'pioneer']) {
+  const list = getChronologicalArtifacts(id);
   assert.deepEqual(list.map(item => item.chronologicalOrder), list.map(item => item.chronologicalOrder).sort((a,b) => a-b));
 }
 for (const count of [0, 1, 2, 4, 5, 9]) {
@@ -302,7 +327,7 @@ assert.deepEqual(normalizeSave(contextSave, missions).readingLocations, v2.readi
 assert.deepEqual(normalizeSave(contextSave, missions).collection, v2.collection, 'Opening dossiers does not award or erase cards');
 assert.equal(normalizeSave({ ...v2, readingContexts: { surveyor: { view: 'wrong', artifactId: 'anything', panel: 'dossier' } } }, missions).readingContexts, undefined);
 assert.equal(normalizeSave({ ...v2, readingContexts: { surveyor: { view: 'contents', artifactId: '<script>', panel: 'dossier' } } }, missions).readingContexts, undefined);
-console.log('Passed: 13 sourced chronological records, exactly 3 playable links, chronology, coordinate bounds, 0/1/2/4/5/9-node Bézier geometry, additive reading-context migration and reward preservation.');
+console.log('Passed: 13 sourced chronological records, 8 simulation targets, chronology, coordinate bounds, 0/1/2/4/5/9-node Bézier geometry, additive reading-context migration and reward preservation.');
 
 const { wrapLongitude, planetCoordinateToVector, shortestAngleDelta, easeAtlasFocus } = await loadTs('../src/utils/planetCoordinates.ts');
 const { SOLAR_ATLAS_BODIES: solarBodies, PLANET_TEXTURES } = await loadTs('../src/data/atlas.ts');

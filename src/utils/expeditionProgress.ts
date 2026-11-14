@@ -5,13 +5,24 @@ import type {
   MissionId,
   SavedExpedition,
 } from "../types/expedition";
+import { BOOKS } from "../data/books";
 
 export const LEGACY_STORAGE_KEY = "offworld-expedition:v1";
 export const EXPEDITION_STORAGE_KEY = "offworld-expedition:v2";
+export const STANDALONE_MISSION_KEYS: Partial<Record<MissionId, string>> = {
+  viking: "viking_expedition_progress",
+  ingenuity: "ingenuity_expedition_progress",
+  near: "near_expedition_progress",
+};
 export const CARD_BY_MISSION: Record<MissionId, CardId> = {
   surveyor: "surveyor-camera",
   curiosity: "curiosity-skycrane",
   pioneer: "pioneer-messenger",
+  viking: "viking-laboratory",
+  ingenuity: "ingenuity-first-flight",
+  near: "near-asteroid-lander",
+  dawn: "dawn-two-worlds",
+  kepler: "kepler-transit-hunter",
 };
 // Retained for legacy diagnostics. Presentation changes never invalidate v2 saves.
 export function contentRevision(missions: ExpeditionMission[]): string {
@@ -24,11 +35,7 @@ export function contentRevision(missions: ExpeditionMission[]): string {
 export function emptyProgress(
   missions: ExpeditionMission[],
 ): ExpeditionProgress {
-  const result: ExpeditionProgress = {
-    surveyor: { discovered: [], completed: false },
-    curiosity: { discovered: [], completed: false },
-    pioneer: { discovered: [], completed: false },
-  };
+  const result = {} as ExpeditionProgress;
   for (const mission of missions)
     result[mission.id] = { discovered: [], completed: false };
   return result;
@@ -89,9 +96,8 @@ export function normalizeSave(
     saved.version === 2,
   );
   result.lastMissionId = missions.find((m) => m.id === saved.lastMissionId)?.id;
-  for (const mission of missions) {
-    const id = mission.id,
-      cardId = CARD_BY_MISSION[id],
+  for (const book of BOOKS) {
+    const id = book.id,
       page = saved.readingLocations?.[id];
     if (Number.isInteger(page) && page >= 0 && page <= 3)
       result.readingLocations[id] = page;
@@ -103,6 +109,10 @@ export function normalizeSave(
         view: context.view, panel: context.panel, artifactId: context.artifactId,
       } };
     }
+  }
+  for (const mission of missions) {
+    const id = mission.id,
+      cardId = CARD_BY_MISSION[id];
     if (result.progress[id].completed) {
       const meta = saved.collection?.[cardId];
       result.collection[cardId] = {
@@ -135,19 +145,46 @@ export function readSavedExpedition(
   missions: ExpeditionMission[],
 ): SavedExpedition {
   try {
+    let result: SavedExpedition | undefined;
     const current = localStorage.getItem(EXPEDITION_STORAGE_KEY);
     if (current) {
       try {
         const parsed = JSON.parse(current);
-        if (parsed?.version === 2) return normalizeSave(parsed, missions);
+        if (parsed?.version === 2) result = normalizeSave(parsed, missions);
       } catch {
         /* Try a valid legacy backup. */
       }
     }
-    const legacy = localStorage.getItem(LEGACY_STORAGE_KEY);
-    return legacy
-      ? normalizeSave(JSON.parse(legacy), missions)
-      : emptySave(missions);
+    if (!result) {
+      const legacy = localStorage.getItem(LEGACY_STORAGE_KEY);
+      result = legacy
+        ? normalizeSave(JSON.parse(legacy), missions)
+        : emptySave(missions);
+    }
+    for (const mission of missions) {
+      const key = STANDALONE_MISSION_KEYS[mission.id];
+      if (!key || result.progress[mission.id].discovered.length > 0) continue;
+      const raw = localStorage.getItem(key);
+      if (!raw) continue;
+      try {
+        const migrated = normalizeProgress(
+          { [mission.id]: JSON.parse(raw) },
+          [mission],
+          true,
+        )[mission.id];
+        result.progress[mission.id] = migrated;
+        if (migrated.completed) {
+          result.collection[CARD_BY_MISSION[mission.id]] = {
+            earnedAt: null,
+            firstViewedAt: null,
+            origin: "legacy-completion",
+          };
+        }
+      } catch {
+        /* Ignore corrupt standalone progress. */
+      }
+    }
+    return result;
   } catch {
     return emptySave(missions);
   }
