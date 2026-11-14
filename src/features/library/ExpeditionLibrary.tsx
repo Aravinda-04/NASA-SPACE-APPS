@@ -169,14 +169,13 @@ export function ExpeditionLibrary({
                 <span className="volume-selected">SELECTED</span>
               )}
             </button>
-            <p>
-              {item.number} · {item.subtitle}
-              {progress[item.id].completed && (
+            {progress[item.id].completed && (
+              <p>
                 <span className="library-complete">
                   <Check size={14} /> Expedition complete
                 </span>
-              )}
-            </p>
+              </p>
+            )}
           </div>
         ))}
       </div>
@@ -201,14 +200,11 @@ export function ExpeditionLibrary({
         </section>
       )}
       <footer className="library-footer">
-        <p>Three playable missions · Your progress stays on this device.</p>
         {selected ? (
           <button className="ow-button" onClick={() => choose(null)}>
             <ArrowLeft size={16} /> View all volumes
           </button>
-        ) : (
-          <p>Choose a book to begin.</p>
-        )}
+        ) : null}
       </footer>
     </main>
   );
