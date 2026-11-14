@@ -120,12 +120,7 @@ export function ExpeditionLibrary({
           color3="#ffffff"
         />
       </div>
-      <header className="ow-header">
-        <Brand />
-        <p>Three volumes · One expedition</p>
-      </header>
       <section className="ow-intro">
-        <p className="ow-eyebrow">THE EXPEDITION LIBRARY</p>
         <h1>Every object has a story.</h1>
         <p>
           Choose a volume. Follow the evidence left behind, and discover what
