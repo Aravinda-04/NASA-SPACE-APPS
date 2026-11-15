@@ -1,96 +1,203 @@
-# Off-world — An Expedition Journal
+# Off-World — An Interactive Space History Explorer
 
-A desktop-first educational demonstration for NASA Space Apps, designed for ages 12–16. Choose a Moon, Mars or Outer Space book, investigate science, explore NASA hardware through a fictional future expedition, and keep a collectible proof of your discoveries in the Space Backpack.
+> Explore humanity's greatest space missions through immersive 3D reconstructions, primary-source archives, and hands-on evidence investigations — designed for ages 12–16.
 
-This is the updated application in **pasan3251/NASA-Space-Apps**. Run commands from this repository's root.
+[Off-World Demo](docs/GIF_4.gif)
 
-## Getting started
+---
 
-Use Node.js 22 or newer and npm:
+## Screenshots
+
+**Book Reader — Mission Briefing & Dossier**
+
+![Book reader showing mission briefing pages](docs/screenshots/screenshot-book-reader.png)
+
+**Mission Contents — Mars Volume**
+
+![Chronological mission contents for the Mars book](docs/screenshots/screenshot-mars-contents.png)
+
+| Curiosity · Mars Science Laboratory | Pioneer 10 · Deep Space |
+|---|---|
+| ![Curiosity mission chronological view](docs/screenshots/screenshot-curiosity.png) | ![Pioneer 10 mission view](docs/screenshots/screenshot-pioneer.png) |
+
+| Surveyor 3 / Apollo 12 · Moon | |
+|---|---|
+| ![Surveyor 3 and Apollo 12 chronological mission view](docs/screenshots/screenshot-surveyor.png) | |
+
+---
+
+## What is Off-World?
+
+Off-World is a desktop-first interactive expedition journal built for the **NASA Space Apps Challenge 2025**. Players choose one of three mission books (Moon, Mars, or Outer Space), read the historical record, then step into a fictional future expedition to inspect real NASA hardware in a cel-shaded 3D environment. Each mission challenges the player to examine four sourced discoveries, draw an evidence conclusion, and earn a collectible mission card in their Space Backpack.
+
+The app runs entirely in the browser — no login, no audio required, no live telemetry. All scientific descriptions link directly to NASA/JPL source records.
+
+---
+
+## Missions
+
+| Book | Mission | Location |
+|------|---------|----------|
+| 🌕 Moon | Surveyor 3 / Apollo 12 | Ocean of Storms |
+| 🌕 Moon | Apollo 12 / Intrepid | Fra Mauro region |
+| 🔴 Mars | Viking 1 | Chryse Planitia |
+| 🔴 Mars | Viking 2 | Utopia Planitia |
+| 🔴 Mars | Curiosity | Gale Crater |
+| 🔴 Mars | Ingenuity | Jezero Crater |
+| 🌌 Outer Space | Pioneer 10 | Deep Space |
+| 🌌 Outer Space | NEAR Shoemaker | Asteroid 433 Eros |
+| 🌌 Outer Space | Dawn | Asteroid Belt (Vesta & Ceres) |
+| 🌌 Outer Space | Kepler / K2 | Heliocentric Orbit |
+
+---
+
+## NASA Data Used
+
+All mission narratives, discoveries, and evidence records are sourced directly from official NASA archives:
+
+| Mission | Primary Source |
+|---------|---------------|
+| Curiosity | [NASA Science — Curiosity](https://science.nasa.gov/mission/msl-curiosity/) · [JPL PIA16001](https://www.jpl.nasa.gov/images/pia16001-scene-of-a-martian-landing/) |
+| Viking 1 & 2 | [NASA Photojournal — PIA00381, PIA00384, PIA00393](https://photojournal.jpl.nasa.gov/) · [NSSDC Viking](https://nssdc.gsfc.nasa.gov/nmc/spacecraft/display.action?id=1975-075A) |
+| Ingenuity | [NASA Science — Ingenuity](https://science.nasa.gov/mission/ingenuity/) · NASA JPL press kit |
+| Surveyor 3 / Apollo 12 | [NASA Science — Apollo 12 & Surveyor 3](https://science.nasa.gov/resource/apollo-12-and-surveyor-3/) · [NTRS Recovery Report](https://ntrs.nasa.gov/citations/19710024418) |
+| Pioneer 10 | [NASA Science — Pioneer 10](https://science.nasa.gov/mission/pioneer-10/) · [3D Model](https://science.nasa.gov/3d-resources/pioneer/) |
+| NEAR Shoemaker | [Johns Hopkins APL — NEAR](https://near.jhuapl.edu/) · NASA NSSDC |
+| Dawn | [NASA Science — Dawn](https://science.nasa.gov/mission/dawn/) · [Dawn Spacecraft](https://science.nasa.gov/mission/dawn/technology/spacecraft/) · NASA/JPL-Caltech/UCLA/MPS/DLR/IDA (Ceres imagery) |
+| Kepler / K2 | [NASA Science — Kepler](https://science.nasa.gov/mission/kepler/) · [Kepler 3D Model](https://science.nasa.gov/resource/kepler-spacecraft/) |
+
+---
+
+## Installation & Running
+
+**Requirements:** Node.js 22 or newer, npm
 
 ```sh
+# Clone the repository
+git clone https://github.com/Aravinda-04/NASA-SPACE-APPS.git
+cd NASA-SPACE-APPS
+
+# Install dependencies
 npm ci
+
+# Start the development server
 npm run dev
 ```
 
-Open the local address printed by Vite. To verify and preview a production build:
+Open the local address printed by Vite in your browser.
+
+### Production Build
 
 ```sh
+# Verify mission content and run checks
 npm test
+
+# Build for production
 npm run build
+
+# Preview the production build locally
 npm run preview
 ```
 
-## Project structure
-
-```text
-src/
-  features/
-    book/                  # Cover, page turns, briefings, journal and sources
-    exploration/           # Walking/EVA, archive HUD, tasks and 3D worlds
-  data/                    # Replaceable mission stories and source references
-  types/                   # Shared mission and progress contracts
-  utils/                   # Progress persistence and cel-shading helper
-  styles/                  # Global styles and recovery states
-  App.tsx                  # Application flow and saved progress
-  main.tsx                 # React entry point
-public/
-  models/                  # Required Curiosity and Pioneer runtime models
-  fonts/                   # Self-hosted fonts and their licenses
-  vendor/draco/            # Local model decoder and its license
-scripts/                   # Mission content and progress checks
-docs/                      # Development, asset credits and verification notes
-.design-rules/             # Apple Design Skill Git submodule (development only)
-PRODUCT.md                 # Product requirements and scope
-DESIGN.md                  # Implemented design system
-```
-
-The original `Visual-Testing/` sandbox is retained locally as a separate, ignored repository. It is not part of this application's source tree or GitHub publication. Dependencies, builds, raw Blender/STL inputs, screenshots and local agent/design artifacts are also excluded.
-
-## Demonstration episodes
-
-- **Moon — Surveyor 3 / Apollo 12:** the camera returned to Earth became scientific evidence.
-- **Mars — Viking 1:** interpret the instruments and the limits of its life-detection evidence.
-- **Mars — Curiosity:** discarded landing hardware enabled a laboratory to investigate ancient habitability.
-- **Mars — Ingenuity:** inspect the systems behind powered, autonomous flight on another world.
-- **Deep space — Pioneer 10:** distinguish continued travel from communication and scientific legacy.
-- **Asteroid 433 Eros — NEAR Shoemaker:** investigate an orbiter that completed the first asteroid landing.
-- **Asteroid belt — Dawn:** compare Vesta and Ceres and inspect the ion propulsion that made a two-world orbital mission possible.
-- **Solar orbit — Kepler / K2:** follow tiny repeating dips in starlight and investigate how engineers recovered a planet-hunting telescope.
-
-Mission selections remain provisional until the competition briefing. The future astronaut, encounter conditions, terrain and inspection layouts are fictional or schematic where labeled. Scientific descriptions link directly to NASA/JPL records. No live telemetry or georeferenced reconstruction is claimed.
+---
 
 ## Controls
 
-Library: select a book, then choose Open. Tab, Enter and the book-selection arrow/Home/End keys work. Reading: page buttons or left/right arrows; each volume remembers its reading location. System reduced-motion preferences apply to books, scientific playback and rewards.
+| Action | Control |
+|--------|---------|
+| Move | WASD |
+| Look | Drag or **Capture Mouse** |
+| Switch camera | C |
+| Show discoveries | J |
+| Inspect hardware | F |
+| Jetpack up / down | E / Space · Q / Control |
+| Sprint | Shift |
+| Release mouse / close | Escape |
+| Navigate book pages | ← → arrow keys |
 
-Exploration: WASD move; drag to look or choose **Capture mouse**; C switches camera; J shows discoveries; F inspects nearby hardware; Escape releases the mouse or closes records. Pioneer jetpack: E/Space up, Q/Control down. Shift moves faster. The discovery list and travel shortcuts offer alternatives to precise movement.
+---
 
-Inspect four records and answer the evidence question to complete a mission. Completion immediately earns its one persistent collectible; optional reinforcement can be retried or skipped. Open the Space Backpack from the screen edge to filter cards, inspect their reverse and sources, or return to a book. Escape closes details/the Backpack; exploration remains paused until you resume.
+## Tech Stack
 
-Progress uses `offworld-expedition:v2` in localStorage and migrates valid `offworld-expedition:v1` saves without deleting the original. Editorial/art changes do not erase completion. Without WebGL, historical records and evidence tasks remain available. Denied storage supports the current session with a visible notice. No audio or account is required.
+| Layer | Technology |
+|-------|-----------|
+| Framework | React 18 + TypeScript |
+| Build Tool | Vite |
+| 3D Engine | Three.js via `@react-three/fiber` and `@react-three/drei` |
+| 3D Models | NASA official GLB assets, Draco-compressed |
+| Styling | Custom CSS — `offworld.css`, `rewards.css`, `exploration.css` |
+| Persistence | `localStorage` (`offworld-expedition:v2`) |
+| Fonts | Self-hosted, licensed — see [`docs/fonts.md`](docs/fonts.md) |
+| Draco Decoder | Local runtime copy (Apache 2.0) — no CDN dependency |
 
-The Pioneer book contains an original SVG light-time demonstration anchored to 23 January 2003, plus one-way/round-trip and reference-distance comparisons. It explicitly separates hypothetical signal propagation from successful historical contact.
+---
 
-See [implemented features, validation and remaining work](docs/implementation-2026-11-14.md).
+## Project Structure
 
-## Content, design and attribution
-
-Edit `src/data/expeditionMissions.ts` to update narratives, discoveries, learning tasks and sources. See [development guidance](docs/development.md) before replacing mission IDs or scene geometry.
-
-- [Asset provenance and reconstruction limits](docs/assets.md)
-- [Font origins and licenses](docs/fonts.md)
-- [Apple design review](docs/quality/apple-design-review.md)
-- [Verification notes](docs/quality/verification.md)
-
-The book uses the user-requested Apple Design Skill. To check out its pinned development references:
-
-```sh
-git submodule update --init
+```
+src/
+  features/
+    book/          # Cover, page turns, briefings, journal and sources
+    exploration/   # Walking/EVA, archive HUD, tasks and 3D worlds
+  data/            # Mission stories, discoveries and source references
+  types/           # Shared mission and progress contracts
+  utils/           # Progress persistence and cel-shading helper
+  styles/          # Global styles and recovery states
+  App.tsx          # Application flow and saved progress
+public/
+  models/          # NASA GLB spacecraft models (Draco compressed)
+  fonts/           # Self-hosted fonts and their licenses
+  vendor/draco/    # Local model decoder
+docs/              # Development notes, asset credits, screenshots
+scripts/           # Mission content and progress validation
+PRODUCT.md         # Product requirements and scope
+DESIGN.md          # Implemented design system
 ```
 
-The skill is not needed to install, build or run the application. The application uses AI-assisted code, educational copy and schematic geometry. It does not imply NASA endorsement, and no generated image is presented as historical evidence. Asset-specific credits and licenses are preserved.
+---
 
-## Current boundaries
+## Team · 23SpaceOps
 
-This demonstration does not include measured historical traverse playback, archival video, narration, realistic collision/jetpack physics or photogrammetric terrain. The supplied Curiosity model's exact original download remains unverified and is disclosed in the asset ledger. Final mission content and challenge-provided source eligibility must be checked after the briefing.
+| Name | Role |
+|------|------|
+| Sandun Kodituwakku | Team Lead |
+| Aravinda Gunawardana | Developer |
+| Pasan Wijerathne | Developer |
+| Prabhasara Vidulanka | 3D Artist |
+| Thisum Danthanarayana | Developer |
+
+---
+
+## The Challenge
+
+**NASA Space Apps Challenge 2025**
+
+Off-World was built for the NASA Space Apps Challenge, the world's largest annual space and science hackathon. Our submission explores how educational storytelling, interactive 3D environments, and primary NASA source archives can make space mission history accessible and engaging for the next generation of explorers.
+
+---
+
+## AI Tools Used
+
+| Tool | Purpose |
+|------|---------|
+| **Google Gemini (Gemini 2.5 Flash)** | System architecture design, React/TypeScript component generation, mission data research and historical accuracy verification, 3D scene procedural geometry (asteroid mesh, lunar terrain, star fields), TypeScript debugging, coordinate geometry verification |
+| **Antigravity (Gemini Agent)** | End-to-end development workflow automation — file editing, build verification, git operations, test suite execution, and iterative mission implementation |
+
+> AI-generated code, schematic geometry, and educational copy are used throughout. No AI-generated image is presented as historical evidence. All scientific descriptions link to official NASA/JPL records.
+
+---
+
+## Attribution & Boundaries
+
+- All exploration scenes are illustrative reconstructions in a fictional future expedition. No future astronaut visit or future hardware state is a historical claim.
+- The supplied spacecraft models are NASA educational 3D resources. Asset-specific credits and licenses are preserved in [`docs/assets.md`](docs/assets.md).
+- This project does not imply NASA endorsement.
+- No live telemetry, georeferenced terrain reconstruction, or archival video is included.
+
+See [full asset provenance](docs/assets.md) · [font licenses](docs/fonts.md) · [verification notes](docs/quality/verification.md)
+
+---
+
+## Live Demo
+
+🚀 *Demo link to be added after deployment.*
