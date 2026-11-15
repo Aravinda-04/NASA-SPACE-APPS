@@ -7,6 +7,11 @@ import type { Discovery, ExpeditionMission, MissionProgress } from '../../types/
 import { MissionWorld } from './MissionWorld';
 import './exploration.css';
 
+const CAMERA_LAB_PHOTO = new URL(
+  '../../../Provided Resources/Surveyor 3/images/as12-48-7134_conrad_surveyor3.jpg',
+  import.meta.url,
+).href;
+
 interface ExplorationExperienceProps {
   mission: ExpeditionMission;
   progress: MissionProgress;
@@ -191,7 +196,7 @@ function ArchiveRecord({ discovery, mission, onClose }: { discovery: Discovery; 
   </aside>;
 }
 
-export function ExplorationExperience({ mission, progress, onDiscover, onComplete, onExit, suspended = false }: ExplorationExperienceProps) {
+function ThreeDimensionalExperience({ mission, progress, onDiscover, onComplete, onExit, suspended = false }: ExplorationExperienceProps) {
   const [mode, setMode] = useState<ViewMode>('surface');
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [showList, setShowList] = useState(true);
@@ -359,4 +364,73 @@ export function ExplorationExperience({ mission, progress, onDiscover, onComplet
     {resumeRequired && !suspended && <div className="exp-resume-notice"><p>Exploration paused. Your position and discoveries are preserved.</p><button onClick={() => setResumeRequired(false)}>Resume exploration</button></div>}
     {sceneUnavailable && <div className="exp-fallback-access"><List size={18} /><span>Archive mode · All discoveries and the evidence task remain available.</span><button onClick={() => setShowList(true)}>Show records</button></div>}
   </main>;
+}
+
+function CameraLabDossier({ mission, progress, onDiscover, onComplete, onExit }: ExplorationExperienceProps) {
+  const [activeId, setActiveId] = useState<string | null>(null);
+  const [answer, setAnswer] = useState<number | null>(null);
+  const active = mission.discoveries.find(item => item.id === activeId) ?? null;
+  const allDiscovered = mission.discoveries.every(item => progress.discovered.includes(item.id));
+  const correct = answer === mission.task.correctIndex;
+  const openRecord = (id: string) => {
+    onDiscover(id);
+    setActiveId(current => current === id ? null : id);
+  };
+  return <main className="lab-dossier" aria-label={`${mission.name} archival investigation`}>
+    <header className="lab-dossier-header">
+      <button onClick={onExit}><ArrowLeft size={17} /> Back to journal</button>
+      <div><span>01 / Moon · laboratory field notes</span><h1>{mission.name}</h1></div>
+      <span className="lab-dossier-progress">{progress.discovered.length}/{mission.discoveries.length} records</span>
+    </header>
+    <div className="lab-dossier-book">
+      <section className="lab-dossier-page lab-dossier-intro">
+        <p className="lab-dossier-kicker">Surveyor 3 · Apollo 12 · Earth laboratory</p>
+        <h2>An object becomes evidence.</h2>
+        <p>{mission.introduction}</p>
+        <div className="lab-dossier-question"><span>Your investigation</span><p>{mission.question}</p></div>
+        <dl>
+          <dt>Mission</dt><dd>{mission.name}</dd>
+          <dt>Historical status</dt><dd>{mission.statusLabel}</dd>
+          <dt>Location</dt><dd>{mission.coordinatesLabel}</dd>
+        </dl>
+        <div className={`lab-dossier-conclusion ${allDiscovered ? 'is-ready' : ''}`}>
+          <span>{allDiscovered ? 'Evidence task ready' : `${mission.discoveries.length - progress.discovered.length} records remain`}</span>
+          <p>{mission.task.question}</p>
+          {allDiscovered && <div className="lab-dossier-answers">{mission.task.options.map((option, index) => <button key={option} onClick={() => setAnswer(index)} className={answer === index ? index === mission.task.correctIndex ? 'is-correct' : 'is-wrong' : ''}><b>{String.fromCharCode(65 + index)}</b>{option}</button>)}</div>}
+          {answer !== null && <p className="lab-dossier-feedback">{correct ? mission.task.explanation : 'That conclusion is not supported by the complete record. Compare the test stations and try again.'}</p>}
+          {(correct || progress.completed) && <button className="lab-dossier-complete" onClick={onComplete}><Check size={16} /> {progress.completed ? 'Mission complete' : 'Complete investigation'}</button>}
+        </div>
+      </section>
+      <section className="lab-dossier-page lab-dossier-records">
+        <figure>
+          <img src={CAMERA_LAB_PHOTO} alt="Apollo 12 astronaut examining Surveyor 3 on the lunar surface." />
+          <figcaption>Historical photograph · AS12-48-7134 · NASA. The photograph documents the recovery context; laboratory tests document changes to the hardware.</figcaption>
+        </figure>
+        <h2>Look a little closer.</h2>
+        <div className="lab-dossier-list">{mission.discoveries.map((discovery, index) => {
+          const discovered = progress.discovered.includes(discovery.id);
+          const expanded = activeId === discovery.id;
+          return <article key={discovery.id} className={expanded ? 'is-open' : ''}>
+            <button onClick={() => openRecord(discovery.id)} aria-expanded={expanded}>
+              <span>{discovered ? <Check size={14} /> : index + 1}</span>
+              <b>{discovery.title}</b>
+              <ChevronDown size={16} />
+            </button>
+            {expanded && <div className="lab-dossier-detail">
+              <small>{discovery.component}</small><p className="summary">{discovery.summary}</p><p>{discovery.story}</p>
+              <h3>What the test revealed</h3><p>{discovery.science}</p>
+              <h3>How to read this evidence</h3><p>{discovery.engineering}</p>
+              <div className="lab-dossier-sources">{mission.sources.filter(source => discovery.sourceIds.includes(source.id)).map(source => <a key={source.id} href={source.url} target="_blank" rel="noreferrer">{source.title} <ExternalLink size={12} /></a>)}</div>
+            </div>}
+          </article>;
+        })}</div>
+        <details className="lab-dossier-source-list"><summary>Historical sources · {mission.sources.length} records</summary>{mission.sources.map(source => <a key={source.id} href={source.url} target="_blank" rel="noreferrer">{source.title}<span>{source.credit}</span></a>)}</details>
+        <p className="lab-dossier-note">{mission.sceneNote}</p>
+      </section>
+    </div>
+  </main>;
+}
+
+export function ExplorationExperience(props: ExplorationExperienceProps) {
+  return props.mission.id === 'camera-lab' ? <CameraLabDossier {...props} /> : <ThreeDimensionalExperience {...props} />;
 }

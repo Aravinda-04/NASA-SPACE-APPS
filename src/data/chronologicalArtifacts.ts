@@ -198,7 +198,7 @@ export const getChronologicalArtifacts = (id: MissionId) => CHRONOLOGICAL_ARTIFA
 export const getPlayableMission = (artifact: ChronologicalArtifact) => EXPEDITION_MISSIONS
   .find((item) => item.id === artifact.playableMissionId && item.id === artifact.volumeId);
 
-export type SimulationTarget = 'surveyor' | 'apollo12' | 'returned-camera' | 'curiosity' | 'john-klein' | 'pioneer' | 'viking' | 'viking2' | 'ingenuity' | 'near' | 'dawn' | 'kepler';
+export type SimulationTarget = 'surveyor' | 'apollo12' | 'returned-camera' | 'camera-lab' | 'curiosity' | 'john-klein' | 'pioneer' | 'viking' | 'viking2' | 'ingenuity' | 'near' | 'dawn' | 'kepler';
 
 export interface ArtifactSimulationInfo {
   targetId: SimulationTarget;
@@ -235,6 +235,9 @@ export const getArtifactSimulation = (artifact: ChronologicalArtifact): Artifact
   }
   if (artifact.id === 'surveyor-camera') {
     return { targetId: 'returned-camera', label: 'Enter recovery reconstruction', title: 'The returned camera' };
+  }
+  if (artifact.id === 'camera-tests') {
+    return { targetId: 'camera-lab', label: 'Enter laboratory archive', title: 'The laboratory afterlife' };
   }
   if (artifact.id === 'apollo-12') {
     return { targetId: 'apollo12', label: 'Enter 3D simulation', title: 'Apollo 12 · Intrepid' };

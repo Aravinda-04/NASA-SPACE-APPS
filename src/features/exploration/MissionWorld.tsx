@@ -1,5 +1,5 @@
 import React, { Suspense, useEffect, useMemo } from 'react';
-import { Billboard, Line, useGLTF } from '@react-three/drei';
+import { Billboard, Line, useGLTF, useTexture } from '@react-three/drei';
 import * as THREE from 'three';
 import type { MissionWorldProps } from '../../types/expedition';
 import { getFourStepGradientMap } from '../../utils/celShading';
@@ -7,6 +7,10 @@ import { VikingProceduralFallback } from '../../components/VikingHardwareRig';
 
 // The decoder is shipped with the demo so neither model needs a third-party CDN.
 const DECODER_PATH = '/vendor/draco/';
+const SURVEYOR_RECOVERY_IMAGE = new URL(
+  '../../../Provided Resources/Surveyor 3/images/as12-48-7134_conrad_surveyor3.jpg',
+  import.meta.url,
+).href;
 function seeded(seed: number) {
   return () => {
     seed = Math.imul(1664525, seed) + 1013904223;
@@ -175,7 +179,29 @@ function SurveyorCameraUnit() {
 }
 
 function ReturnedCameraSite() {
+  const recoveryImage = useTexture(SURVEYOR_RECOVERY_IMAGE);
+  useEffect(() => {
+    recoveryImage.colorSpace = THREE.SRGBColorSpace;
+    recoveryImage.anisotropy = 8;
+    recoveryImage.needsUpdate = true;
+  }, [recoveryImage]);
   return <group>
+    {/* Apollo 12 frame AS12-48-7134 is mounted as a physical archive panel so
+        camera movement reveals its depth and angle like every other scene object. */}
+    <group position={[-7.2, 3.4, -4.2]} rotation={[0, 0.34, 0]}>
+      <mesh position={[0, 0, -0.11]} castShadow>
+        <boxGeometry args={[5.45, 5.45, 0.2]} />
+        <meshStandardMaterial color="#303638" roughness={0.82} metalness={0.18} />
+      </mesh>
+      <mesh position={[0, 0, 0.012]}>
+        <planeGeometry args={[5.12, 5.12]} />
+        <meshBasicMaterial map={recoveryImage} toneMapped={false} />
+      </mesh>
+      <Strut from={[-1.65, -2.72, -0.08]} to={[-1.65, -3.33, -0.08]} radius={0.065} color="#697071" />
+      <Strut from={[1.65, -2.72, -0.08]} to={[1.65, -3.33, -0.08]} radius={0.065} color="#697071" />
+      <mesh position={[-1.65, -3.4, -0.08]}><cylinderGeometry args={[0.3, 0.38, 0.12, 16]} /><meshStandardMaterial color="#555b5b" roughness={0.9} /></mesh>
+      <mesh position={[1.65, -3.4, -0.08]}><cylinderGeometry args={[0.3, 0.38, 0.12, 16]} /><meshStandardMaterial color="#555b5b" roughness={0.9} /></mesh>
+    </group>
     <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.07, 0]} receiveShadow><circleGeometry args={[110, 96]} /><meshToonMaterial color="#8c8e88" gradientMap={getFourStepGradientMap()} /></mesh>
     <mesh position={[-1.8, -0.02, 0]} rotation={[-Math.PI / 2, 0, 0]}><circleGeometry args={[4.4, 48]} /><meshToonMaterial color="#a3a299" gradientMap={getFourStepGradientMap()} /></mesh>
     {/* Tool carrier and return-container archive. */}
@@ -183,6 +209,29 @@ function ReturnedCameraSite() {
     {/* Earth-laboratory archive is deliberately abstract and visually separated. */}
     <group position={[7.2, 0, -3.8]}><mesh position={[0, 0.42, 0]}><cylinderGeometry args={[0.72, 0.82, 0.82, 24]} /><meshStandardMaterial color="#617c7b" emissive="#315957" emissiveIntensity={0.45} roughness={0.6} /></mesh><mesh position={[0, 0.9, 0]} rotation={[-Math.PI / 2, 0, 0]}><ringGeometry args={[0.36, 0.48, 28]} /><meshBasicMaterial color="#c5efea" transparent opacity={0.72} /></mesh></group>
     <Line points={[[3.5, 0.5, -1.8], [5.2, 0.7, -2.7], [7.2, 0.9, -3.8]]} color="#b6d0cc" lineWidth={1} transparent opacity={0.42} dashed dashSize={0.2} gapSize={0.22} />
+  </group>;
+}
+
+function CameraLaboratory() {
+  return <group>
+    <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.03, 0]} receiveShadow><planeGeometry args={[52, 52]} /><meshStandardMaterial color="#293536" roughness={0.8} metalness={0.12} /></mesh>
+    <mesh position={[0, 6, -14]}><planeGeometry args={[30, 12]} /><meshStandardMaterial color="#344345" roughness={0.9} /></mesh>
+    {[-10, -5, 0, 5, 10].map(x => <Line key={`wall-${x}`} points={[[x, 0, -13.95], [x, 12, -13.95]]} color="#60807f" lineWidth={1} transparent opacity={0.22} />)}
+    {[1, 3, 5, 7, 9, 11].map(y => <Line key={`wall-y-${y}`} points={[[-15, y, -13.95], [15, y, -13.95]]} color="#60807f" lineWidth={1} transparent opacity={0.18} />)}
+    {/* Returned camera on a central inspection turntable. */}
+    <mesh position={[0, 0.38, 0]} castShadow><cylinderGeometry args={[1.15, 1.3, 0.72, 40]} /><meshStandardMaterial color="#536567" metalness={0.42} roughness={0.38} /></mesh>
+    <group position={[0, 1.05, 0]} scale={1.25}><SurveyorCameraUnit /></group>
+    <mesh position={[0, 1.05, -0.1]}><cylinderGeometry args={[1.7, 1.7, 2.2, 36, 1, true]} /><meshBasicMaterial color="#8de2da" transparent opacity={0.06} side={THREE.DoubleSide} depthWrite={false} /></mesh>
+    {/* Optical bench and explanatory light path. */}
+    <group position={[-3.8, 0, 0]}><mesh position={[0, 0.58, 0]}><boxGeometry args={[2.4, 0.22, 1.2]} /><meshStandardMaterial color="#5c6969" metalness={0.35} roughness={0.5} /></mesh><mesh position={[0, 1.18, 0]} rotation={[0, Math.PI / 2, 0]}><cylinderGeometry args={[0.42, 0.42, 0.28, 28]} /><meshStandardMaterial color="#182629" metalness={0.5} roughness={0.25} /></mesh><mesh position={[0.15, 1.18, 0]} rotation={[0, Math.PI / 2, 0]}><circleGeometry args={[0.31, 28]} /><meshBasicMaterial color="#9feaf0" transparent opacity={0.65} /></mesh></group>
+    <Line points={[[-3.55, 1.18, 0], [-1.4, 1.18, 0], [-0.5, 1.1, 0]]} color="#9feaf0" lineWidth={2} transparent opacity={0.52} />
+    {/* Electrical station with deliberately abstract waveform. */}
+    <group position={[0, 0, -3.8]}><mesh position={[0, 0.7, 0]}><boxGeometry args={[2.2, 1.4, 0.55]} /><meshStandardMaterial color="#435455" roughness={0.55} /></mesh><mesh position={[0, 0.82, 0.29]}><planeGeometry args={[1.65, 0.72]} /><meshBasicMaterial color="#122527" /></mesh><Line points={[[ -0.72, 0.82, 0.31], [-0.35, 1.02, 0.31], [0, 0.62, 0.31], [0.35, 0.98, 0.31], [0.72, 0.76, 0.31]]} color="#80e0b5" lineWidth={2} /></group>
+    {/* Mechanical station: scanning axis and bearing cutaway. */}
+    <group position={[3.8, 0, 0]}><mesh position={[0, 0.55, 0]}><boxGeometry args={[2.3, 0.25, 1.3]} /><meshStandardMaterial color="#5b6464" metalness={0.36} roughness={0.48} /></mesh><mesh position={[0, 1.12, 0]} rotation={[Math.PI / 2, 0, 0]}><torusGeometry args={[0.64, 0.16, 12, 30]} /><meshStandardMaterial color="#bd9f62" metalness={0.55} roughness={0.35} /></mesh><mesh position={[0, 1.12, 0]} rotation={[Math.PI / 2, 0, 0]}><cylinderGeometry args={[0.18, 0.18, 0.45, 18]} /><meshStandardMaterial color="#7b8583" metalness={0.65} roughness={0.3} /></mesh></group>
+    {/* Materials station with magnified dust grains under a lens. */}
+    <group position={[0, 0, 3.8]}><mesh position={[0, 0.5, 0]}><boxGeometry args={[2.2, 0.24, 1.4]} /><meshStandardMaterial color="#596665" roughness={0.62} /></mesh><mesh position={[0, 1.02, 0]} rotation={[Math.PI / 2, 0, 0]}><cylinderGeometry args={[0.72, 0.72, 0.16, 28]} /><meshStandardMaterial color="#aac8c5" transparent opacity={0.45} metalness={0.25} roughness={0.2} /></mesh>{[[-0.28, 0.15], [0.18, 0.26], [0.32, -0.18], [-0.12, -0.26]].map(([x,z], index) => <mesh key={index} position={[x, 1.18, z]}><dodecahedronGeometry args={[0.09 + index * 0.02, 0]} /><meshStandardMaterial color="#b3aa98" roughness={1} /></mesh>)}</group>
+    <pointLight position={[0, 7, 2]} color="#d8fffa" intensity={1.8} distance={24} decay={2} />
   </group>;
 }
 
@@ -909,19 +958,21 @@ export function MissionWorld({ mission, selectedId, discoveredIds, onSelect }: M
   const isIngenuity = mission.id === 'ingenuity';
   const isApollo12 = mission.id === 'apollo12';
   const isReturnedCamera = mission.id === 'returned-camera';
+  const isCameraLab = mission.id === 'camera-lab';
   const space = mission.id === 'pioneer' || isNear || isDawn || isKepler;
   const moon = mission.id === 'surveyor' || isApollo12 || isReturnedCamera;
   return <>
-    <color attach="background" args={[space ? '#090f1b' : moon ? '#111820' : isJohnKlein ? '#9d684d' : isIngenuity ? '#b9744d' : '#c69273']} />
-    {!space ? <fog attach="fog" args={[moon ? '#283138' : isJohnKlein ? '#8d5e49' : isIngenuity ? '#a96749' : '#c69273', isJohnKlein || isIngenuity ? 30 : 42, isJohnKlein || isIngenuity ? 105 : 150]} /> : null}
+    <color attach="background" args={[space ? '#090f1b' : moon ? '#111820' : isCameraLab ? '#1d282a' : isJohnKlein ? '#9d684d' : isIngenuity ? '#b9744d' : '#c69273']} />
+    {!space ? <fog attach="fog" args={[moon ? '#283138' : isCameraLab ? '#1d282a' : isJohnKlein ? '#8d5e49' : isIngenuity ? '#a96749' : '#c69273', isCameraLab ? 22 : isJohnKlein || isIngenuity ? 30 : 42, isCameraLab ? 70 : isJohnKlein || isIngenuity ? 105 : 150]} /> : null}
     <ambientLight intensity={space ? 1.1 : 0.7} color={space ? '#b7c8df' : '#fff0d6'} />
     <hemisphereLight args={[moon ? '#cdd8de' : '#f5d9b0', moon ? '#4f5557' : '#69402d', 1.15]} />
     <directionalLight position={[-12, 16, 8]} intensity={space ? 2.5 : 3} color="#fff4dd" castShadow shadow-mapSize={[1024, 1024]} shadow-camera-left={-25} shadow-camera-right={25} shadow-camera-top={25} shadow-camera-bottom={-25} shadow-bias={-0.001} />
     {space || moon ? <StarField /> : null}
-    {!space && !moon && !isJohnKlein && !isIngenuity ? <Surface moon={false} /> : null}
+    {!space && !moon && !isJohnKlein && !isIngenuity && !isCameraLab ? <Surface moon={false} /> : null}
     {mission.id === 'surveyor' ? <SurveyorSiteSurface /> : null}
     {isApollo12 ? <Apollo12Site /> : null}
     {isReturnedCamera ? <ReturnedCameraSite /> : null}
+    {isCameraLab ? <CameraLaboratory /> : null}
     {isJohnKlein ? <YellowknifeBaySurface /> : null}
     {isIngenuity ? <JezeroAirfield /> : null}
     {mission.id === 'surveyor' ? <>

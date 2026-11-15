@@ -14,6 +14,13 @@ export interface CollectibleDefinition {
 }
 export const COLLECTIBLE_CARDS: CollectibleDefinition[] = [
   {
+    id: "camera-lab-inspector", missionId: "camera-lab", title: "Systems Inspector", classification: "Returned-hardware laboratory",
+    fact: "Surveyor 3's returned camera could be examined optically, electrically, mechanically and materially on Earth.",
+    explanation: "Combining subsystem tests produced stronger evidence than appearance alone and helped engineers understand how exposed spacecraft hardware endured the lunar environment.",
+    source: "https://ntrs.nasa.gov/citations/19710024418", sourceLabel: "NASA-CR-121796 · returned camera tests",
+    artwork: "/images/rewards/surveyor-camera-illustration.webp", alt: "Illustration of Surveyor's camera used for the laboratory-inspector reward.", accent: "#7ab4b0",
+  },
+  {
     id: "returned-camera-lab", missionId: "returned-camera", title: "Hardware Evidence", classification: "Returned lunar equipment",
     fact: "Apollo 12 returned Surveyor 3's television camera so engineers could examine the effects of lunar exposure.",
     explanation: "The camera connected remote observation, astronaut recovery and laboratory testing. Its physical condition supplied evidence that transmitted pictures alone could not provide.",

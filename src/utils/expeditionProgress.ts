@@ -15,6 +15,7 @@ export const STANDALONE_MISSION_KEYS: Partial<Record<MissionId, string>> = {
   "john-klein": "john_klein_expedition_progress",
   apollo12: "apollo12_expedition_progress",
   "returned-camera": "returned_camera_expedition_progress",
+  "camera-lab": "camera_lab_expedition_progress",
   ingenuity: "ingenuity_expedition_progress",
   near: "near_expedition_progress",
 };
@@ -27,6 +28,7 @@ export const CARD_BY_MISSION: Record<MissionId, CardId> = {
   "john-klein": "john-klein-rock-archive",
   apollo12: "apollo12-precision-landing",
   "returned-camera": "returned-camera-lab",
+  "camera-lab": "camera-lab-inspector",
   ingenuity: "ingenuity-first-flight",
   near: "near-asteroid-lander",
   dawn: "dawn-two-worlds",

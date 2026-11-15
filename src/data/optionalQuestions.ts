@@ -24,6 +24,12 @@ export const OPTIONAL_QUESTIONS: Record<MissionId, LearningTask> = {
     correctIndex: 0,
     explanation: "Laboratory examination could directly evaluate the hardware’s condition after lunar exposure. Images recorded the scene but could not replace physical tests of the camera itself.",
   },
+  "camera-lab": {
+    question: "Which observation would require a mechanical rather than purely visual test?",
+    options: ["Whether the scanning mechanism could move correctly.", "Whether the housing appeared lighter in a photograph.", "Whether the mission had landed on the Moon."],
+    correctIndex: 0,
+    explanation: "A mechanism’s freedom of movement and wear require direct mechanical inspection. External appearance alone cannot establish that internal moving parts operate correctly.",
+  },
   curiosity: {
     question:
       "Why did the powered descent stage fly away after Curiosity touched down?",

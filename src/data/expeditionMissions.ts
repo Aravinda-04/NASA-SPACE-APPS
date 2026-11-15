@@ -4,6 +4,7 @@ import { VIKING_2_MISSION } from './viking2Mission';
 import { JOHN_KLEIN_MISSION } from './johnKleinMission';
 import { APOLLO_12_MISSION } from './apollo12Mission';
 import { RETURNED_CAMERA_MISSION } from './returnedCameraMission';
+import { CAMERA_LAB_MISSION } from './cameraLabMission';
 import { INGENUITY_MISSION } from './ingenuityMission';
 import { NEAR_MISSION } from './nearMission';
 import { DAWN_MISSION } from './dawnMission';
@@ -202,6 +203,7 @@ export const EXPEDITION_MISSIONS: ExpeditionMission[] = [
   JOHN_KLEIN_MISSION,
   APOLLO_12_MISSION,
   RETURNED_CAMERA_MISSION,
+  CAMERA_LAB_MISSION,
   INGENUITY_MISSION,
   NEAR_MISSION,
   DAWN_MISSION,

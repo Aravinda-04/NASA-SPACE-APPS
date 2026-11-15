@@ -55,6 +55,7 @@ export const BOOK_BY_MISSION: Record<MissionId, BookId> = {
   "john-klein": "curiosity",
   apollo12: "surveyor",
   "returned-camera": "surveyor",
+  "camera-lab": "surveyor",
   ingenuity: "curiosity",
   near: "pioneer",
   dawn: "pioneer",

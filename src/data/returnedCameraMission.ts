@@ -10,7 +10,7 @@ export const RETURNED_CAMERA_MISSION: ExpeditionMission = {
   dateLabel: 'Recovered: 20 November 1969 · examined on Earth afterward',
   statusLabel: 'Historical: camera returned to Earth', accent: '#b6d0cc',
   coordinatesLabel: 'Ocean of Storms recovery site · camera now on Earth',
-  sceneNote: 'Fictional frozen-moment reconstruction. Astronaut, camera, tool carrier and Surveyor positions are arranged for scale and inspection rather than reproducing an exact photograph. The laboratory station is an archive visualization, not equipment left on the Moon.',
+  sceneNote: 'Fictional frozen-moment reconstruction using Apollo 12 photograph AS12-48-7134 on a mounted evidence panel. The 3D models and their distances are not to scale. The panel and laboratory station are archive visualizations, not equipment left on the Moon.',
   discoveries: [
     {
       id: 'camera-scale', title: 'A robotic eye in human hands', component: 'Surveyor television camera assembly',

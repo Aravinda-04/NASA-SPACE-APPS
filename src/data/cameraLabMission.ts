@@ -1,0 +1,62 @@
+import type { ExpeditionMission } from '../types/expedition';
+
+export const CAMERA_LAB_MISSION: ExpeditionMission = {
+  id: 'camera-lab', chapter: 1, destination: 'Earth laboratory · returned hardware archive', name: 'The Laboratory Afterlife',
+  title: 'Test the Machine That Watched the Moon', subtitle: 'The Surveyor camera returned as an engineering specimen.',
+  question: 'How can one recovered instrument support several different investigations?',
+  introduction: 'After Apollo 12 returned Surveyor 3’s television camera, engineers examined the physical instrument rather than relying only on its old transmissions. Optical, electrical, mechanical and materials evidence could now be studied directly.',
+  arrival: 'Enter a stylized Earth laboratory. Move around the camera turntable and open each test station to separate observed condition from engineering interpretation.',
+  legacy: 'The returned camera demonstrated the value of recovering exposed spacecraft hardware. It connected remote operations on the Moon with controlled laboratory examination on Earth.',
+  dateLabel: 'Camera recovered: 1969 · technical report published: 1970',
+  statusLabel: 'Historical returned hardware · report preserved in NASA archive', accent: '#7ab4b0',
+  coordinatesLabel: 'Earth laboratory archive · not a lunar location',
+  sceneNote: 'Schematic Earth-laboratory visualization. Camera geometry, instruments, readings and room layout are not to scale and do not reproduce a specific facility. No live measurements are generated.',
+  discoveries: [
+    {
+      id: 'lab-optics', title: 'Did the robotic eye still see?', component: 'Optical inspection station',
+      position: [-3.8, 1, 0], cameraPosition: [-5.8, 2.1, 3.2],
+      summary: 'Lenses, mirrors and image-forming performance could be examined after exposure and recovery.',
+      story: 'The camera had once converted a lunar scene into transmitted scan lines. On Earth, researchers could inspect the optical path and compare its physical condition with expected performance.',
+      science: 'Direct inspection helped distinguish optical degradation from changes elsewhere in the imaging and transmission chain.',
+      engineering: 'This station symbolizes bench tests of optical components. Its projected beam is explanatory, not a reconstructed measurement.',
+      status: 'Historical test category summarized from the returned-camera report.', evidence: 'Historical record', sourceIds: ['camera-report'],
+    },
+    {
+      id: 'lab-electrical', title: 'Trace the signal path', component: 'Electrical and electronic inspection station',
+      position: [0, 0.9, -3.8], cameraPosition: [3.2, 2, -5.8],
+      summary: 'Returned circuits could be measured instead of inferred through a silent spacecraft.',
+      story: 'Once Surveyor stopped communicating, controllers could no longer diagnose the camera remotely. Recovery made its wiring and electronic assemblies accessible again.',
+      science: 'Electrical tests helped identify which parts continued to function and which changes could plausibly be associated with exposure or handling.',
+      engineering: 'The waveform display is a visual metaphor for continuity and component testing, not authentic test data.',
+      status: 'Historical engineering examination; no live circuit is represented.', evidence: 'Historical record', sourceIds: ['camera-report'],
+    },
+    {
+      id: 'lab-mechanical', title: 'A scanner with moving parts', component: 'Mechanical scan and bearing inspection',
+      position: [3.8, 0.9, 0], cameraPosition: [5.8, 2.1, 3.2],
+      summary: 'Motors, bearings and scan mechanisms preserved a record of operation in lunar dust and vacuum.',
+      story: 'Surveyor’s facsimile camera formed images through controlled mechanical scanning. Its recovered mechanisms could be inspected for wear, contamination and freedom of movement.',
+      science: 'Mechanical condition provided evidence about how exposed moving assemblies endured the lunar environment.',
+      engineering: 'The cutaway wheel and motion guide represent categories of inspection without simulating the original mechanism.',
+      status: 'Historical mechanical evidence summarized for the archive.', evidence: 'Historical record', sourceIds: ['camera-report'],
+    },
+    {
+      id: 'lab-materials', title: 'Dust, coatings and exposure', component: 'Surface and materials analysis station',
+      position: [0, 0.75, 3.8], cameraPosition: [-2.7, 2, 5.8],
+      summary: 'Discoloration and deposits had to be separated from damage inside the instrument.',
+      story: 'Researchers examined surfaces and internal materials to understand visible changes after lunar exposure and the journey home.',
+      science: 'Dust contamination and radiation-related effects helped explain some observed discoloration while many parts remained serviceable.',
+      engineering: 'Material evidence is strongest when documented alongside optical, electrical and mechanical results rather than treated as a single dramatic conclusion.',
+      status: 'Historical report evidence. The magnified particles are an explanatory visualization.', evidence: 'Historical record', sourceIds: ['camera-report'],
+    },
+  ],
+  task: {
+    question: 'Why did the laboratory examine several camera subsystems instead of relying on appearance alone?',
+    options: ['Different tests could distinguish optical, electrical, mechanical and material changes.', 'A photograph of the housing automatically proved every internal component worked.', 'The laboratory was trying to restart Surveyor on the Moon.'],
+    correctIndex: 0,
+    explanation: 'Surface appearance cannot establish the condition of optics, circuits or moving mechanisms. Multiple tests created a more defensible engineering assessment of the returned hardware.',
+  },
+  sources: [
+    { id: 'camera-report', title: 'Tests of the returned Surveyor 3 television camera', url: 'https://ntrs.nasa.gov/citations/19710024418', credit: 'NASA Technical Reports Server · NASA-CR-121796' },
+    { id: 'apollo-recovery', title: 'Apollo 12 and Surveyor 3', url: 'https://science.nasa.gov/resource/apollo-12-and-surveyor-3/', credit: 'NASA Science' },
+  ],
+};
