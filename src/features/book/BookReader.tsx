@@ -49,6 +49,7 @@ export function BookReader({
     onContext({ ...context, view: 'reading' });
     onPage(next);
   };
+  const goTimeline = () => onContext({ ...context, view: 'contents', panel: 'contents' });
   useEffect(() => {
     heading.current?.focus({ preventScroll: true });
     heading.current?.closest("main")?.scrollTo(0, 0);
@@ -85,7 +86,7 @@ export function BookReader({
         if (isContents || event.defaultPrevented || (event.target as HTMLElement).closest('button,a,.artifact-field-notes,[role="slider"]') || (event.target as HTMLElement).isContentEditable) return;
         if (event.key === "ArrowLeft") {
           event.preventDefault();
-          if (activePage <= 1) onContext({ ...context, view: 'contents', panel: 'contents' });
+          if (activePage <= 1) goTimeline();
           else goPage(activePage - 1);
         }
         if (event.key === "ArrowRight" && activePage < 3) {
@@ -99,9 +100,13 @@ export function BookReader({
         <p>
           {book.volume} / {isContents ? 'Chronological contents' : labels[activePage]}
         </p>
-        {isContents && (
+        {isContents ? (
           <button className="ow-button" onClick={onLibrary}>
             <ArrowLeft size={16} /> Expedition Library
+          </button>
+        ) : activePage === 3 && (
+          <button className="ow-button" onClick={goTimeline}>
+            <ArrowLeft size={16} /> Back to timeline
           </button>
         )}
       </header>
@@ -208,7 +213,7 @@ export function BookReader({
         <button
           className="ow-button"
           disabled={isContents}
-          onClick={() => activePage <= 1 ? onContext({ ...context, view: 'contents', panel: 'contents' }) : goPage(activePage - 1)}
+          onClick={() => activePage <= 1 ? goTimeline() : goPage(activePage - 1)}
         >
           <ArrowLeft size={16} />
           Previous
