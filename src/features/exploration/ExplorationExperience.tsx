@@ -376,7 +376,7 @@ function CameraLabDossier({ mission, progress, onDiscover, onComplete, onExit }:
     onDiscover(id);
     setActiveId(current => current === id ? null : id);
   };
-  return <main className="lab-dossier" aria-label={`${mission.name} archival investigation`}>
+  return <main className="lab-dossier" style={{ '--lab-photo': `url(${CAMERA_LAB_PHOTO})` } as React.CSSProperties} aria-label={`${mission.name} archival investigation`}>
     <header className="lab-dossier-header">
       <button onClick={onExit}><ArrowLeft size={17} /> Back to journal</button>
       <div><span>01 / Moon · laboratory field notes</span><h1>{mission.name}</h1></div>

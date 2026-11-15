@@ -130,12 +130,54 @@ function SurveyorSiteSurface() {
   </group>;
 }
 
+function LunarBackdrop({ variant }: { variant: 'apollo12' | 'recovery' }) {
+  const rocks = useMemo(() => {
+    const random = seeded(variant === 'apollo12' ? 19691119 : 19691120);
+    return Array.from({ length: 46 }, (_, index) => ({
+      position: [(random() - 0.5) * 70, 0.08 + random() * 0.28, -9 - random() * 42] as [number, number, number],
+      scale: 0.12 + random() * (index % 12 === 0 ? 1.1 : 0.42),
+      rotation: random() * Math.PI,
+    }));
+  }, [variant]);
+  const earthPosition: [number, number, number] = variant === 'apollo12' ? [-24, 20, -68] : [24, 17, -64];
+  return <group>
+    {/* Layered irregular ridges replace the empty horizon while remaining
+        explicitly illustrative rather than georeferenced lunar topography. */}
+    {Array.from({ length: 17 }, (_, index) => {
+      const x = -52 + index * 6.5;
+      const height = 3.5 + ((index * 7) % 5) * 1.3;
+      return <mesh key={`lunar-ridge-${index}`} position={[x, -2.7 + height * 0.36, -54 - Math.abs(index - 8) * 0.9]} scale={[6.8, height, 8]} rotation={[0.04, index * 0.17, 0]}>
+        <icosahedronGeometry args={[1, 1]} />
+        <meshToonMaterial color={index % 3 === 0 ? '#626764' : index % 2 ? '#747772' : '#85857e'} gradientMap={getFourStepGradientMap()} />
+      </mesh>;
+    })}
+    {rocks.map((rock, index) => <mesh key={`lunar-rock-${index}`} position={rock.position} scale={[rock.scale * 1.35, rock.scale * 0.62, rock.scale]} rotation={[0.08, rock.rotation, 0.04]} castShadow receiveShadow>
+      <dodecahedronGeometry args={[1, 0]} />
+      <meshToonMaterial color={index % 5 === 0 ? '#b0ada4' : '#696c68'} gradientMap={getFourStepGradientMap()} />
+    </mesh>)}
+    {variant === 'apollo12' ? <>
+      <mesh position={[-15, 0.01, -19]} rotation={[-Math.PI / 2, 0, 0]}><ringGeometry args={[3.8, 4.5, 44]} /><meshToonMaterial color="#686b68" gradientMap={getFourStepGradientMap()} /></mesh>
+      <mesh position={[18, 0.012, -26]} rotation={[-Math.PI / 2, 0, 0]}><ringGeometry args={[5.2, 6.2, 50]} /><meshToonMaterial color="#777974" gradientMap={getFourStepGradientMap()} /></mesh>
+    </> : <>
+      <mesh position={[-17, 0.01, -22]} rotation={[-Math.PI / 2, 0, 0]}><ringGeometry args={[5.5, 6.6, 48]} /><meshToonMaterial color="#656965" gradientMap={getFourStepGradientMap()} /></mesh>
+      <mesh position={[14, 0.012, -18]} rotation={[-Math.PI / 2, 0, 0]}><ringGeometry args={[3.1, 3.8, 40]} /><meshToonMaterial color="#7b7d77" gradientMap={getFourStepGradientMap()} /></mesh>
+    </>}
+    {/* A restrained Earth reference gives the black sky depth and orientation. */}
+    <group position={earthPosition}>
+      <mesh><sphereGeometry args={[2.35, 32, 24]} /><meshStandardMaterial color="#6f9eae" roughness={0.9} /></mesh>
+      <mesh scale={1.08}><sphereGeometry args={[2.35, 32, 24]} /><meshBasicMaterial color="#b9e4ed" transparent opacity={0.12} side={THREE.BackSide} /></mesh>
+      <mesh position={[-0.45, 0.35, 2.17]} rotation={[0, 0, 0.5]}><circleGeometry args={[0.55, 18]} /><meshBasicMaterial color="#e7e4d2" transparent opacity={0.7} /></mesh>
+    </group>
+  </group>;
+}
+
 function Apollo12Site() {
   const steps = useMemo(() => Array.from({ length: 28 }, (_, index) => {
     const t = index / 27;
     return { x: -0.8 - t * 8.7 + Math.sin(t * 10) * 0.25, z: -0.5 - t * 6, side: index % 2 ? 0.2 : -0.2 };
   }), []);
   return <group>
+    <LunarBackdrop variant="apollo12" />
     <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.07, 0]} receiveShadow><circleGeometry args={[130, 96]} /><meshToonMaterial color="#96968e" gradientMap={getFourStepGradientMap()} /></mesh>
     {/* Intrepid's engine-scoured landing area anchors the scene. */}
     <mesh position={[0, -0.02, 0]} rotation={[-Math.PI / 2, 0, 0]}><circleGeometry args={[4.6, 48]} /><meshToonMaterial color="#6d706c" gradientMap={getFourStepGradientMap()} /></mesh>
@@ -186,6 +228,7 @@ function ReturnedCameraSite() {
     recoveryImage.needsUpdate = true;
   }, [recoveryImage]);
   return <group>
+    <LunarBackdrop variant="recovery" />
     {/* Apollo 12 frame AS12-48-7134 is mounted as a physical archive panel so
         camera movement reveals its depth and angle like every other scene object. */}
     <group position={[-7.2, 3.4, -4.2]} rotation={[0, 0.34, 0]}>
