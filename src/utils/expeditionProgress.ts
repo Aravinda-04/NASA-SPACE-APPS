@@ -11,6 +11,10 @@ export const LEGACY_STORAGE_KEY = "offworld-expedition:v1";
 export const EXPEDITION_STORAGE_KEY = "offworld-expedition:v2";
 export const STANDALONE_MISSION_KEYS: Partial<Record<MissionId, string>> = {
   viking: "viking_expedition_progress",
+  viking2: "viking2_expedition_progress",
+  "john-klein": "john_klein_expedition_progress",
+  apollo12: "apollo12_expedition_progress",
+  "returned-camera": "returned_camera_expedition_progress",
   ingenuity: "ingenuity_expedition_progress",
   near: "near_expedition_progress",
 };
@@ -19,6 +23,10 @@ export const CARD_BY_MISSION: Record<MissionId, CardId> = {
   curiosity: "curiosity-skycrane",
   pioneer: "pioneer-messenger",
   viking: "viking-laboratory",
+  viking2: "viking2-frost-station",
+  "john-klein": "john-klein-rock-archive",
+  apollo12: "apollo12-precision-landing",
+  "returned-camera": "returned-camera-lab",
   ingenuity: "ingenuity-first-flight",
   near: "near-asteroid-lander",
   dawn: "dawn-two-worlds",

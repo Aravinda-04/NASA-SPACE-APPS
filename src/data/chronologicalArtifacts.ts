@@ -198,7 +198,7 @@ export const getChronologicalArtifacts = (id: MissionId) => CHRONOLOGICAL_ARTIFA
 export const getPlayableMission = (artifact: ChronologicalArtifact) => EXPEDITION_MISSIONS
   .find((item) => item.id === artifact.playableMissionId && item.id === artifact.volumeId);
 
-export type SimulationTarget = 'surveyor' | 'curiosity' | 'pioneer' | 'viking' | 'ingenuity' | 'near' | 'dawn' | 'kepler';
+export type SimulationTarget = 'surveyor' | 'apollo12' | 'returned-camera' | 'curiosity' | 'john-klein' | 'pioneer' | 'viking' | 'viking2' | 'ingenuity' | 'near' | 'dawn' | 'kepler';
 
 export interface ArtifactSimulationInfo {
   targetId: SimulationTarget;
@@ -211,21 +211,33 @@ export interface ArtifactSimulationInfo {
  * Prevents generic or incorrect fallback linking to the Curiosity rover.
  */
 export const getArtifactSimulation = (artifact: ChronologicalArtifact): ArtifactSimulationInfo | null => {
-  // 1. Viking 1 (and sister lander Viking 2) -> Chryse Planitia Viking 3D Simulation
-  if (artifact.id === 'viking-1' || artifact.id === 'viking-2') {
+  // 1. Each Viking landing record opens its corresponding surface expedition.
+  if (artifact.id === 'viking-1') {
     return { targetId: 'viking', label: 'Enter 3D simulation', title: 'Viking 1' };
+  }
+  if (artifact.id === 'viking-2') {
+    return { targetId: 'viking2', label: 'Enter 3D simulation', title: 'Viking 2' };
   }
   // 2. Ingenuity Helicopter -> Jezero Crater Ingenuity 3D Simulation
   if (artifact.id === 'ingenuity') {
     return { targetId: 'ingenuity', label: 'Enter 3D simulation', title: 'Ingenuity Helicopter' };
   }
   // 3. Curiosity Rover & John Klein drill rock -> Gale Crater Curiosity 3D Simulation
-  if (artifact.id === 'curiosity-rover' || artifact.id === 'john-klein') {
+  if (artifact.id === 'curiosity-rover') {
     return { targetId: 'curiosity', label: 'Enter 3D simulation', title: 'Curiosity Rover' };
   }
+  if (artifact.id === 'john-klein') {
+    return { targetId: 'john-klein', label: 'Enter rock archive', title: 'John Klein' };
+  }
   // 4. Surveyor 3, Apollo 12, & Surveyor camera -> Ocean of Storms Surveyor 3 3D Simulation
-  if (artifact.id === 'surveyor-3' || artifact.id === 'apollo-12' || artifact.id === 'surveyor-camera') {
+  if (artifact.id === 'surveyor-3') {
     return { targetId: 'surveyor', label: 'Enter 3D simulation', title: 'Surveyor 3' };
+  }
+  if (artifact.id === 'surveyor-camera') {
+    return { targetId: 'returned-camera', label: 'Enter recovery reconstruction', title: 'The returned camera' };
+  }
+  if (artifact.id === 'apollo-12') {
+    return { targetId: 'apollo12', label: 'Enter 3D simulation', title: 'Apollo 12 · Intrepid' };
   }
   // 5. Pioneer 10 -> Deep Space Pioneer 10 3D Simulation
   if (artifact.id === 'pioneer-10') {

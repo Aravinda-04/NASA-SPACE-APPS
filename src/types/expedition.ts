@@ -2,6 +2,10 @@ export type BookId = "surveyor" | "curiosity" | "pioneer";
 export type MissionId =
   | BookId
   | "viking"
+  | "viking2"
+  | "john-klein"
+  | "apollo12"
+  | "returned-camera"
   | "ingenuity"
   | "near"
   | "dawn"
@@ -73,6 +77,10 @@ export type CardId =
   | "curiosity-skycrane"
   | "pioneer-messenger"
   | "viking-laboratory"
+  | "viking2-frost-station"
+  | "john-klein-rock-archive"
+  | "apollo12-precision-landing"
+  | "returned-camera-lab"
   | "ingenuity-first-flight"
   | "near-asteroid-lander"
   | "dawn-two-worlds"

@@ -35,8 +35,8 @@ const {
   EXPEDITION_STORAGE_KEY,
   LEGACY_STORAGE_KEY,
 } = await loadTs("../src/utils/expeditionProgress.ts");
-assert.equal(missions.length, 8);
-assert.equal(new Set(missions.map((m) => m.id)).size, 8);
+assert.equal(missions.length, 12);
+assert.equal(new Set(missions.map((m) => m.id)).size, 12);
 for (const mission of missions) {
   assert.equal(
     mission.discoveries.length,
@@ -219,8 +219,8 @@ for (const mission of missions) {
     "Replay is idempotent and preserves the earned timestamp.",
   );
 }
-assert.equal(collectionCount(journey), 8);
-assert.equal(Object.keys(journey.collection).length, 8);
+assert.equal(collectionCount(journey), 12);
+assert.equal(Object.keys(journey.collection).length, 12);
 assert.equal(
   normalizeSave(
     { ...journey, collection: { ...journey.collection, future: {} } },
@@ -238,8 +238,8 @@ const { BOOK_BY_MISSION: bookByMission } = await loadTs(
   "../src/data/books.ts",
 );
 assert.deepEqual(bookByMission, {
-  surveyor: 'surveyor', curiosity: 'curiosity', pioneer: 'pioneer',
-  viking: 'curiosity', ingenuity: 'curiosity', near: 'pioneer', dawn: 'pioneer', kepler: 'pioneer',
+  surveyor: 'surveyor', apollo12: 'surveyor', 'returned-camera': 'surveyor', curiosity: 'curiosity', pioneer: 'pioneer',
+  viking: 'curiosity', viking2: 'curiosity', 'john-klein': 'curiosity', ingenuity: 'curiosity', near: 'pioneer', dawn: 'pioneer', kepler: 'pioneer',
 });
 for (const card of cards) {
   assert.ok(missions.some((m) => m.id === card.missionId));
@@ -250,8 +250,8 @@ for (const card of cards) {
   );
 }
 assert.equal(cards.length, missions.length);
-assert.equal(new Set(cards.map((c) => c.id)).size, 8);
-assert.equal(new Set(cards.map((c) => c.missionId)).size, 8);
+assert.equal(new Set(cards.map((c) => c.id)).size, 12);
+assert.equal(new Set(cards.map((c) => c.missionId)).size, 12);
 for (const mission of missions) {
   const q = questions[mission.id];
   assert.ok(q.correctIndex >= 0 && q.correctIndex < q.options.length);
@@ -276,7 +276,7 @@ assert.ok(
     0.001,
 );
 console.log(
-  "Passed: 8 missions, 32 sourced discoveries, tasks, legacy migration, v2 roundtrip, content resilience, denied/corrupt storage, repeat-safe 8-card rewards, artwork, optional questions and numerical light-time checks.",
+  "Passed: 12 missions, 48 sourced discoveries, tasks, legacy migration, v2 roundtrip, content resilience, denied/corrupt storage, repeat-safe 12-card rewards, artwork, optional questions and numerical light-time checks.",
 );
 
 const { CHRONOLOGICAL_ARTIFACTS: artifacts, getChronologicalArtifacts, getPlayableMission, getArtifactSimulation } = await loadTs('../src/data/chronologicalArtifacts.ts');
@@ -286,7 +286,7 @@ assert.deepEqual(['surveyor', 'curiosity', 'pioneer'].map(id => getChronological
 assert.deepEqual(artifacts.filter(getPlayableMission).map(item => item.playableMissionId).sort(), ['curiosity', 'pioneer', 'surveyor']);
 assert.deepEqual(
   [...new Set(artifacts.map(getArtifactSimulation).filter(Boolean).map(target => target.targetId))].sort(),
-  ['curiosity', 'dawn', 'ingenuity', 'kepler', 'near', 'pioneer', 'surveyor', 'viking'],
+  ['apollo12', 'curiosity', 'dawn', 'ingenuity', 'john-klein', 'kepler', 'near', 'pioneer', 'returned-camera', 'surveyor', 'viking', 'viking2'],
 );
 for (const item of artifacts) {
   assert.ok(missions.some(m => m.id === item.volumeId));
@@ -327,7 +327,7 @@ assert.deepEqual(normalizeSave(contextSave, missions).readingLocations, v2.readi
 assert.deepEqual(normalizeSave(contextSave, missions).collection, v2.collection, 'Opening dossiers does not award or erase cards');
 assert.equal(normalizeSave({ ...v2, readingContexts: { surveyor: { view: 'wrong', artifactId: 'anything', panel: 'dossier' } } }, missions).readingContexts, undefined);
 assert.equal(normalizeSave({ ...v2, readingContexts: { surveyor: { view: 'contents', artifactId: '<script>', panel: 'dossier' } } }, missions).readingContexts, undefined);
-console.log('Passed: 13 sourced chronological records, 8 simulation targets, chronology, coordinate bounds, 0/1/2/4/5/9-node Bézier geometry, additive reading-context migration and reward preservation.');
+console.log('Passed: 13 sourced chronological records, 12 simulation targets, chronology, coordinate bounds, 0/1/2/4/5/9-node Bézier geometry, additive reading-context migration and reward preservation.');
 
 const { wrapLongitude, planetCoordinateToVector, shortestAngleDelta, easeAtlasFocus } = await loadTs('../src/utils/planetCoordinates.ts');
 const { SOLAR_ATLAS_BODIES: solarBodies, PLANET_TEXTURES } = await loadTs('../src/data/atlas.ts');

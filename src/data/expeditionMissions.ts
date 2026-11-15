@@ -1,5 +1,9 @@
 import type { ExpeditionMission } from '../types/expedition';
 import { VIKING_MISSION } from './vikingMission';
+import { VIKING_2_MISSION } from './viking2Mission';
+import { JOHN_KLEIN_MISSION } from './johnKleinMission';
+import { APOLLO_12_MISSION } from './apollo12Mission';
+import { RETURNED_CAMERA_MISSION } from './returnedCameraMission';
 import { INGENUITY_MISSION } from './ingenuityMission';
 import { NEAR_MISSION } from './nearMission';
 import { DAWN_MISSION } from './dawnMission';
@@ -17,10 +21,10 @@ export const EXPEDITION_MISSIONS: ExpeditionMission[] = [
     legacy: 'Surveyor helped prepare the way for human exploration. Parts returned by Apollo 12 let engineers investigate how equipment endured the lunar environment.',
     dateLabel: 'Surveyor: 1967 · Apollo 12: 1969', statusLabel: 'Historical: inactive lander; selected parts returned',
     accent: '#819b97', coordinatesLabel: 'Ocean of Storms · Apollo 12 / Surveyor 3 region',
-    sceneNote: 'Fictional future visit. Simplified hardware and terrain; the nearby Apollo descent stage is an inspection-layout convenience, not a georeferenced distance. Removed parts are represented by archive markers.',
+    sceneNote: 'Fictional future visit. The crater, EVA traverse and nearby Apollo descent stage form a compressed inspection layout, not georeferenced terrain. Removed parts are represented by archive outlines rather than restored hardware.',
     discoveries: [
       {
-        id: 'lander', title: 'The robotic scout', component: 'Surveyor 3 lander', position: [0, 1, 0],
+        id: 'lander', title: 'The robotic scout', component: 'Surveyor 3 lander', position: [0, 1, 0], cameraPosition: [3.4, 2.2, 4.2],
         summary: 'A robot investigated the lunar surface before astronauts walked here.',
         story: 'Surveyor 3 landed in 1967. Its camera and surface sampler sent information to Earth before its final contact in May of that year.',
         science: 'Surface tests helped scientists assess the strength of lunar soil and its ability to support an Apollo lunar module.',
@@ -29,7 +33,7 @@ export const EXPEDITION_MISSIONS: ExpeditionMission[] = [
         evidence: 'Historical record', sourceIds: ['surveyor-mission'],
       },
       {
-        id: 'sampler', title: 'A scoop asks a question', component: 'Surface sampler archive', position: [-1.7, 0.35, 1],
+        id: 'sampler', title: 'A scoop asks a question', component: 'Surface sampler archive', position: [-1.7, 0.35, 1], cameraPosition: [-3.4, 1.7, 3.1],
         summary: 'How firm is the ground beneath a spacecraft?',
         story: 'Controllers used Surveyor’s sampler to dig, press and manipulate lunar material. Apollo 12 later recovered its scoop among the parts returned to Earth.',
         science: 'Mechanical tests revealed properties that photographs alone could not establish. Engineers needed evidence about the ground before attempting human landings.',
@@ -38,7 +42,7 @@ export const EXPEDITION_MISSIONS: ExpeditionMission[] = [
         evidence: 'Historical record', sourceIds: ['surveyor-mission', 'apollo-recovery'],
       },
       {
-        id: 'camera', title: 'The missing camera', component: 'Television camera mounting position', position: [0, 2, 0],
+        id: 'camera', title: 'The missing camera', component: 'Television camera mounting position', position: [0, 2, 0], cameraPosition: [2.6, 2.8, 3.2],
         summary: 'This empty mounting position points to a journey back to Earth.',
         story: 'Apollo 12 astronauts Pete Conrad and Alan Bean visited Surveyor 3 in November 1969. They removed its camera and other pieces for examination on Earth.',
         science: 'The returned camera let researchers test how its materials and optical performance had changed after exposure to the lunar environment.',
@@ -47,12 +51,12 @@ export const EXPEDITION_MISSIONS: ExpeditionMission[] = [
         evidence: 'Historical record', sourceIds: ['apollo-recovery', 'camera-report'],
       },
       {
-        id: 'descent', title: 'The part that stayed', component: 'Apollo 12 lunar module descent stage', position: [12, 1, -9],
+        id: 'descent', title: 'The part that stayed', component: 'Apollo 12 lunar module archive', position: [12, 1.8, -9], cameraPosition: [16, 3.1, -4.4],
         summary: 'One stage carried astronauts down; another carried them away.',
         story: 'Apollo 12’s lunar module Intrepid landed near Surveyor 3. Its ascent stage later departed, leaving the descent stage on the Moon.',
         science: 'Precision landing made the Surveyor visit possible, connecting a robotic mission with a later human investigation of its hardware.',
-        engineering: 'The lunar module separated the job of landing from the job of returning astronauts to lunar orbit. This schematic shows the remaining lower stage.',
-        status: 'Descent stage left on the Moon; its placement here is schematic.',
+        engineering: 'The lunar module separated the job of landing from the job of returning astronauts to lunar orbit. The supplied full-module model explains that architecture; after departure, only the lower stage remained.',
+        status: 'Descent stage left on the Moon. The complete-module model and its nearby placement are explicitly illustrative.',
         evidence: 'Historical record', sourceIds: ['apollo-summary', 'site-orbit'],
       },
     ],
@@ -194,6 +198,10 @@ export const EXPEDITION_MISSIONS: ExpeditionMission[] = [
     ],
   },
   VIKING_MISSION,
+  VIKING_2_MISSION,
+  JOHN_KLEIN_MISSION,
+  APOLLO_12_MISSION,
+  RETURNED_CAMERA_MISSION,
   INGENUITY_MISSION,
   NEAR_MISSION,
   DAWN_MISSION,

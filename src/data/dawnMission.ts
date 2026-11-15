@@ -26,8 +26,8 @@ export const DAWN_MISSION: ExpeditionMission = {
       id: 'ion-propulsion',
       title: 'A gentle push for years',
       component: 'Xenon ion propulsion system',
-      position: [0, -1.1, -1.2],
-      cameraPosition: [0, -2.2, -3.5],
+      position: [-0.7, -0.25, -1],
+      cameraPosition: [-0.5, -1.4, -3.8],
       summary: 'Small but sustained thrust let Dawn reshape its orbit and travel from Vesta to Ceres.',
       story:
         'Dawn used three ion engines, operating one at a time, to accelerate electrically charged xenon. The thrust was gentle, but it could continue for long periods with far less propellant than a comparable chemical system.',
@@ -44,8 +44,8 @@ export const DAWN_MISSION: ExpeditionMission = {
       id: 'solar-arrays',
       title: 'Power across the asteroid belt',
       component: 'Two large solar-array wings',
-      position: [-4.2, 0, 0],
-      cameraPosition: [-6.5, 1.2, 2.2],
+      position: [-4.25, 0.85, 0.45],
+      cameraPosition: [-6.5, 2.1, 3.2],
       summary: 'Wide solar arrays powered the spacecraft and its electric propulsion far from Earth.',
       story:
         'Dawn’s two solar wings stretched nearly 20 metres from tip to tip. They supplied power for instruments, communications and the ion propulsion system as sunlight weakened with distance from the Sun.',
@@ -62,8 +62,8 @@ export const DAWN_MISSION: ExpeditionMission = {
       id: 'science-instruments',
       title: 'Different measurements, one history',
       component: 'Framing cameras, VIR spectrometer and GRaND detector',
-      position: [1.1, 0.2, 0.8],
-      cameraPosition: [3.1, 1.4, 2.8],
+      position: [0.2, 0.85, 0.7],
+      cameraPosition: [2.7, 2, 3.4],
       summary: 'Images, spectra, elemental measurements and radio tracking revealed complementary evidence.',
       story:
         'Dawn mapped shape and geology with framing cameras, studied minerals with its visible and infrared spectrometer, and measured elemental composition with a gamma-ray and neutron detector.',
@@ -80,8 +80,8 @@ export const DAWN_MISSION: ExpeditionMission = {
       id: 'ceres-salts',
       title: 'Bright evidence of brines',
       component: 'Occator Crater bright deposits archive',
-      position: [4.85, -4.95, -4.65],
-      cameraPosition: [4.85, -3.5, 2],
+      position: [5.26, -2.84, -5.57],
+      cameraPosition: [5.1, -1.2, 1.4],
       summary: 'Bright carbonate salts connected Ceres’s surface to water-rich material below.',
       story:
         'Dawn observed exceptionally bright deposits in Occator Crater. Measurements identified salts, including sodium carbonate, associated with material that reached the surface from brines.',

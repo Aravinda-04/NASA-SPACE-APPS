@@ -13,14 +13,14 @@ export const INGENUITY_MISSION: ExpeditionMission = {
   destination: 'Mars · Jezero Crater',
   name: 'Ingenuity Mars Helicopter',
   title: 'The First Powered Flight on Another World',
-  subtitle: 'A historic 39-second hover in Jezero Crater. 72 flights that rewrote the rules of planetary exploration.',
+  subtitle: 'A 39-second hover became 72 flights across the floor of Jezero Crater.',
   question: 'How can a rotorcraft generate lift in an atmosphere 100 times thinner than Earth’s?',
   introduction:
     'On April 19, 2021, Ingenuity became the first aircraft in history to make a powered, controlled flight on another planet. Operating in Jezero Crater beneath Martian skies, its counter-rotating carbon blades and autonomous vision system proved that humanity could fly across alien worlds.',
   arrival:
     'On this fictional future visit, explore Wright Brothers Field in Jezero Crater. Inspect the helicopter, trace the autonomous visual odometry flight corridor, and examine the legacy of its historic 72-flight campaign.',
   legacy:
-    'Designed as a technology demonstration for up to five flights, Ingenuity achieved 72 flights, flew over 17 kilometers (10.6 miles), and logged more than two hours in the air. Having scouted rover routes and hazardous dunes for Perseverance, it rests permanently at Valinor Hills in Jezero Crater.',
+    'Designed for up to five flights, Ingenuity completed 72, covered about 17 kilometres and logged 128.8 minutes in the air. It proved flight, scouted terrain for Perseverance and exposed the limits of visual navigation over low-texture sand.',
   dateLabel: 'First flight: 19 April 2021 · Jezero Crater',
   statusLabel: 'Mission complete: final flight 18 January 2024 (72 flights)',
   accent: '#d97706',
@@ -33,13 +33,13 @@ export const INGENUITY_MISSION: ExpeditionMission = {
       title: 'Thin air, fast blades',
       component: 'Coaxial counter-rotating rotor system',
       position: [0.0, 0.55, 0.0],
-      cameraPosition: [-1.2, 1.7, 1.2],
+      cameraPosition: [-2.2, 1.8, 2.4],
       summary:
         'Two pairs of carbon-fiber blades spun in opposite directions at 2,400+ RPM to generate lift in Mars’s 1% atmosphere.',
       story:
         'On April 19, 2021, Ingenuity achieved the first powered, controlled flight on another planet. Because the Martian atmosphere has only about 1% of Earth’s sea-level density, the 1.2-meter counter-rotating composite blades had to spin at 2,400 to 2,900 RPM—almost ten times faster than helicopters on Earth. The counter-rotating coaxial design cancelled gyroscopic torque without requiring a heavy tail rotor.',
       science:
-        'Proved aerodynamic flight is possible in ultra-thin atmospheres. High blade speeds pushed the blade tips into transonic regimes (~Mach 0.7) in cold carbon dioxide, validating new fluid dynamics models for planetary atmosphere exploration.',
+        'The flights demonstrated that controlled aerodynamic flight is practical in Mars’s extremely thin carbon-dioxide atmosphere and supplied real performance data for future aircraft.',
       engineering:
         'Powered by six lithium-ion batteries recharged daily by a top-mounted solar array. Two brushless DC motors drove independent swashplates for collective and cyclic pitch control, built with lightweight carbon foam cores and carbon fiber skins weighing just 1.8 kg (4.0 lbs) total.',
       status:
@@ -52,17 +52,17 @@ export const INGENUITY_MISSION: ExpeditionMission = {
       title: 'Eyes on the ground',
       component: 'Downward NAVCAM & autonomous visual odometry',
       position: [2.8, 0.08, -2.4],
-      cameraPosition: [3.9, 1.7, -1.4],
+      cameraPosition: [4.5, 2.2, 0.2],
       summary:
         'With radio signals taking up to 20 minutes from Earth, Ingenuity piloted itself using a downward camera tracking sand ripples 30 times a second.',
       story:
         'Because radio signals between Earth and Mars take anywhere from 5 to 20 minutes to cross interplanetary space, real-time joystick piloting was impossible. Ingenuity had to make all split-second flight corrections autonomously. A downward-facing black-and-white navigation camera (NAVCAM) captured 30 frames per second of Martian terrain features, estimating speed, drift, and position on the fly.',
       science:
-        'Demonstrated that visual feature tracking over alien regolith and dune fields can provide stable, drift-free navigation without GPS, paving the way for future aerial drones on Titan and Mars.',
+        'Demonstrated visual navigation without GPS while also revealing that feature-poor terrain can deprive the system of reliable motion estimates.',
       engineering:
         'An onboard cellphone-grade processor (Qualcomm Snapdragon 801 running Linux and JPL’s F Prime flight software) combined NAVCAM optical flow with a laser rangefinder (altimeter) and an inertial measurement unit (IMU) running guidance algorithms at 500 Hz.',
       status:
-        'Flew over diverse terrains—from rocky outcrops to rolling dunes—logging over 17 kilometers (10.6 miles) of cumulative autonomous traverse across Jezero Crater.',
+        'Historical navigation record from 72 flights. Cyan locks and the elevated route in this scene are explanatory interface graphics, not recorded telemetry.',
       evidence: 'Historical record',
       sourceIds: ['flight-software', 'flight-log'],
     },
@@ -71,7 +71,7 @@ export const INGENUITY_MISSION: ExpeditionMission = {
       title: 'A piece of Kitty Hawk',
       component: 'Wright Brothers Field & commemorative wing fabric',
       position: [2.2, 0.08, 1.8],
-      cameraPosition: [3.2, 1.7, 2.7],
+      cameraPosition: [4.2, 2, 4.4],
       summary:
         'Beneath the solar panel, a postage-stamp swatch of fabric from the 1903 Wright Flyer connected the first flight on Earth to the first on Mars.',
       story:
@@ -90,19 +90,19 @@ export const INGENUITY_MISSION: ExpeditionMission = {
       title: 'The final landing',
       component: 'Flight 72 landing site & rotor blade legacy',
       position: [-5.5, 0.35, -4.8],
-      cameraPosition: [-4.2, 1.7, -3.7],
+      cameraPosition: [-2.7, 2, -1.9],
       summary:
         'On January 18, 2024, Flight 72 over featureless dunes ended with a damaged rotor blade, completing a historic 72-flight campaign.',
       story:
-        'On its 72nd flight, while executing a quick vertical hop over a sandy, featureless expanse in Neretva Vallis, Ingenuity lost its visual tracking references over the uniform sand ripples. The helicopter experienced a hard touchdown, and shadow photography soon confirmed that at least one rotor blade tip had fractured during landing, ending its flight career.',
+        'Flight 72 was a short vertical hop over low-texture rippled sand. NASA’s investigation concluded that insufficient surface features likely produced inaccurate navigation estimates, beginning a chain of events that ended in a hard landing and severe rotor damage.',
       science:
         'Provided crucial boundary data on the limits of optical flow navigation over low-texture aeolian sand fields, informing navigation sensor designs for future rotorcraft such as the Dragonfly mission to Saturn’s moon Titan.',
       engineering:
-        'Although flight operations concluded, Ingenuity’s avionics, solar panel, and communications survived. The helicopter was repurposed as a stationary weather station and test bed, continuing to wake daily, test avionics health, and log temperatures.',
+        'Post-flight images and engineering data were used to reconstruct the accident. A separated blade fragment was identified about 15 metres from the helicopter.',
       status:
-        'Having flown 14 times farther and 33 times longer than originally planned, Ingenuity rests permanently at "Valinor Hills" in Jezero Crater, an enduring monument to human engineering.',
+        'Flight operations ended in January 2024. The team received its final downlink in April 2024; this reconstruction does not imply continuing contact.',
       evidence: 'Historical record',
-      sourceIds: ['final-flight-report', 'flight-log'],
+      sourceIds: ['final-flight-report', 'accident-investigation', 'flight-log'],
     },
   ],
   task: {
@@ -147,6 +147,12 @@ export const INGENUITY_MISSION: ExpeditionMission = {
       title: 'NASA Release 24-013: Ingenuity Mission Complete',
       url: 'https://www.nasa.gov/news-release/after-three-years-on-mars-nasas-ingenuity-helicopter-mission-ends/',
       credit: 'NASA Headquarters',
+    },
+    {
+      id: 'accident-investigation',
+      title: 'NASA performs first aircraft accident investigation on another world',
+      url: 'https://www.jpl.nasa.gov/news/nasa-performs-first-aircraft-accident-investigation-on-another-world/',
+      credit: 'NASA/JPL-Caltech',
     },
   ],
 };
