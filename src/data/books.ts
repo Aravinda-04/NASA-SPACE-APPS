@@ -1,7 +1,7 @@
-import type { MissionId } from "../types/expedition";
+import type { BookId, MissionId } from "../types/expedition";
 
 export interface BookDefinition {
-  id: MissionId;
+  id: BookId;
   volume: string;
   number: string;
   spacecraft: string;
@@ -46,4 +46,21 @@ export const BOOKS: BookDefinition[] = [
     theme: "#172b43",
   },
 ];
-export const getBook = (id: MissionId) => BOOKS.find((book) => book.id === id)!;
+export const BOOK_BY_MISSION: Record<MissionId, BookId> = {
+  surveyor: "surveyor",
+  curiosity: "curiosity",
+  pioneer: "pioneer",
+  viking: "curiosity",
+  viking2: "curiosity",
+  "john-klein": "curiosity",
+  apollo12: "surveyor",
+  "returned-camera": "surveyor",
+  "camera-lab": "surveyor",
+  ingenuity: "curiosity",
+  near: "pioneer",
+  dawn: "pioneer",
+  kepler: "pioneer",
+};
+
+export const getBook = (id: MissionId) =>
+  BOOKS.find((book) => book.id === BOOK_BY_MISSION[id])!;

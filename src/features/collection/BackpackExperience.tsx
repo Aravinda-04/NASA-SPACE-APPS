@@ -317,7 +317,8 @@ export function BackpackExperience({
                   </div>
                   <div className="collection-grid">
                     {COLLECTIBLE_CARDS.filter(
-                      (item) => filter === "all" || item.missionId === filter,
+                      (item) =>
+                        filter === "all" || getBook(item.missionId).id === filter,
                     ).map((item) => (
                       <button
                         ref={(node) => {
@@ -342,7 +343,7 @@ export function BackpackExperience({
                     ))}
                   </div>
                   <p className="ow-muted">
-                    Three missions. Three obtainable cards. Each card carries
+                    Eight missions. Eight obtainable cards. Each card carries
                     the science behind the achievement.
                   </p>
                 </>

@@ -14,7 +14,8 @@ import {
 } from "./features/collection/BackpackExperience";
 import { MissionRewardExperience } from "./features/rewards/MissionRewardExperience";
 import { EXPEDITION_MISSIONS } from "./data/expeditionMissions";
-import type { CardId, MissionId, SavedExpedition } from "./types/expedition";
+import { BOOK_BY_MISSION } from "./data/books";
+import type { BookId, CardId, MissionId, SavedExpedition } from "./types/expedition";
 import {
   CARD_BY_MISSION,
   completeMission,
@@ -38,7 +39,7 @@ export function App() {
   const [activeMissionId, setActiveMissionId] = useState<MissionId | null>(
     null,
   );
-  const [bookId, setBookId] = useState<MissionId | null>(null);
+  const [bookId, setBookId] = useState<BookId | null>(null);
   const [restoreReadingFocus, setRestoreReadingFocus] = useState(false);
   const [backpackOpen, setBackpackOpen] = useState(false);
   const [reward, setReward] = useState<{
@@ -65,19 +66,20 @@ export function App() {
     persist(save);
   }, [save, persist]);
   const openBook = (id: MissionId, fromLibrary = false) => {
+    const targetBookId = BOOK_BY_MISSION[id];
     if (document.pointerLockElement) document.exitPointerLock();
     setBackpackOpen(false);
     setReward(null);
     setActiveMissionId(null);
-    setBookId(id);
+    setBookId(targetBookId);
     setRestoreReadingFocus(false);
     const current = saveRef.current;
-    const readingContext = current.readingContexts?.[id];
+    const readingContext = current.readingContexts?.[targetBookId];
     commit({
       ...current,
       lastMissionId: id,
       ...(fromLibrary && readingContext ? {
-        readingContexts: { ...current.readingContexts, [id]: { ...readingContext, view: 'contents' as const, panel: 'contents' as const } },
+        readingContexts: { ...current.readingContexts, [targetBookId]: { ...readingContext, view: 'contents' as const, panel: 'contents' as const } },
       } : {}),
     });
     window.scrollTo(0, 0);
@@ -192,9 +194,13 @@ export function App() {
               readingLocations: { ...current.readingLocations, [bookId]: page },
             });
           }}
-          onExplore={() => {
+          onExplore={(targetId?: string) => {
             setRestoreReadingFocus(false);
-            setActiveMissionId(bookId);
+            if (targetId && EXPEDITION_MISSIONS.some((m) => m.id === targetId)) {
+              setActiveMissionId(targetId as MissionId);
+            } else {
+              setActiveMissionId(bookId);
+            }
             window.scrollTo(0, 0);
           }}
           onLibrary={() => {
@@ -206,7 +212,7 @@ export function App() {
         <ExpeditionLibrary
           suspended={backpackOpen || reward !== null}
           progress={save.progress}
-          initialSelection={save.lastMissionId}
+          initialSelection={save.lastMissionId ? BOOK_BY_MISSION[save.lastMissionId] : undefined}
           onOpen={(id) => openBook(id, true)}
         />
       )}

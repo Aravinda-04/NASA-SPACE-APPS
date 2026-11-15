@@ -2,13 +2,13 @@ import { useEffect, useLayoutEffect, useRef, useState, type CSSProperties } from
 import { ArrowLeft, ArrowRight, Check } from "lucide-react";
 import { BOOKS, type BookDefinition } from "../../data/books";
 import { EXPEDITION_MISSIONS } from "../../data/expeditionMissions";
-import type { ExpeditionProgress, MissionId } from "../../types/expedition";
+import type { BookId, ExpeditionProgress, MissionId } from "../../types/expedition";
 import { useReducedMotion } from "../../hooks/useReducedMotion";
 import { Galaxy } from "../../components/Galaxy";
 import { BookCarousel, type CarouselBookId } from "./BookCarousel";
 import "../../styles/cockpit.css";
 
-const CAROUSEL_TO_MISSION: Record<CarouselBookId, MissionId> = {
+const CAROUSEL_TO_MISSION: Record<CarouselBookId, BookId> = {
   moon: "surveyor",
   mars: "curiosity",
   "outer-space": "pioneer",
@@ -18,6 +18,16 @@ const MISSION_TO_CAROUSEL: Record<MissionId, CarouselBookId> = {
   surveyor: "moon",
   curiosity: "mars",
   pioneer: "outer-space",
+  viking: "mars",
+  viking2: "mars",
+  "john-klein": "mars",
+  apollo12: "moon",
+  "returned-camera": "moon",
+  "camera-lab": "moon",
+  ingenuity: "mars",
+  near: "outer-space",
+  dawn: "outer-space",
+  kepler: "outer-space",
 };
 
 export function Brand() {

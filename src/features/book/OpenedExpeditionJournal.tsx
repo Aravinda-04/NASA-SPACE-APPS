@@ -1,6 +1,6 @@
 import { Suspense, lazy, useEffect, useRef, useState } from "react";
 import { ArrowLeft, ArrowRight, BookOpen, Compass } from "lucide-react";
-import { getChronologicalArtifacts } from "../../data/chronologicalArtifacts";
+import { getChronologicalArtifacts, getArtifactSimulation } from "../../data/chronologicalArtifacts";
 import { getBook } from "../../data/books";
 import { ModalFrame } from "../../components/ModalFrame";
 import { CurvedContentsTimelinePage } from "./CurvedContentsTimelinePage";
@@ -13,12 +13,13 @@ export function OpenedExpeditionJournal({ volumeId, context, onContext, onExplor
   volumeId: MissionId;
   context: BookReadingContext;
   onContext: (context: BookReadingContext) => void;
-  onExplore: () => void;
+  onExplore: (targetId?: string) => void;
   onLibrary: () => void;
   suspended?: boolean;
 }) {
   const artifacts = getChronologicalArtifacts(volumeId);
   const artifact = artifacts.find(item => item.id === context.artifactId) ?? artifacts[0];
+  const simulation = getArtifactSimulation(artifact);
   const book = getBook(volumeId);
   const heading = useRef<HTMLHeadingElement>(null);
   const returning = useRef(false);
@@ -73,7 +74,9 @@ export function OpenedExpeditionJournal({ volumeId, context, onContext, onExplor
           <p>{artifact.purpose}</p>
           <div className="atlas-summary-actions">
             <button id="artifact-open-dossier" className="ow-button atlas-dossier-action" onClick={() => onContext({ ...context, artifactId: artifact.id, panel: 'dossier' })}><BookOpen size={15} />Open artifact dossier</button>
-            <button id="artifact-launch" className="ow-button archive-launch" onClick={onExplore}>Enter 3D simulation <ArrowRight size={15} /></button>
+            {simulation && (
+              <button id="artifact-launch" className="ow-button archive-launch" onClick={() => onExplore(simulation.targetId)}>Enter 3D simulation <ArrowRight size={15} /></button>
+            )}
           </div>
         </section>
         <footer className="archive-page-footer"><span>p. 01 — {volumeId === 'pioneer' ? 'Space atlas' : 'Planetary atlas'}</span><span>History, located.</span></footer>

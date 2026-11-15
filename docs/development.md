@@ -24,7 +24,7 @@ See the [implementation handoff and verification record](implementation-2026-11-
 
 1. Confirm the competition-provided missions and at least one eligible NASA data source.
 2. Update the story, historical status reference date, four discoveries, task and source IDs in the mission data.
-3. Update `MissionWorld.tsx` when changing hardware models or inspection positions. Scene geometry currently switches on the three existing mission IDs; editing text alone does not replace a world.
+3. Update `MissionWorld.tsx` when changing hardware models or inspection positions. Scene geometry switches on the eight registered mission IDs; editing text alone does not replace a world.
 4. Keep documented history, reconstruction and fictional future visits distinct.
 5. Add runtime models/textures to `public/` with source, rights, credit and transformation notes in `docs/assets.md`.
 6. Run `npm test` and `npm run build`, then verify the book-to-exploration-to-journal flow in the browser.

@@ -1,6 +1,6 @@
-import type { MissionId } from "../types/expedition";
+import type { BookId } from "../types/expedition";
 export const STORY_MEDIA: Record<
-  MissionId,
+  BookId,
   { src: string; alt: string; caption: string; source: string }
 > = {
   surveyor: {

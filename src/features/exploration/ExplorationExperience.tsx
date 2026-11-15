@@ -7,6 +7,11 @@ import type { Discovery, ExpeditionMission, MissionProgress } from '../../types/
 import { MissionWorld } from './MissionWorld';
 import './exploration.css';
 
+const CAMERA_LAB_PHOTO = new URL(
+  '../../../Provided Resources/Surveyor 3/images/as12-48-7134_conrad_surveyor3.jpg',
+  import.meta.url,
+).href;
+
 interface ExplorationExperienceProps {
   mission: ExpeditionMission;
   progress: MissionProgress;
@@ -17,7 +22,11 @@ interface ExplorationExperienceProps {
 }
 
 type ViewMode = 'surface' | 'orbit';
-interface CameraCommand { serial: number; target: [number, number, number] }
+interface CameraCommand {
+  serial: number;
+  target: [number, number, number];
+  cameraPosition?: [number, number, number];
+}
 interface NearbyDiscovery { id: string; distance: number }
 
 function unlockPointer() {
@@ -37,6 +46,8 @@ function NoWebGL() {
   return <div className="exp-scene-fallback"><Compass size={38} /><p>Historical records are ready.</p><span>This browser cannot display the 3D environment. Use the discovery list to continue.</span></div>;
 }
 
+const isSpaceMission = (id: string) => id === 'pioneer' || id === 'near' || id === 'dawn' || id === 'kepler';
+
 function ExplorerCamera({ mission, mode, paused, command, onNearby }: {
   mission: ExpeditionMission;
   mode: ViewMode;
@@ -51,7 +62,7 @@ function ExplorerCamera({ mission, mode, paused, command, onNearby }: {
   const pitch = useRef(0);
   const frameClock = useRef(0);
   const lastNearby = useRef('');
-  const isSpace = mission.id === 'pioneer';
+  const isSpace = isSpaceMission(mission.id);
   const rotation = useMemo(() => new THREE.Euler(0, 0, 0, 'YXZ'), []);
   const movement = useMemo(() => new THREE.Vector3(), []);
   const orbitTarget: [number, number, number] = command?.target ?? [0, isSpace ? 1 : 0.8, 0];
@@ -61,7 +72,9 @@ function ExplorerCamera({ mission, mode, paused, command, onNearby }: {
     dragging.current = false;
     const target = command?.target ?? [0, isSpace ? 1 : 0.5, 0];
     if (mode === 'orbit') {
-      camera.position.set(target[0] + 15, target[1] + 13, target[2] + 18);
+      camera.position.set(target[0] + 5, target[1] + 3.8, target[2] + 5.5);
+    } else if (command?.cameraPosition) {
+      camera.position.set(command.cameraPosition[0], command.cameraPosition[1], command.cameraPosition[2]);
     } else if (command) {
       camera.position.set(target[0] + 2.5, isSpace ? target[1] + 2 : 1.7, target[2] + 4.5);
     } else {
@@ -183,7 +196,7 @@ function ArchiveRecord({ discovery, mission, onClose }: { discovery: Discovery; 
   </aside>;
 }
 
-export function ExplorationExperience({ mission, progress, onDiscover, onComplete, onExit, suspended = false }: ExplorationExperienceProps) {
+function ThreeDimensionalExperience({ mission, progress, onDiscover, onComplete, onExit, suspended = false }: ExplorationExperienceProps) {
   const [mode, setMode] = useState<ViewMode>('surface');
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [showList, setShowList] = useState(true);
@@ -206,6 +219,7 @@ export function ExplorationExperience({ mission, progress, onDiscover, onComplet
   const count = mission.discoveries.filter(item => progress.discovered.includes(item.id)).length;
   const allDiscovered = count === mission.discoveries.length;
   const correct = answer === mission.task.correctIndex;
+  const isSpace = isSpaceMission(mission.id);
   const paused = selectedId !== null || showTask || showHelp || suspended || resumeRequired;
   useEffect(() => { if (suspended) { unlockPointer(); setResumeRequired(true); } }, [suspended]);
   const unavailable = useCallback(() => setFailedMissionId(mission.id), [mission.id]);
@@ -269,7 +283,11 @@ export function ExplorationExperience({ mission, progress, onDiscover, onComplet
   const goTo = (discovery: Discovery) => {
     setResumeRequired(false);
     unlockPointer(); setSelectedId(null); setShowTask(false); setShowHelp(false);
-    setCommand({ serial: ++commandSerial.current, target: discovery.position });
+    setCommand({
+      serial: ++commandSerial.current,
+      target: discovery.position,
+      cameraPosition: discovery.cameraPosition,
+    });
   };
   const nextDiscovery = mission.discoveries.find(item => !progress.discovered.includes(item.id)) ?? mission.discoveries[0];
   const leave = () => { unlockPointer(); onExit(); };
@@ -293,7 +311,7 @@ export function ExplorationExperience({ mission, progress, onDiscover, onComplet
   return <main className={`exp-experience exp-${mission.id}`} style={{ '--exp-accent': mission.accent } as React.CSSProperties} aria-label={`${mission.name} exploration`}>
     <div className="exp-scene" aria-label="Reconstructed mission environment">
       <SceneBoundary key={mission.id} onUnavailable={unavailable}>
-        <Canvas frameloop={suspended ? 'never' : 'always'} shadows dpr={[1, 1.5]} camera={{ position: [0, mission.id === 'pioneer' ? 3 : 1.7, 14], fov: 58, near: 0.1, far: 180 }} onCreated={({ gl }) => { canvasRef.current = gl.domElement; setFailedMissionId(null); }} fallback={<NoWebGL />}>
+        <Canvas frameloop={suspended ? 'never' : 'always'} shadows dpr={[1, 1.5]} camera={{ position: [0, isSpace ? 3 : 1.7, 14], fov: 58, near: 0.1, far: 180 }} onCreated={({ gl }) => { canvasRef.current = gl.domElement; setFailedMissionId(null); }} fallback={<NoWebGL />}>
           <Suspense fallback={null}><MissionWorld mission={mission} selectedId={selectedId} discoveredIds={progress.discovered} onSelect={inspect} /></Suspense>
           <ExplorerCamera mission={mission} mode={mode} paused={paused} command={command} onNearby={setNearby} />
         </Canvas>
@@ -302,11 +320,11 @@ export function ExplorationExperience({ mission, progress, onDiscover, onComplet
     <div className="exp-vignette" aria-hidden="true" />
     <header className="exp-topbar">
       <button className="exp-back-button" onClick={leave}><ArrowLeft size={17} /> Back to journal</button>
-      <div className="exp-mission-heading"><h1>{mission.name}</h1><span>{mission.destination} · {mission.id === 'pioneer' ? 'Jetpack expedition' : 'Surface expedition'}</span></div>
+      <div className="exp-mission-heading"><h1>{mission.name}</h1><span>{mission.destination} · {isSpace ? 'Jetpack expedition' : 'Surface expedition'}</span></div>
       <button className="exp-journal-toggle" onClick={() => { unlockPointer(); setShowList(value => !value); }} aria-expanded={showList} aria-controls="exp-discovery-list"><BookOpen size={18} /> {count}/{mission.discoveries.length} records {progress.completed && <Check size={16} />}</button>
     </header>
 
-    <div className="exp-context"><span className="exp-fiction-dot" /> Fictional future expedition <span>·</span> {mode === 'orbit' ? 'Orbit inspection' : mission.id === 'pioneer' ? 'First-person EVA' : 'First-person explorer'}</div>
+    <div className="exp-context"><span className="exp-fiction-dot" /> Fictional future expedition <span>·</span> {mode === 'orbit' ? 'Orbit inspection' : isSpace ? 'First-person EVA' : 'First-person explorer'}</div>
 
     {showList && <aside className="exp-discoveries" id="exp-discovery-list" aria-label="Mission discovery journal">
       <div className="exp-list-heading"><h2>Your discoveries</h2><button className="exp-icon-button" aria-label="Hide discovery list" onClick={() => setShowList(false)}><ChevronDown size={18} /></button></div>
@@ -335,7 +353,7 @@ export function ExplorationExperience({ mission, progress, onDiscover, onComplet
       </div>
     </aside>}
 
-    {showHelp && <aside className="exp-archive" aria-label="Exploration controls"><div className="exp-archive-toolbar"><span><Move size={16} /> Explore at your own pace</span><button className="exp-icon-button exp-ink-button" onClick={() => setShowHelp(false)} aria-label="Close controls"><X size={19} /></button></div><div className="exp-archive-body"><h2>Your expedition controls</h2><dl className="exp-controls-list"><dt>Move</dt><dd>W A S D</dd><dt>Look around</dt><dd>Capture mouse, or drag the environment</dd>{mission.id === 'pioneer' && <><dt>Jetpack up / down</dt><dd>E / Q · Space / Control</dd></>}<dt>Move faster</dt><dd>Hold Shift</dd><dt>Inspect nearby object</dt><dd>F</dd><dt>Switch camera</dt><dd>C</dd><dt>Show discovery list</dt><dd>J</dd><dt>Release mouse / close record</dt><dd>Escape</dd></dl><p>Orbit view supports dragging to rotate and scrolling to zoom. The discovery list opens every record without walking or jetpacking.</p><h3>About this environment</h3><p>{mission.sceneNote}</p><p>Movement speeds, travel shortcuts, and the future astronaut visit are fictional interface choices.</p></div></aside>}
+    {showHelp && <aside className="exp-archive" aria-label="Exploration controls"><div className="exp-archive-toolbar"><span><Move size={16} /> Explore at your own pace</span><button className="exp-icon-button exp-ink-button" onClick={() => setShowHelp(false)} aria-label="Close controls"><X size={19} /></button></div><div className="exp-archive-body"><h2>Your expedition controls</h2><dl className="exp-controls-list"><dt>Move</dt><dd>W A S D</dd><dt>Look around</dt><dd>Capture mouse, or drag the environment</dd>{isSpace && <><dt>Jetpack up / down</dt><dd>E / Q · Space / Control</dd></>}<dt>Move faster</dt><dd>Hold Shift</dd><dt>Inspect nearby object</dt><dd>F</dd><dt>Switch camera</dt><dd>C</dd><dt>Show discovery list</dt><dd>J</dd><dt>Release mouse / close record</dt><dd>Escape</dd></dl><p>Orbit view supports dragging to rotate and scrolling to zoom. The discovery list opens every record without walking or jetpacking.</p><h3>About this environment</h3><p>{mission.sceneNote}</p><p>Movement speeds, travel shortcuts, and the future astronaut visit are fictional interface choices.</p></div></aside>}
 
     <footer className="exp-bottom-bar">
       <div className="exp-view-controls"><button onClick={() => { unlockPointer(); setMode(value => value === 'surface' ? 'orbit' : 'surface'); }} aria-label="Switch camera view"><Compass size={17} />{mode === 'orbit' ? 'First person' : 'Orbit view'}<kbd>C</kbd></button>{!sceneUnavailable && <button onClick={startLooking}><Maximize2 size={16} />{locked ? 'Mouse captured · Esc to release' : 'Capture mouse'}</button>}<button onClick={() => { unlockPointer(); setSelectedId(null); setShowTask(false); setShowHelp(value => !value); }} aria-expanded={showHelp}><Move size={16} />Controls</button></div>
@@ -346,4 +364,73 @@ export function ExplorationExperience({ mission, progress, onDiscover, onComplet
     {resumeRequired && !suspended && <div className="exp-resume-notice"><p>Exploration paused. Your position and discoveries are preserved.</p><button onClick={() => setResumeRequired(false)}>Resume exploration</button></div>}
     {sceneUnavailable && <div className="exp-fallback-access"><List size={18} /><span>Archive mode · All discoveries and the evidence task remain available.</span><button onClick={() => setShowList(true)}>Show records</button></div>}
   </main>;
+}
+
+function CameraLabDossier({ mission, progress, onDiscover, onComplete, onExit }: ExplorationExperienceProps) {
+  const [activeId, setActiveId] = useState<string | null>(null);
+  const [answer, setAnswer] = useState<number | null>(null);
+  const active = mission.discoveries.find(item => item.id === activeId) ?? null;
+  const allDiscovered = mission.discoveries.every(item => progress.discovered.includes(item.id));
+  const correct = answer === mission.task.correctIndex;
+  const openRecord = (id: string) => {
+    onDiscover(id);
+    setActiveId(current => current === id ? null : id);
+  };
+  return <main className="lab-dossier" style={{ '--lab-photo': `url(${CAMERA_LAB_PHOTO})` } as React.CSSProperties} aria-label={`${mission.name} archival investigation`}>
+    <header className="lab-dossier-header">
+      <button onClick={onExit}><ArrowLeft size={17} /> Back to journal</button>
+      <div><span>01 / Moon · laboratory field notes</span><h1>{mission.name}</h1></div>
+      <span className="lab-dossier-progress">{progress.discovered.length}/{mission.discoveries.length} records</span>
+    </header>
+    <div className="lab-dossier-book">
+      <section className="lab-dossier-page lab-dossier-intro">
+        <p className="lab-dossier-kicker">Surveyor 3 · Apollo 12 · Earth laboratory</p>
+        <h2>An object becomes evidence.</h2>
+        <p>{mission.introduction}</p>
+        <div className="lab-dossier-question"><span>Your investigation</span><p>{mission.question}</p></div>
+        <dl>
+          <dt>Mission</dt><dd>{mission.name}</dd>
+          <dt>Historical status</dt><dd>{mission.statusLabel}</dd>
+          <dt>Location</dt><dd>{mission.coordinatesLabel}</dd>
+        </dl>
+        <div className={`lab-dossier-conclusion ${allDiscovered ? 'is-ready' : ''}`}>
+          <span>{allDiscovered ? 'Evidence task ready' : `${mission.discoveries.length - progress.discovered.length} records remain`}</span>
+          <p>{mission.task.question}</p>
+          {allDiscovered && <div className="lab-dossier-answers">{mission.task.options.map((option, index) => <button key={option} onClick={() => setAnswer(index)} className={answer === index ? index === mission.task.correctIndex ? 'is-correct' : 'is-wrong' : ''}><b>{String.fromCharCode(65 + index)}</b>{option}</button>)}</div>}
+          {answer !== null && <p className="lab-dossier-feedback">{correct ? mission.task.explanation : 'That conclusion is not supported by the complete record. Compare the test stations and try again.'}</p>}
+          {(correct || progress.completed) && <button className="lab-dossier-complete" onClick={onComplete}><Check size={16} /> {progress.completed ? 'Mission complete' : 'Complete investigation'}</button>}
+        </div>
+      </section>
+      <section className="lab-dossier-page lab-dossier-records">
+        <figure>
+          <img src={CAMERA_LAB_PHOTO} alt="Apollo 12 astronaut examining Surveyor 3 on the lunar surface." />
+          <figcaption>Historical photograph · AS12-48-7134 · NASA. The photograph documents the recovery context; laboratory tests document changes to the hardware.</figcaption>
+        </figure>
+        <h2>Look a little closer.</h2>
+        <div className="lab-dossier-list">{mission.discoveries.map((discovery, index) => {
+          const discovered = progress.discovered.includes(discovery.id);
+          const expanded = activeId === discovery.id;
+          return <article key={discovery.id} className={expanded ? 'is-open' : ''}>
+            <button onClick={() => openRecord(discovery.id)} aria-expanded={expanded}>
+              <span>{discovered ? <Check size={14} /> : index + 1}</span>
+              <b>{discovery.title}</b>
+              <ChevronDown size={16} />
+            </button>
+            {expanded && <div className="lab-dossier-detail">
+              <small>{discovery.component}</small><p className="summary">{discovery.summary}</p><p>{discovery.story}</p>
+              <h3>What the test revealed</h3><p>{discovery.science}</p>
+              <h3>How to read this evidence</h3><p>{discovery.engineering}</p>
+              <div className="lab-dossier-sources">{mission.sources.filter(source => discovery.sourceIds.includes(source.id)).map(source => <a key={source.id} href={source.url} target="_blank" rel="noreferrer">{source.title} <ExternalLink size={12} /></a>)}</div>
+            </div>}
+          </article>;
+        })}</div>
+        <details className="lab-dossier-source-list"><summary>Historical sources · {mission.sources.length} records</summary>{mission.sources.map(source => <a key={source.id} href={source.url} target="_blank" rel="noreferrer">{source.title}<span>{source.credit}</span></a>)}</details>
+        <p className="lab-dossier-note">{mission.sceneNote}</p>
+      </section>
+    </div>
+  </main>;
+}
+
+export function ExplorationExperience(props: ExplorationExperienceProps) {
+  return props.mission.id === 'camera-lab' ? <CameraLabDossier {...props} /> : <ThreeDimensionalExperience {...props} />;
 }

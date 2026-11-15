@@ -197,3 +197,70 @@ export const getChronologicalArtifacts = (id: MissionId) => CHRONOLOGICAL_ARTIFA
 /** The registry is the authority on whether a linked episode actually exists. */
 export const getPlayableMission = (artifact: ChronologicalArtifact) => EXPEDITION_MISSIONS
   .find((item) => item.id === artifact.playableMissionId && item.id === artifact.volumeId);
+
+export type SimulationTarget = 'surveyor' | 'apollo12' | 'returned-camera' | 'camera-lab' | 'curiosity' | 'john-klein' | 'pioneer' | 'viking' | 'viking2' | 'ingenuity' | 'near' | 'dawn' | 'kepler';
+
+export interface ArtifactSimulationInfo {
+  targetId: SimulationTarget;
+  label: string;
+  title: string;
+}
+
+/**
+ * Maps each historical artifact to its specific interactive 3D simulation.
+ * Prevents generic or incorrect fallback linking to the Curiosity rover.
+ */
+export const getArtifactSimulation = (artifact: ChronologicalArtifact): ArtifactSimulationInfo | null => {
+  // 1. Each Viking landing record opens its corresponding surface expedition.
+  if (artifact.id === 'viking-1') {
+    return { targetId: 'viking', label: 'Enter 3D simulation', title: 'Viking 1' };
+  }
+  if (artifact.id === 'viking-2') {
+    return { targetId: 'viking2', label: 'Enter 3D simulation', title: 'Viking 2' };
+  }
+  // 2. Ingenuity Helicopter -> Jezero Crater Ingenuity 3D Simulation
+  if (artifact.id === 'ingenuity') {
+    return { targetId: 'ingenuity', label: 'Enter 3D simulation', title: 'Ingenuity Helicopter' };
+  }
+  // 3. Curiosity Rover & John Klein drill rock -> Gale Crater Curiosity 3D Simulation
+  if (artifact.id === 'curiosity-rover') {
+    return { targetId: 'curiosity', label: 'Enter 3D simulation', title: 'Curiosity Rover' };
+  }
+  if (artifact.id === 'john-klein') {
+    return { targetId: 'john-klein', label: 'Enter rock archive', title: 'John Klein' };
+  }
+  // 4. Surveyor 3, Apollo 12, & Surveyor camera -> Ocean of Storms Surveyor 3 3D Simulation
+  if (artifact.id === 'surveyor-3') {
+    return { targetId: 'surveyor', label: 'Enter 3D simulation', title: 'Surveyor 3' };
+  }
+  if (artifact.id === 'surveyor-camera') {
+    return { targetId: 'returned-camera', label: 'Enter recovery reconstruction', title: 'The returned camera' };
+  }
+  if (artifact.id === 'camera-tests') {
+    return { targetId: 'camera-lab', label: 'Enter laboratory archive', title: 'The laboratory afterlife' };
+  }
+  if (artifact.id === 'apollo-12') {
+    return { targetId: 'apollo12', label: 'Enter 3D simulation', title: 'Apollo 12 · Intrepid' };
+  }
+  // 5. Pioneer 10 -> Deep Space Pioneer 10 3D Simulation
+  if (artifact.id === 'pioneer-10') {
+    return { targetId: 'pioneer', label: 'Enter 3D simulation', title: 'Pioneer 10' };
+  }
+  // 6. NEAR Shoemaker -> Asteroid 433 Eros NEAR Shoemaker 3D Simulation
+  if (artifact.id === 'near-shoemaker') {
+    return { targetId: 'near', label: 'Enter 3D simulation', title: 'NEAR Shoemaker' };
+  }
+  // 7. Dawn -> schematic Ceres-orbit Dawn simulation
+  if (artifact.id === 'dawn') {
+    return { targetId: 'dawn', label: 'Enter 3D simulation', title: 'Dawn' };
+  }
+  // 8. Kepler / K2 -> heliocentric observatory simulation
+  if (artifact.id === 'kepler') {
+    return { targetId: 'kepler', label: 'Enter 3D simulation', title: 'Kepler / K2' };
+  }
+  // 9. Fallback for any other playable mission if configured
+  if (artifact.playableMissionId) {
+    return { targetId: artifact.playableMissionId as SimulationTarget, label: 'Enter 3D simulation', title: artifact.title };
+  }
+  return null;
+};
