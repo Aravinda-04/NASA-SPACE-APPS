@@ -450,3 +450,787 @@
 .cinematic-library .volume-button:focus-visible { transform:translateY(-7px) rotate(-.5deg); }
 .ow-shell .atlas-mission-summary > p:not(.atlas-summary-location):not(.atlas-context-note) { font-size:14px; }
 .ow-shell .atlas-mission-summary .atlas-context-note { font-size:12px; }
+
+/* ==========================================================================
+   STAGE 2: VIEWPORT-FITTING ZERO-SCROLL LAYOUT
+   ========================================================================== */
+html:has(.reader),
+body:has(.reader) {
+  height: 100dvh !important;
+  max-height: 100dvh !important;
+  overflow: hidden !important;
+}
+
+.ow-shell.reader {
+  height: 100dvh !important;
+  max-height: 100dvh !important;
+  min-height: 100dvh !important;
+  overflow: hidden !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: space-between !important;
+  box-sizing: border-box !important;
+  padding: 8px clamp(16px, 2.5vw, 36px) !important;
+}
+
+.reader .ow-header {
+  flex-shrink: 0;
+  margin-bottom: 2px;
+}
+
+.reader .ow-intro {
+  flex-shrink: 0;
+  margin-bottom: 4px;
+}
+
+.reader .ow-intro h1 {
+  font-size: clamp(20px, 2.2vw, 28px);
+  margin-bottom: 0;
+}
+
+.reader .ow-intro .ow-eyebrow {
+  margin-bottom: 2px;
+  font-size: 11px;
+}
+
+.reader-book-stage {
+  flex: 1 1 0;
+  min-height: 0;
+  min-width: 0;
+  width: 100%;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: visible;
+}
+
+.reader-book-scaler {
+  width: var(--logical-w, 1240px);
+  height: var(--logical-h, 660px);
+  transform: scale(var(--book-scale, 1));
+  transform-origin: center center;
+  flex-shrink: 0;
+  display: flex;
+  align-items: stretch;
+  justify-content: center;
+  position: relative;
+  margin: 0 auto;
+}
+
+.reader-book-scaler > .chronological-spread,
+.reader-book-scaler > .reader-spread,
+.reader-book-scaler > .light-time {
+  width: 100% !important;
+  height: 100% !important;
+  max-width: none !important;
+  margin: 0 !important;
+  box-sizing: border-box !important;
+}
+
+.reader-book-scaler > .chronological-spread {
+  grid-template-rows: minmax(0, 1fr) !important;
+}
+
+.reader .reader-pagination {
+  flex-shrink: 0;
+  margin-top: 4px;
+  margin-bottom: 0;
+  padding: 4px 0 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* Zero scrolling inside pages and preview area */
+.reader .reader-page,
+.reader .archive-page,
+.reader .contents-records,
+.reader .artifact-field-notes,
+.reader .planet-atlas-viewport {
+  overflow: hidden !important;
+  scrollbar-width: none !important;
+}
+
+.reader .reader-page::-webkit-scrollbar,
+.reader .archive-page::-webkit-scrollbar,
+.reader .contents-records::-webkit-scrollbar,
+.reader .artifact-field-notes::-webkit-scrollbar {
+  display: none !important;
+}
+
+/* ==========================================================================
+   STAGE 3: PER-PAGE CONTENT FITTING & DROPDOWN HANDLING
+   ========================================================================== */
+.reader-book-scaler .reader-page {
+  padding: 24px 32px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: flex-start !important;
+  height: 100% !important;
+  box-sizing: border-box !important;
+  overflow: hidden !important;
+}
+
+.reader-book-scaler .reader-page h2 {
+  font-size: 25px !important;
+  margin-bottom: 8px !important;
+  line-height: 1.15 !important;
+}
+
+.reader-book-scaler .reader-page > p {
+  font-size: 15px !important;
+  line-height: 1.5 !important;
+  margin-bottom: 8px !important;
+}
+
+.reader-book-scaler .reader-page blockquote {
+  padding: 10px 14px !important;
+  margin: 10px 0 !important;
+}
+
+.reader-book-scaler .reader-page blockquote p {
+  font-size: 16px !important;
+}
+
+.reader-book-scaler .reader-facts {
+  margin: 10px 0 !important;
+  gap: 6px !important;
+  font-size: 12px !important;
+}
+
+.reader-book-scaler .reader-facts dt {
+  font-size: 11px !important;
+}
+
+.reader-book-scaler .reader-page figure {
+  margin: 0 0 10px !important;
+}
+
+.reader-book-scaler .reader-photo {
+  max-height: 170px !important;
+  width: 100% !important;
+  object-fit: cover !important;
+  border-radius: 3px !important;
+  transition: max-height 0.25s ease !important;
+}
+
+.reader-book-scaler .reader-art {
+  padding: 10px !important;
+  display: flex !important;
+  justify-content: center !important;
+}
+
+.reader-book-scaler .reader-art img {
+  max-height: 140px !important;
+  width: auto !important;
+  object-fit: contain !important;
+  transition: max-height 0.25s ease !important;
+}
+
+.reader-book-scaler .reader-page figcaption {
+  margin-top: 6px !important;
+  font-size: 11px !important;
+}
+
+.reader-book-scaler .ow-shell .reader-page h3 {
+  margin-top: 10px !important;
+  margin-bottom: 6px !important;
+  font-size: 18px !important;
+}
+
+.reader-book-scaler .reader-records {
+  margin: 0 0 10px !important;
+}
+
+.reader-book-scaler .reader-records li {
+  padding: 5px 0 !important;
+  font-size: 13px !important;
+}
+
+.reader-book-scaler .reader-sources {
+  margin: 8px 0 !important;
+  font-size: 12px !important;
+}
+
+.reader-book-scaler .reader-sources summary {
+  cursor: pointer !important;
+  padding: 4px 0 !important;
+  color: var(--archive-accent, #a64b2d) !important;
+}
+
+.reader-book-scaler .reader-sources p {
+  margin: 4px 0 !important;
+  font-size: 11px !important;
+  line-height: 1.35 !important;
+}
+
+/* Reduce image and figure sizes when dropdown is open before touching text */
+.reader-book-scaler .reader-page:has(details[open]) .reader-photo {
+  max-height: 85px !important;
+}
+
+.reader-book-scaler .reader-page:has(details[open]) .reader-art {
+  padding: 4px !important;
+}
+
+.reader-book-scaler .reader-page:has(details[open]) .reader-art img {
+  max-height: 75px !important;
+}
+
+.reader-book-scaler .reader-page:has(details[open]) .reader-records {
+  margin-bottom: 4px !important;
+}
+
+.reader-book-scaler .reader-page:has(details[open]) .reader-records li {
+  padding: 3px 0 !important;
+}
+
+.reader-book-scaler .reader-page:has(details[open]) .reader-page-footer {
+  margin-top: 4px !important;
+  padding-top: 4px !important;
+}
+
+/* Atlas page fitting */
+.reader-book-scaler .planet-atlas-page {
+  padding: 14px 24px 10px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  height: 100% !important;
+  min-height: 0 !important;
+  box-sizing: border-box !important;
+}
+
+.reader-book-scaler .planet-atlas-heading {
+  padding: 4px 0 !important;
+  flex-shrink: 0 !important;
+}
+
+.reader-book-scaler .ow-shell .planet-atlas-heading h2 {
+  font-size: 23px !important;
+  margin-bottom: 3px !important;
+}
+
+.reader-book-scaler .ow-shell .planet-atlas-heading p {
+  font-size: 11px !important;
+  margin: 0 !important;
+}
+
+.reader-book-scaler .interactive-planet-atlas {
+  flex-shrink: 0 !important;
+}
+
+.reader-book-scaler .planet-atlas-viewport {
+  height: 210px !important;
+  min-height: 180px !important;
+  max-height: 220px !important;
+}
+
+.reader-book-scaler .planet-atlas-controls {
+  padding: 4px 0 2px !important;
+  gap: 3px !important;
+}
+
+.reader-book-scaler .planet-atlas-controls button {
+  min-height: 28px !important;
+  min-width: 26px !important;
+  font-size: 10px !important;
+  padding: 2px 4px !important;
+}
+
+.reader-book-scaler .atlas-mission-summary {
+  margin-top: 6px !important;
+  padding-top: 4px !important;
+  flex-shrink: 0 !important;
+}
+
+.reader-book-scaler .ow-shell .atlas-mission-summary h3 {
+  font-size: 17px !important;
+  margin: 2px 0 !important;
+}
+
+.reader-book-scaler .ow-shell .atlas-mission-summary p {
+  font-size: 11px !important;
+  line-height: 1.35 !important;
+  margin: 2px 0 4px !important;
+}
+
+.reader-book-scaler .atlas-summary-actions {
+  margin-top: 4px !important;
+  gap: 6px !important;
+}
+
+.reader-book-scaler .atlas-summary-actions .ow-button {
+  min-height: 30px !important;
+  padding: 4px 10px !important;
+  font-size: 10.5px !important;
+}
+
+.reader-book-scaler .planet-atlas-page > .archive-page-footer {
+  margin-top: auto !important;
+  padding-top: 4px !important;
+  flex-shrink: 0 !important;
+}
+
+/* Curved timeline fitting */
+.reader-book-scaler .archive-index {
+  padding: 16px 24px 12px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  height: 100% !important;
+  min-height: 0 !important;
+  box-sizing: border-box !important;
+}
+
+.reader-book-scaler .archive-index > .archive-page-footer {
+  margin-top: auto !important;
+  padding-top: 4px !important;
+  flex-shrink: 0 !important;
+}
+
+.reader-book-scaler .archive-index-heading {
+  padding-top: 6px !important;
+}
+
+.reader-book-scaler .planetary-journal .archive-index-heading h2 {
+  font-size: 25px !important;
+  margin-bottom: 4px !important;
+}
+
+.reader-book-scaler .ow-shell .archive-index-heading p {
+  font-size: 13px !important;
+  margin-bottom: 6px !important;
+}
+
+.reader-book-scaler .ow-shell .archive-instruction {
+  margin-bottom: 4px !important;
+  font-size: 11px !important;
+}
+
+.reader-book-scaler .planetary-journal .contents-timeline {
+  flex: 1 1 0 !important;
+  min-height: 0 !important;
+  display: flex !important;
+  flex-direction: column !important;
+}
+
+.reader-book-scaler .planetary-journal .contents-records {
+  grid-template-rows: repeat(var(--record-count), minmax(0, 1fr)) !important;
+  flex: 1 1 0 !important;
+  min-height: 0 !important;
+}
+
+.reader-book-scaler .planetary-journal .contents-record {
+  min-height: 0 !important;
+  padding: 2px 0 2px 28% !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: center !important;
+}
+
+.reader-book-scaler .contents-record strong {
+  font-size: 18px !important;
+}
+
+.reader-book-scaler .contents-synopsis {
+  font-size: 11px !important;
+  line-height: 1.35 !important;
+}
+
+/* Science page fitting */
+
+/* --- Curiosity EDL Spread (Spread 2) --- */
+.reader-book-scaler .reader-page {
+  --edl-density: 1;
+  --edl-img-h: calc(115px * var(--edl-density));
+}
+
+.reader-book-scaler .timeline-events {
+  gap: 4px !important;
+  margin-bottom: 6px !important;
+}
+
+.reader-book-scaler .timeline-events button {
+  padding: 6px 10px !important;
+  min-height: 32px !important;
+  font-size: 11.5px !important;
+}
+
+.reader-book-scaler .reader-page .signal-scrubber {
+  font-size: 11px !important;
+  margin-top: auto !important;
+  margin-bottom: 0 !important;
+}
+
+.reader-book-scaler .edl-stage {
+  padding: 8px 12px !important;
+  text-align: center !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  margin-bottom: 6px !important;
+  flex-shrink: 0 !important;
+}
+
+.reader-book-scaler .edl-stage img {
+  max-height: var(--edl-img-h, 115px) !important;
+  width: auto !important;
+  height: auto !important;
+  object-fit: contain !important;
+}
+
+.reader-book-scaler .edl-stage span {
+  font-size: 11px !important;
+  margin-top: 2px !important;
+}
+
+.reader-book-scaler .timeline-record {
+  margin-top: 6px !important;
+  margin-bottom: 4px !important;
+}
+
+.reader-book-scaler .timeline-record .ow-eyebrow {
+  margin-bottom: 2px !important;
+}
+
+.reader-book-scaler .timeline-record h2 {
+  font-size: 19px !important;
+  margin: 2px 0 !important;
+}
+
+.reader-book-scaler .timeline-record h3 {
+  font-size: 13.5px !important;
+  margin: 2px 0 3px !important;
+}
+
+.reader-book-scaler .timeline-record p {
+  font-size: 11.5px !important;
+  line-height: 1.35 !important;
+  margin: 2px 0 !important;
+}
+
+.reader-book-scaler .timeline-record blockquote {
+  margin: 4px 0 !important;
+  padding: 4px 10px !important;
+}
+
+.reader-book-scaler .timeline-record blockquote p {
+  font-size: 11px !important;
+  line-height: 1.25 !important;
+  margin: 0 !important;
+}
+
+.reader-book-scaler .science-action-row {
+  display: grid !important;
+  grid-template-columns: auto 1fr !important;
+  gap: 10px !important;
+  align-items: center !important;
+  margin-top: auto !important;
+  padding-top: 4px !important;
+}
+
+.reader-book-scaler .science-action-row .science-controls {
+  display: flex !important;
+  gap: 6px !important;
+  flex-shrink: 0 !important;
+}
+
+.reader-book-scaler .science-action-row .science-controls .ow-button {
+  min-height: 30px !important;
+  padding: 4px 10px !important;
+  font-size: 11px !important;
+  white-space: nowrap !important;
+}
+
+.reader-book-scaler .science-action-row .ow-caption {
+  font-size: 10.5px !important;
+  line-height: 1.25 !important;
+  margin: 0 !important;
+}
+
+.reader-book-scaler .reader-page > a {
+  font-size: 11px !important;
+  min-height: 20px !important;
+  padding: 2px 0 !important;
+  margin-top: 2px !important;
+}
+
+/* --- Pioneer Light-Time Spread (Spread 2) --- */
+.reader-book-scaler .light-time {
+  --signal-density: 1;
+  --signal-svg-h: calc(115px * var(--signal-density));
+  padding: 16px 24px 12px !important;
+  gap: 20px !important;
+  display: grid !important;
+  grid-template-columns: minmax(220px, 1fr) minmax(0, 2.2fr) !important;
+  height: 100% !important;
+  box-sizing: border-box !important;
+}
+
+.reader-book-scaler .science-copy {
+  display: flex !important;
+  flex-direction: column !important;
+  height: 100% !important;
+  min-height: 0 !important;
+}
+
+.reader-book-scaler .science-copy h2 {
+  font-size: 23px !important;
+  margin-bottom: 4px !important;
+}
+
+.reader-book-scaler .science-copy p {
+  font-size: 12px !important;
+  line-height: 1.35 !important;
+  margin-bottom: 6px !important;
+}
+
+.reader-book-scaler .science-evidence {
+  margin-top: auto !important;
+  margin-bottom: 4px !important;
+  padding: 4px 8px !important;
+  font-size: 11px !important;
+}
+
+.reader-book-scaler .science-copy > a {
+  font-size: 11px !important;
+  min-height: 22px !important;
+  margin-top: 2px !important;
+}
+
+.reader-book-scaler .science-interaction {
+  display: flex !important;
+  flex-direction: column !important;
+  height: 100% !important;
+  min-height: 0 !important;
+}
+
+.reader-book-scaler .signal-distance {
+  font-size: 11px !important;
+  margin-bottom: 2px !important;
+}
+
+.reader-book-scaler .signal-diagram {
+  margin-bottom: 4px !important;
+  flex-shrink: 0 !important;
+}
+
+.reader-book-scaler .signal-diagram svg {
+  max-height: var(--signal-svg-h, 115px) !important;
+  width: 100% !important;
+  height: auto !important;
+}
+
+.reader-book-scaler .science-readouts {
+  display: grid !important;
+  grid-template-columns: 1fr 1fr !important;
+  gap: 10px !important;
+  margin-bottom: 4px !important;
+}
+
+.reader-book-scaler .science-readouts > div {
+  padding: 3px 6px !important;
+}
+
+.reader-book-scaler .science-readouts strong {
+  font-size: 16px !important;
+  margin: 1px 0 !important;
+}
+
+.reader-book-scaler .science-readouts small {
+  font-size: 9.5px !important;
+}
+
+.reader-book-scaler .science-interaction .science-controls {
+  gap: 6px !important;
+  margin-bottom: 3px !important;
+  align-items: center !important;
+}
+
+.reader-book-scaler .science-interaction .science-controls .ow-button {
+  min-height: 28px !important;
+  padding: 3px 8px !important;
+  font-size: 10.5px !important;
+}
+
+.reader-book-scaler .science-interaction .science-controls p[role="status"] {
+  font-size: 10px !important;
+  margin: 0 !important;
+}
+
+.reader-book-scaler .science-interaction .signal-scrubber {
+  font-size: 10.5px !important;
+  margin-bottom: 3px !important;
+}
+
+.reader-book-scaler .science-interaction .science-select {
+  font-size: 10.5px !important;
+  margin-bottom: 3px !important;
+}
+
+.reader-book-scaler .science-interaction .science-select select {
+  padding: 2px 6px !important;
+  font-size: 10.5px !important;
+}
+
+.reader-book-scaler .science-interaction .ow-caption {
+  font-size: 10px !important;
+  line-height: 1.25 !important;
+  margin: 1px 0 !important;
+}
+
+.reader-book-scaler .science-warning {
+  font-size: 9.5px !important;
+  line-height: 1.2 !important;
+  margin: 1px 0 !important;
+}
+
+/* --- Surveyor Camera Spread (Spread 2) --- */
+.reader-book-scaler .reader-photo {
+  max-height: var(--surveyor-photo-h, 190px) !important;
+  width: auto !important;
+  height: auto !important;
+  object-fit: contain !important;
+}
+
+.reader-book-scaler .reader-page figure {
+  margin: 0 0 8px !important;
+}
+
+.reader-book-scaler .reader-page figcaption {
+  margin-top: 3px !important;
+  font-size: 10.5px !important;
+  line-height: 1.25 !important;
+}
+
+/* --- Story & Sources Spreads (Spreads 1 & 3) --- */
+.reader-book-scaler .reader-page h2 {
+  font-size: 24px !important;
+  line-height: 1.15 !important;
+  margin: 2px 0 6px !important;
+}
+
+.reader-book-scaler .reader-page > p {
+  font-size: 12.5px !important;
+  line-height: 1.4 !important;
+  margin: 0 0 6px !important;
+}
+
+.reader-book-scaler .reader-page blockquote {
+  margin: 6px 0 !important;
+  padding: 6px 12px !important;
+}
+
+.reader-book-scaler .reader-page blockquote p {
+  font-size: 12.5px !important;
+  line-height: 1.35 !important;
+}
+
+.reader-book-scaler .reader-facts {
+  margin: 8px 0 !important;
+  gap: 6px !important;
+  font-size: 11.5px !important;
+}
+
+.reader-book-scaler .reader-facts > div {
+  grid-template-columns: 110px 1fr !important;
+  gap: 8px !important;
+}
+
+.reader-book-scaler .reader-art {
+  display: flex !important;
+  justify-content: center !important;
+  margin: 0 0 4px !important;
+  padding: 10px !important;
+}
+
+.reader-book-scaler .reader-art img {
+  max-height: 130px !important;
+  width: auto !important;
+  height: auto !important;
+  object-fit: contain !important;
+}
+
+.reader-book-scaler .reader-page h3 {
+  font-size: 14.5px !important;
+  margin: 4px 0 2px !important;
+}
+
+.reader-book-scaler .reader-records {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  gap: 4px 12px !important;
+  padding: 0 !important;
+  margin: 2px 0 6px !important;
+  list-style: none !important;
+}
+
+.reader-book-scaler .reader-records li {
+  font-size: 11px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 4px !important;
+  padding: 2px 0 !important;
+  border-bottom: 0 !important;
+}
+
+.reader-book-scaler .reader-sources {
+  margin: 6px 0 4px !important;
+  font-size: 11px !important;
+}
+
+.reader-book-scaler .reader-sources summary {
+  cursor: pointer !important;
+  min-height: 22px !important;
+  font-size: 11px !important;
+  font-weight: 600 !important;
+  color: #783d2c !important;
+  margin-bottom: 4px !important;
+}
+
+.reader-book-scaler .reader-sources-list {
+  display: grid !important;
+  grid-template-columns: 1fr 1fr !important;
+  gap: 4px 14px !important;
+  margin-bottom: 4px !important;
+}
+
+.reader-book-scaler .reader-sources-list p {
+  margin: 0 !important;
+  font-size: 10.5px !important;
+  line-height: 1.25 !important;
+}
+
+.reader-book-scaler .reader-sources-list a {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 3px !important;
+  font-size: 10.5px !important;
+}
+
+.reader-book-scaler .reader-sources-list small {
+  display: block !important;
+  font-size: 9.5px !important;
+  color: #556451 !important;
+}
+
+.reader-book-scaler .reader-page > .ow-caption {
+  font-size: 10px !important;
+  line-height: 1.25 !important;
+  margin-top: auto !important;
+  margin-bottom: 0 !important;
+  color: #556451 !important;
+}
+
+/* ==========================================================================
+   AUDIT DEBUG MODE (exposes true unclipped overflow)
+   ========================================================================== */
+body[data-audit-debug="true"] .reader-page,
+body[data-audit-debug="true"] .archive-page,
+body[data-audit-debug="true"] .contents-records,
+body[data-audit-debug="true"] .artifact-field-notes,
+body[data-audit-debug="true"] .planet-atlas-viewport,
+body[data-audit-debug="true"] .reader-book-scaler > * {
+  overflow: visible !important;
+}

@@ -33,6 +33,45 @@ export function BackpackLauncher({
   hasNew: boolean;
   expanded: boolean;
 }) {
+  const initialDpr = useRef<number>(1);
+  const [zoom, setZoom] = useState<number>(1);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    initialDpr.current = window.devicePixelRatio || 1;
+
+    const computeZoom = () => {
+      let z = 1;
+      // Primary: outerWidth / innerWidth
+      if (window.outerWidth && window.innerWidth) {
+        const ratio = window.outerWidth / window.innerWidth;
+        if (Number.isFinite(ratio) && ratio > 0.1 && ratio < 10) {
+          z = ratio;
+        }
+      } else if (window.devicePixelRatio && initialDpr.current) {
+        // Fallback: devicePixelRatio relative to DPR at load
+        z = window.devicePixelRatio / initialDpr.current;
+      }
+      setZoom(z || 1);
+    };
+
+    computeZoom();
+
+    window.addEventListener("resize", computeZoom);
+    if (window.visualViewport) {
+      window.visualViewport.addEventListener("resize", computeZoom);
+    }
+
+    return () => {
+      window.removeEventListener("resize", computeZoom);
+      if (window.visualViewport) {
+        window.visualViewport.removeEventListener("resize", computeZoom);
+      }
+    };
+  }, []);
+
+  const scaleFactor = zoom > 0 ? 1 / zoom : 1;
+
   return (
     <button
       className="backpack-launcher"
@@ -40,6 +79,10 @@ export function BackpackLauncher({
       aria-label="Open Space Backpack"
       aria-expanded={expanded}
       aria-controls="space-backpack"
+      style={{
+        transform: `translateY(-50%) scale(${scaleFactor})`,
+        transformOrigin: "right center",
+      }}
     >
       <img
         src="/images/rewards/offworld-backpack-shell.webp"

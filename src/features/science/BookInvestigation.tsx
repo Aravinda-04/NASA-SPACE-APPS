@@ -67,28 +67,30 @@ export function BookInvestigation({ missionId, suspended = false }: { missionId:
               <p>{event.fate}</p>
             </blockquote>
           </div>
-          <div className="science-controls">
-            <button
-              className="ow-button"
-              disabled={index === 0}
-              onClick={() => setIndex((i) => i - 1)}
-            >
-              <ArrowLeft size={16} />
-              Previous event
-            </button>
-            <button
-              className="ow-button"
-              disabled={index === EDL_EVENTS.length - 1}
-              onClick={() => setIndex((i) => i + 1)}
-            >
-              Next event
-              <ArrowRight size={16} />
-            </button>
+          <div className="science-action-row">
+            <div className="science-controls">
+              <button
+                className="ow-button"
+                disabled={index === 0}
+                onClick={() => setIndex((i) => i - 1)}
+              >
+                <ArrowLeft size={16} />
+                Previous event
+              </button>
+              <button
+                className="ow-button"
+                disabled={index === EDL_EVENTS.length - 1}
+                onClick={() => setIndex((i) => i + 1)}
+              >
+                Next event
+                <ArrowRight size={16} />
+              </button>
+            </div>
+            <p className="ow-caption">
+              Earth received touchdown at 05:31:45.4 UTC, about 13m48s later.
+              Event occurrence and Earth reception are different times.
+            </p>
           </div>
-          <p className="ow-caption">
-            Earth received touchdown at 05:31:45.4 UTC, about 13m48s later.
-            Event occurrence and Earth reception are different times.
-          </p>
           <a
             href="https://www.jpl.nasa.gov/news/timeline-of-major-mission-events-during-curiositys-landing/"
             target="_blank"

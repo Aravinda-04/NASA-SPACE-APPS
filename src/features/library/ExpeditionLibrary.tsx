@@ -4,7 +4,21 @@ import { BOOKS, type BookDefinition } from "../../data/books";
 import { EXPEDITION_MISSIONS } from "../../data/expeditionMissions";
 import type { ExpeditionProgress, MissionId } from "../../types/expedition";
 import { useReducedMotion } from "../../hooks/useReducedMotion";
-import GlitterWrap from "../../components/GlitterWrap";
+import { Galaxy } from "../../components/Galaxy";
+import { BookCarousel, type CarouselBookId } from "./BookCarousel";
+import "../../styles/cockpit.css";
+
+const CAROUSEL_TO_MISSION: Record<CarouselBookId, MissionId> = {
+  moon: "surveyor",
+  mars: "curiosity",
+  "outer-space": "pioneer",
+};
+
+const MISSION_TO_CAROUSEL: Record<MissionId, CarouselBookId> = {
+  surveyor: "moon",
+  curiosity: "mars",
+  pioneer: "outer-space",
+};
 
 export function Brand() {
   return (
@@ -43,6 +57,9 @@ export function ExpeditionLibrary({
   const [selected, setSelected] = useState<MissionId | null>(
     initialSelection ?? null,
   );
+  const [lastCarouselBook, setLastCarouselBook] = useState<CarouselBookId>(
+    initialSelection ? MISSION_TO_CAROUSEL[initialSelection] : "moon",
+  );
   const buttons = useRef<(HTMLButtonElement | null)[]>([]);
   const shelf = useRef<HTMLDivElement>(null);
   const [phase, setPhase] = useState<'browsing' | 'focusing' | 'focused' | 'opening'>(initialSelection ? 'focused' : 'browsing');
@@ -56,6 +73,9 @@ export function ExpeditionLibrary({
   const reduced = useReducedMotion();
   const choose = (id: MissionId | null) => {
     if (id === selected && phase !== 'opening') return;
+    if (id) {
+      setLastCarouselBook(MISSION_TO_CAROUSEL[id]);
+    }
     setSelected(id);
     setPhase(id ? (reduced ? 'focused' : 'focusing') : 'browsing');
     if (!id && selected) {
@@ -63,6 +83,26 @@ export function ExpeditionLibrary({
       requestAnimationFrame(() => buttons.current[previous]?.focus({ preventScroll: true }));
     }
   };
+  useEffect(() => {
+    if (!selected) {
+      const origHtmlOverflow = document.documentElement.style.overflow;
+      const origHtmlHeight = document.documentElement.style.height;
+      const origBodyOverflow = document.body.style.overflow;
+      const origBodyHeight = document.body.style.height;
+
+      document.documentElement.style.height = "100dvh";
+      document.documentElement.style.overflow = "hidden";
+      document.body.style.height = "100dvh";
+      document.body.style.overflow = "hidden";
+
+      return () => {
+        document.documentElement.style.overflow = origHtmlOverflow;
+        document.documentElement.style.height = origHtmlHeight;
+        document.body.style.overflow = origBodyOverflow;
+        document.body.style.height = origBodyHeight;
+      };
+    }
+  }, [selected]);
   useLayoutEffect(() => {
     const element = shelf.current;
     if (!element) return;
@@ -93,7 +133,7 @@ export function ExpeditionLibrary({
     const observer = new ResizeObserver(measure);
     observer.observe(element);
     return () => observer.disconnect();
-  }, []);
+  }, [selected]);
   useEffect(() => {
     if (phase !== 'focusing') return;
     const timer = window.setTimeout(() => setPhase('focused'), reduced ? 0 : 650);
@@ -118,32 +158,89 @@ export function ExpeditionLibrary({
     >
       <div className="library-environment" aria-hidden="true"><div className="library-environment-image" /><div className="library-environment-light" /></div>
       <div className="library-starfield" aria-hidden="true">
-        <GlitterWrap
-          particleCount={180}
-          density={35}
-          trailAmount={0}
-          speed={reduced ? 0 : 4}
-          glitterIntensity={reduced ? 0 : 3}
-          color1="#ffffff"
-          color2="#ffffff"
-          color3="#ffffff"
+        <Galaxy
+          density={1}
+          glowIntensity={0.2}
+          flareIntensity={3.6}
+          starSpeed={reduced ? 0 : 2}
+          mouseRepulsion={false}
+          clickWarp={false}
+          saturation={0.26}
+          twinkleIntensity={0.3}
+          speed={reduced ? 0 : 3}
+          rotationSpeed={0}
+          layers={4}
+          mouseInteraction={false}
+          intro={false}
+          starColors={["#ffffff", "#ffffff", "#ffd6e7", "#c2f0ff"]}
+          backgroundColor="#100c14"
+          starSize={1}
+          transparent={true}
+          disableAnimation={reduced}
         />
       </div>
-      <header className="ow-header">
-        <Brand />
-      </header>
-      <section className="ow-intro">
-        <p className="ow-eyebrow">THE EXPEDITION LIBRARY</p>
-        <h1>Every object has a story.</h1>
-        <p>
-          Choose a volume. Follow the evidence left behind, and discover what
-          space exploration teaches us.
-        </p>
-      </section>
+      {!selected && (
+        <>
+          <header className="ow-header">
+            <Brand />
+          </header>
+          <section className="ow-intro">
+            <p className="ow-eyebrow">THE EXPEDITION LIBRARY</p>
+            <h1>Every object has a story.</h1>
+            <p>
+              Choose a volume. Follow the evidence left behind, and discover what
+              space exploration teaches us.
+            </p>
+          </section>
+        </>
+      )}
+      {selected && (
+        <button
+          className="ow-button library-back-button"
+          onClick={() => choose(null)}
+          aria-label="View all volumes"
+        >
+          <ArrowLeft size={16} /> View all volumes
+        </button>
+      )}
+      {!selected && (
+        <BookCarousel
+          initialBookId={lastCarouselBook}
+          onSelectionChange={(id) => setLastCarouselBook(id)}
+          onOpenBook={(carouselId) => {
+            const missionId = CAROUSEL_TO_MISSION[carouselId];
+            choose(missionId);
+          }}
+          bookState={{
+            moon: {
+              coverImageUrl: BOOKS[0].cover,
+              completed: progress.surveyor.completed,
+            },
+            mars: {
+              coverImageUrl: BOOKS[1].cover,
+              completed: progress.curiosity.completed,
+            },
+            "outer-space": {
+              coverImageUrl: BOOKS[2].cover,
+              completed: progress.pioneer.completed,
+            },
+          }}
+        />
+      )}
       <div
         ref={shelf}
         className="library-books"
         aria-label="Choose an expedition book"
+        style={
+          !selected
+            ? {
+                position: "absolute",
+                opacity: 0,
+                pointerEvents: "none",
+                visibility: "hidden",
+              }
+            : undefined
+        }
       >
         {BOOKS.map((item, index) => (
           <div
@@ -224,13 +321,7 @@ export function ExpeditionLibrary({
           </section>
         )}
       </div>
-      {selected && (
-        <footer className="library-footer">
-          <button className="ow-button" onClick={() => choose(null)}>
-            <ArrowLeft size={16} /> View all volumes
-          </button>
-        </footer>
-      )}
+
       <p className="sr-only" role="status">{phase === 'focusing' ? `Centring ${book?.volume}.` : phase === 'focused' ? `${book?.volume} is ready to open. Use the arrow keys to choose another volume, or Escape to return to the shelf.` : phase === 'opening' ? 'Opening the expedition atlas. Press Escape to cancel.' : ''}</p>
     </main>
   );

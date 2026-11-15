@@ -1,0 +1,44 @@
+[
+  {
+    "Viewport": "1536x864 (100%)",
+    "Status": "✅ PASS",
+    "Page Bottom vs Spread": "792px / 800px",
+    "Failure Reason": "None (100% Fit)"
+  },
+  {
+    "Viewport": "1920x1080 (100%)",
+    "Status": "✅ PASS",
+    "Page Bottom vs Spread": "1005px / 1016px",
+    "Failure Reason": "None (100% Fit)"
+  },
+  {
+    "Viewport": "1366x768 (100%)",
+    "Status": "✅ PASS",
+    "Page Bottom vs Spread": "697px / 704px",
+    "Failure Reason": "None (100% Fit)"
+  },
+  {
+    "Viewport": "1280x720 (100%)",
+    "Status": "✅ PASS",
+    "Page Bottom vs Spread": "650px / 656px",
+    "Failure Reason": "None (100% Fit)"
+  },
+  {
+    "Viewport": "1536x864 (90%)",
+    "Status": "✅ PASS",
+    "Page Bottom vs Spread": "792px / 800px",
+    "Failure Reason": "None (100% Fit)"
+  },
+  {
+    "Viewport": "1536x864 (110%)",
+    "Status": "✅ PASS",
+    "Page Bottom vs Spread": "792px / 800px",
+    "Failure Reason": "None (100% Fit)"
+  },
+  {
+    "Viewport": "1536x864 (125%)",
+    "Status": "✅ PASS",
+    "Page Bottom vs Spread": "792px / 800px",
+    "Failure Reason": "None (100% Fit)"
+  }
+]

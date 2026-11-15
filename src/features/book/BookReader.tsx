@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { ArrowLeft, ArrowRight, Check, ExternalLink } from "lucide-react";
 import { getBook } from "../../data/books";
 import { Brand } from "../library/ExpeditionLibrary";
@@ -61,6 +61,99 @@ export function BookReader({
       target?.scrollIntoView({ block: 'nearest' });
     }
   }, []);
+  // Lock html and body to 100dvh with zero scrolling
+  useEffect(() => {
+    const origHtmlOverflow = document.documentElement.style.overflow;
+    const origHtmlHeight = document.documentElement.style.height;
+    const origBodyOverflow = document.body.style.overflow;
+    const origBodyHeight = document.body.style.height;
+
+    document.documentElement.style.height = "100dvh";
+    document.documentElement.style.overflow = "hidden";
+    document.body.style.height = "100dvh";
+    document.body.style.overflow = "hidden";
+
+    if (
+      window.location.search.includes("audit_debug=true") ||
+      (window as any).__AUDIT_DEBUG__
+    ) {
+      document.body.setAttribute("data-audit-debug", "true");
+    }
+
+    return () => {
+      document.documentElement.style.overflow = origHtmlOverflow;
+      document.documentElement.style.height = origHtmlHeight;
+      document.body.style.overflow = origBodyOverflow;
+      document.body.style.height = origBodyHeight;
+    };
+  }, []);
+
+  // Fixed logical spread dimensions and stage scaling
+  const stageRef = useRef<HTMLDivElement>(null);
+  const [bookScale, setBookScale] = useState(1);
+  const LOGICAL_WIDTH = 1240;
+  const LOGICAL_HEIGHT = 660;
+
+  useLayoutEffect(() => {
+    const stage = stageRef.current;
+    if (!stage) return;
+
+    const updateScale = () => {
+      const stageWidth = stage.clientWidth;
+      const stageHeight = stage.clientHeight;
+      if (stageWidth === 0 || stageHeight === 0) return;
+
+      const scaleX = stageWidth / LOGICAL_WIDTH;
+      const scaleY = stageHeight / LOGICAL_HEIGHT;
+      const newScale = Math.min(scaleX, scaleY);
+      setBookScale(newScale);
+    };
+
+    updateScale();
+    const observer = new ResizeObserver(updateScale);
+    observer.observe(stage);
+    window.addEventListener("resize", updateScale);
+
+    return () => {
+      observer.disconnect();
+      window.removeEventListener("resize", updateScale);
+    };
+  }, []);
+
+  const scalerRef = useRef<HTMLDivElement>(null);
+
+  const fitContent = useCallback(() => {
+    const scaler = scalerRef.current;
+    if (!scaler) return;
+
+    const pages = scaler.querySelectorAll<HTMLElement>(
+      ".reader-page, .archive-page, .science-copy, .science-interaction"
+    );
+
+    pages.forEach((pageEl) => {
+      // Clean up any residual transform
+      pageEl.style.removeProperty("transform");
+      pageEl.style.removeProperty("transform-origin");
+    });
+  }, []);
+
+  useLayoutEffect(() => {
+    fitContent();
+  }, [page, isContents, bookScale, fitContent]);
+
+  useEffect(() => {
+    const handleToggle = () => {
+      requestAnimationFrame(fitContent);
+    };
+
+    window.addEventListener("resize", fitContent);
+    document.addEventListener("toggle", handleToggle, true);
+
+    return () => {
+      window.removeEventListener("resize", fitContent);
+      document.removeEventListener("toggle", handleToggle, true);
+    };
+  }, [fitContent]);
   const labels = [
     "",
     "Mission story",
@@ -113,6 +206,12 @@ export function BookReader({
           {isContents ? `${book.volume} / The archive opens here.` : book.title}
         </h1>
       </section>
+      <div className="reader-book-stage" ref={stageRef}>
+        <div ref={scalerRef} className="reader-book-scaler" style={{
+          "--book-scale": bookScale,
+          "--logical-w": `${LOGICAL_WIDTH}px`,
+          "--logical-h": `${LOGICAL_HEIGHT}px`,
+        } as React.CSSProperties}>
       {isContents ? <OpenedExpeditionJournal volumeId={mission.id} context={context} onContext={onContext} onExplore={explore} onLibrary={onLibrary} suspended={suspended} /> : activePage === 2 ? (
         <BookInvestigation key={mission.id} missionId={mission.id} suspended={suspended} />
       ) : (
@@ -191,6 +290,7 @@ export function BookReader({
               <summary>
                 Historical sources · {mission.sources.length} records
               </summary>
+              <div className="reader-sources-list">
               {mission.sources.map((source) => (
                 <p key={source.id}>
                   <a href={source.url} target="_blank" rel="noreferrer">
@@ -199,11 +299,14 @@ export function BookReader({
                   <small>{source.credit}</small>
                 </p>
               ))}
+              </div>
             </details>
             <p className="ow-caption">{mission.sceneNote}</p>
           </article>
         </section>
       )}
+        </div>
+      </div>
       <nav className="reader-pagination" aria-label={`${book.volume} pages`}>
         <button
           className="ow-button"

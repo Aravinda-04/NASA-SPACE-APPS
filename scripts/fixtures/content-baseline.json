@@ -1,0 +1,876 @@
+{
+  "surveyor": {
+    "meta": {
+      "id": "surveyor",
+      "volume": "Moon",
+      "number": "01",
+      "title": "The camera that came back",
+      "name": "Surveyor 3 · Apollo 12"
+    },
+    "spread0": {
+      "left": {
+        "runningHeader": [
+          "Off-world / Interactive field atlas",
+          "Moon"
+        ],
+        "heading": "The Moon, a little closer.",
+        "subtitle": "Turn the world. Find the place. Follow the evidence.",
+        "controls": [
+          "left",
+          "right",
+          "up",
+          "down",
+          "zoom-in",
+          "zoom-out",
+          "overview",
+          "focus",
+          "labels"
+        ],
+        "artifacts": [
+          {
+            "id": "surveyor-3",
+            "title": "Surveyor 3",
+            "purpose": "It tested lunar soil and returned surface images to help assess conditions for future Apollo landings.",
+            "actions": [
+              "Open artifact dossier",
+              "Enter 3D simulation"
+            ]
+          },
+          {
+            "id": "apollo-12",
+            "title": "Apollo 12 · Intrepid",
+            "purpose": "Apollo 12 demonstrated a precision lunar landing, collected samples and deployed experiments. Landing near Surveyor 3 also made equipment recovery possible.",
+            "actions": [
+              "Open artifact dossier",
+              "Enter 3D simulation"
+            ]
+          },
+          {
+            "id": "surveyor-camera",
+            "title": "The returned camera",
+            "purpose": "Apollo 12 astronauts Pete Conrad and Alan Bean visited Surveyor 3 in November 1969. They removed its camera and other pieces for examination on Earth.",
+            "actions": [
+              "Open artifact dossier",
+              "Enter 3D simulation"
+            ]
+          },
+          {
+            "id": "camera-tests",
+            "title": "The laboratory afterlife",
+            "purpose": "Researchers wanted to learn how lunar exposure had affected the instrument.",
+            "actions": [
+              "Open artifact dossier",
+              "Enter 3D simulation"
+            ]
+          }
+        ],
+        "footer": [
+          "p. 01 — Planetary atlas",
+          "History, located."
+        ]
+      },
+      "right": {
+        "runningHeader": [
+          "Astro-archaeology expedition manual",
+          "Archive index"
+        ],
+        "volumeLine": "Contents: Volume I — Moon",
+        "heading": "A trail of discoveries.",
+        "subtitle": "A chronological registry of spacecraft, instruments & scientific legacies.",
+        "instruction": "Select a record to locate its scientific story. Dates refer to the event named in each entry.",
+        "records": [
+          {
+            "index": 1,
+            "id": "surveyor-3",
+            "dateLabel": "20 Apr 1967 · landing",
+            "title": "Surveyor 3",
+            "synopsis": "A robotic scout tests the ground for human explorers.",
+            "recordId": "R01"
+          },
+          {
+            "index": 2,
+            "id": "apollo-12",
+            "dateLabel": "19 Nov 1969 · landing",
+            "title": "Apollo 12 · Intrepid",
+            "synopsis": "A precision landing brings two expeditions together.",
+            "recordId": "R02"
+          },
+          {
+            "index": 3,
+            "id": "surveyor-camera",
+            "dateLabel": "20 Nov 1969 · recovery",
+            "title": "The returned camera",
+            "synopsis": "An instrument becomes a sample of the lunar environment.",
+            "recordId": "R03"
+          },
+          {
+            "index": 4,
+            "id": "camera-tests",
+            "dateLabel": "1970 · report published",
+            "title": "The laboratory afterlife",
+            "synopsis": "Back on Earth, the hardware tells a second scientific story.",
+            "recordId": "R04"
+          }
+        ],
+        "footer": [
+          "p. 02 — Table of contents",
+          "Close book"
+        ]
+      }
+    },
+    "spread1": {
+      "left": {
+        "eyebrow": "Surveyor 3 · Apollo 12",
+        "heading": "An object becomes evidence.",
+        "introduction": "Before astronauts arrived, robotic scouts tested the Moon. Surveyor 3 photographed its surroundings and examined the soil. Two years later, Apollo 12 astronauts returned parts of the lander to Earth. The machine itself had become an experiment.",
+        "question": "Can a machine teach us something after it stops transmitting?",
+        "facts": [
+          {
+            "label": "Mission",
+            "value": "Surveyor 3 · Apollo 12"
+          },
+          {
+            "label": "Historical status",
+            "value": "Historical: inactive lander; selected parts returned"
+          },
+          {
+            "label": "Location",
+            "value": "Ocean of Storms · Apollo 12 / Surveyor 3 region"
+          }
+        ]
+      },
+      "right": {
+        "image": {
+          "src": "/images/history/apollo12.webp",
+          "alt": "Apollo 12 astronaut beside the Surveyor 3 lander on the lunar surface.",
+          "caption": "Historical photograph · AS12-48-7134 / NASA. The photograph documents the visit; laboratory tests document material changes.",
+          "source": "https://science.nasa.gov/resource/apollo-12-and-surveyor-3/"
+        },
+        "heading": "Look a little closer.",
+        "discoveries": [
+          "The robotic scout",
+          "A scoop asks a question",
+          "The missing camera",
+          "The part that stayed"
+        ],
+        "sources": [
+          {
+            "title": "Surveyor 3 mission history",
+            "url": "https://science.nasa.gov/mission/surveyor-3/",
+            "credit": "NASA Science"
+          },
+          {
+            "title": "Apollo 12 and Surveyor 3",
+            "url": "https://science.nasa.gov/resource/apollo-12-and-surveyor-3/",
+            "credit": "NASA"
+          },
+          {
+            "title": "Tests of the returned Surveyor 3 television camera",
+            "url": "https://ntrs.nasa.gov/citations/19710024418",
+            "credit": "NASA Technical Reports Server · NASA-CR-121796"
+          },
+          {
+            "title": "Apollo 12 mission summary",
+            "url": "https://www.nasa.gov/wp-content/uploads/static/history/SP-4029/Apollo_12a_Summary.htm",
+            "credit": "NASA History · Apollo by the Numbers"
+          },
+          {
+            "title": "LRO views the Apollo 12 and Surveyor 3 sites",
+            "url": "https://www.nasa.gov/missions/lunar-reconnaissance-orbiter-looks-at-apollo-12-surveyor-3-landing-sites/",
+            "credit": "NASA / LRO"
+          }
+        ],
+        "sceneNote": "Fictional future visit. Simplified hardware and terrain; the nearby Apollo descent stage is an inspection-layout convenience, not a georeferenced distance. Removed parts are represented by archive markers."
+      }
+    },
+    "spread2": {
+      "type": "surveyor-camera",
+      "left": {
+        "eyebrow": "SURVEYOR 3 / APOLLO 12",
+        "heading": "The camera that became evidence",
+        "intro": "After about 2½ years on the Moon, the television camera returned to Earth. Engineers examined its optics, electronics, mechanisms, materials and coatings.",
+        "tabs": [
+          "Historical photo",
+          "Laboratory tests",
+          "Illustration"
+        ],
+        "question": "Which record would help you evaluate a material’s performance: a landing photograph, or tests of the returned hardware?",
+        "nasaReportLink": "https://ntrs.nasa.gov/citations/19710024418"
+      },
+      "right": {
+        "pipelineHeading": "Equipment → purpose → fate → knowledge",
+        "pipelineText": "Camera → observe the Moon → returned by Apollo 12 → test how materials and instruments endured lunar exposure.",
+        "caption": "The report describes specific observations. It does not establish that all equipment survives every lunar condition."
+      }
+    },
+    "spread3": {
+      "left": {
+        "eyebrow": "Surveyor 3 · Apollo 12",
+        "heading": "Your expedition starts here.",
+        "arrival": "Your imagined future expedition has reached the Ocean of Storms. Look closely: a missing camera is the beginning of this story, not its end.",
+        "question": "Can a machine teach us something after it stops transmitting?",
+        "facts": [
+          {
+            "label": "Mission",
+            "value": "Surveyor 3 · Apollo 12"
+          },
+          {
+            "label": "Historical status",
+            "value": "Historical: inactive lander; selected parts returned"
+          },
+          {
+            "label": "Location",
+            "value": "Ocean of Storms · Apollo 12 / Surveyor 3 region"
+          }
+        ]
+      },
+      "right": {
+        "schematic": "/images/covers/moon.svg",
+        "caption": "Original schematic reconstruction · not a photograph.",
+        "heading": "Look a little closer.",
+        "discoveries": [
+          "The robotic scout",
+          "A scoop asks a question",
+          "The missing camera",
+          "The part that stayed"
+        ],
+        "sources": [
+          {
+            "title": "Surveyor 3 mission history",
+            "url": "https://science.nasa.gov/mission/surveyor-3/",
+            "credit": "NASA Science"
+          },
+          {
+            "title": "Apollo 12 and Surveyor 3",
+            "url": "https://science.nasa.gov/resource/apollo-12-and-surveyor-3/",
+            "credit": "NASA"
+          },
+          {
+            "title": "Tests of the returned Surveyor 3 television camera",
+            "url": "https://ntrs.nasa.gov/citations/19710024418",
+            "credit": "NASA Technical Reports Server · NASA-CR-121796"
+          },
+          {
+            "title": "Apollo 12 mission summary",
+            "url": "https://www.nasa.gov/wp-content/uploads/static/history/SP-4029/Apollo_12a_Summary.htm",
+            "credit": "NASA History · Apollo by the Numbers"
+          },
+          {
+            "title": "LRO views the Apollo 12 and Surveyor 3 sites",
+            "url": "https://www.nasa.gov/missions/lunar-reconnaissance-orbiter-looks-at-apollo-12-surveyor-3-landing-sites/",
+            "credit": "NASA / LRO"
+          }
+        ],
+        "sceneNote": "Fictional future visit. Simplified hardware and terrain; the nearby Apollo descent stage is an inspection-layout convenience, not a georeferenced distance. Removed parts are represented by archive markers."
+      }
+    }
+  },
+  "curiosity": {
+    "meta": {
+      "id": "curiosity",
+      "volume": "Mars",
+      "number": "02",
+      "title": "The journey to the surface",
+      "name": "Curiosity · Mars Science Laboratory"
+    },
+    "spread0": {
+      "left": {
+        "runningHeader": [
+          "Off-world / Interactive field atlas",
+          "Mars"
+        ],
+        "heading": "A world of discoveries.",
+        "subtitle": "Turn the world. Find the place. Follow the evidence.",
+        "controls": [
+          "left",
+          "right",
+          "up",
+          "down",
+          "zoom-in",
+          "zoom-out",
+          "overview",
+          "focus",
+          "labels"
+        ],
+        "artifacts": [
+          {
+            "id": "viking-1",
+            "title": "Viking 1",
+            "purpose": "Its experiments investigated Martian soil, weather and the possibility of life.",
+            "actions": [
+              "Open artifact dossier",
+              "Enter 3D simulation"
+            ]
+          },
+          {
+            "id": "viking-2",
+            "title": "Viking 2",
+            "purpose": "A second site let researchers compare soils and environments rather than generalise from one location.",
+            "actions": [
+              "Open artifact dossier",
+              "Enter 3D simulation"
+            ]
+          },
+          {
+            "id": "curiosity-rover",
+            "title": "Curiosity & the sky crane",
+            "purpose": "The rover was sent to investigate whether ancient Mars had environments suitable for microbial life.",
+            "actions": [
+              "Open artifact dossier",
+              "Enter 3D simulation"
+            ]
+          },
+          {
+            "id": "john-klein",
+            "title": "John Klein · rock archive",
+            "purpose": "In 2013 the team analyzed powder drilled from John Klein at Yellowknife Bay. Chemical and mineral evidence supported a past environment suitable for microbial life.",
+            "actions": [
+              "Open artifact dossier",
+              "Enter 3D simulation"
+            ]
+          },
+          {
+            "id": "ingenuity",
+            "title": "Ingenuity",
+            "purpose": "It tested powered, controlled flight in the thin Martian atmosphere, then helped scout terrain.",
+            "actions": [
+              "Open artifact dossier",
+              "Enter 3D simulation"
+            ]
+          }
+        ],
+        "footer": [
+          "p. 01 — Planetary atlas",
+          "History, located."
+        ]
+      },
+      "right": {
+        "runningHeader": [
+          "Astro-archaeology expedition manual",
+          "Archive index"
+        ],
+        "volumeLine": "Contents: Volume II — Mars",
+        "heading": "A trail of discoveries.",
+        "subtitle": "A chronological registry of spacecraft, instruments & scientific legacies.",
+        "instruction": "Select a record to locate its scientific story. Dates refer to the event named in each entry.",
+        "records": [
+          {
+            "index": 1,
+            "id": "viking-1",
+            "dateLabel": "20 Jul 1976 · landing",
+            "title": "Viking 1",
+            "synopsis": "A long-lived surface laboratory opens a new view of Mars.",
+            "recordId": "R01"
+          },
+          {
+            "index": 2,
+            "id": "viking-2",
+            "dateLabel": "3 Sep 1976 · landing",
+            "title": "Viking 2",
+            "synopsis": "A second landing site makes comparison possible.",
+            "recordId": "R02"
+          },
+          {
+            "index": 3,
+            "id": "curiosity-rover",
+            "dateLabel": "6 Aug 2012 · landing (UTC)",
+            "title": "Curiosity & the sky crane",
+            "synopsis": "Discarded landing hardware delivers a mobile laboratory.",
+            "recordId": "R03"
+          },
+          {
+            "index": 4,
+            "id": "john-klein",
+            "dateLabel": "12 Mar 2013 · result announced",
+            "title": "John Klein · rock archive",
+            "synopsis": "A drilled rock preserves evidence of ancient habitability.",
+            "recordId": "R04"
+          },
+          {
+            "index": 5,
+            "id": "ingenuity",
+            "dateLabel": "19 Apr 2021 · first flight",
+            "title": "Ingenuity",
+            "synopsis": "A small rotorcraft proves that powered flight can work on Mars.",
+            "recordId": "R05"
+          }
+        ],
+        "footer": [
+          "p. 02 — Table of contents",
+          "Close book"
+        ]
+      }
+    },
+    "spread1": {
+      "left": {
+        "eyebrow": "Curiosity · Mars Science Laboratory",
+        "heading": "An object becomes evidence.",
+        "introduction": "Curiosity reached Gale Crater in August 2012. A heat shield, parachute and powered descent stage helped deliver the rover, then separated. The laboratory they protected went on to investigate whether ancient Mars had environments suitable for microbes.",
+        "question": "Why would a successful mission leave important equipment behind?",
+        "facts": [
+          {
+            "label": "Mission",
+            "value": "Curiosity · Mars Science Laboratory"
+          },
+          {
+            "label": "Historical status",
+            "value": "NASA record checked November 2026: active mission"
+          },
+          {
+            "label": "Location",
+            "value": "Gale Crater · landing and Yellowknife Bay archives"
+          }
+        ]
+      },
+      "right": {
+        "image": {
+          "src": "/images/history/curiosity-hardware.webp",
+          "alt": "MRO HiRISE orbital image locating Curiosity and discarded landing hardware.",
+          "caption": "Orbital observation · PIA16001 / NASA/JPL-Caltech/University of Arizona. Taken after landing, not during the descent.",
+          "source": "https://www.jpl.nasa.gov/images/pia16001-scene-of-a-martian-landing/"
+        },
+        "heading": "Look a little closer.",
+        "discoveries": [
+          "A successful separation",
+          "A laboratory on six wheels",
+          "Different tools, different questions",
+          "A rock remembers water"
+        ],
+        "sources": [
+          {
+            "title": "Curiosity mission overview and dated status",
+            "url": "https://science.nasa.gov/mission/msl-curiosity/",
+            "credit": "NASA Science · status checked 13 November 2026"
+          },
+          {
+            "title": "Scene of a Martian Landing · PIA16001",
+            "url": "https://www.jpl.nasa.gov/images/pia16001-scene-of-a-martian-landing/",
+            "credit": "NASA/JPL-Caltech/University of Arizona"
+          },
+          {
+            "title": "Final Minutes of Curiosity’s Arrival at Mars",
+            "url": "https://science.nasa.gov/resource/final-minutes-of-curiositys-arrival-at-mars/",
+            "credit": "NASA/JPL-Caltech"
+          },
+          {
+            "title": "JPL Robotics · rover mobility comparison",
+            "url": "https://robotics.jpl.nasa.gov/what-we-do/flight-projects/mars-2020-rover/m2020mobility/",
+            "credit": "NASA/JPL Robotics · includes Curiosity comparison"
+          },
+          {
+            "title": "Curiosity science instruments",
+            "url": "https://science.nasa.gov/mission/msl-curiosity/science-instruments/",
+            "credit": "NASA Science"
+          },
+          {
+            "title": "Conditions Once Suited for Ancient Life on Mars",
+            "url": "https://www.jpl.nasa.gov/news/nasa-rover-finds-conditions-once-suited-for-ancient-life-on-mars/",
+            "credit": "NASA/JPL-Caltech · 12 March 2013"
+          }
+        ],
+        "sceneNote": "Schematic inspection layout, not a continuous geographic site. Landing debris and the later John Klein investigation are separated in real distance and time. Dashed lines are illustrative navigation guides, not a measured traverse. Future rover condition is imagined; no live telemetry or present-day location is shown."
+      }
+    },
+    "spread2": {
+      "type": "edl",
+      "left": {
+        "eyebrow": "6 AUGUST 2012 · EVENT TIME AT MARS",
+        "heading": "Seven minutes of terror",
+        "intro": "Landing was a sequence of different engineering jobs. Follow what each piece of equipment did, and why it was left behind.",
+        "events": [
+          "01 · Atmospheric entry",
+          "02 · Parachute deployment",
+          "03 · Heat-shield separation",
+          "04 · Back shell separates",
+          "05 · Rover separation",
+          "06 · Touchdown"
+        ],
+        "scrubberLabel": "Mission timeline"
+      },
+      "rightSteps": [
+        {
+          "stepIndex": 0,
+          "stepCounter": "1 / 6",
+          "time": "05:10:45.7 UTC · T+0",
+          "title": "Atmospheric entry",
+          "equipment": "Heat shield",
+          "purpose": "Protect the rover from intense entry heating.",
+          "fate": "The heat shield separates later, once its protective job is done.",
+          "touchdownCaption": "Earth received touchdown at 05:31:45.4 UTC, about 13m48s later. Event occurrence and Earth reception are different times.",
+          "jplLink": "https://www.jpl.nasa.gov/news/timeline-of-major-mission-events-during-curiositys-landing/"
+        },
+        {
+          "stepIndex": 1,
+          "stepCounter": "2 / 6",
+          "time": "05:15:04.9 UTC · T+4m19.2s",
+          "title": "Parachute deployment",
+          "equipment": "Supersonic parachute",
+          "purpose": "Use the atmosphere to slow the descending spacecraft.",
+          "fate": "The back shell and parachute are later discarded before powered descent.",
+          "touchdownCaption": "Earth received touchdown at 05:31:45.4 UTC, about 13m48s later. Event occurrence and Earth reception are different times.",
+          "jplLink": "https://www.jpl.nasa.gov/news/timeline-of-major-mission-events-during-curiositys-landing/"
+        },
+        {
+          "stepIndex": 2,
+          "stepCounter": "3 / 6",
+          "time": "05:15:24.6 UTC · T+4m38.9s",
+          "title": "Heat-shield separation",
+          "equipment": "Heat shield",
+          "purpose": "Clear the view for landing sensors after protection is no longer needed.",
+          "fate": "The shield falls separately to the surface.",
+          "touchdownCaption": "Earth received touchdown at 05:31:45.4 UTC, about 13m48s later. Event occurrence and Earth reception are different times.",
+          "jplLink": "https://www.jpl.nasa.gov/news/timeline-of-major-mission-events-during-curiositys-landing/"
+        },
+        {
+          "stepIndex": 3,
+          "stepCounter": "4 / 6",
+          "time": "Ordered stage · exact time not specified here",
+          "title": "Back shell separates",
+          "equipment": "Back shell and parachute",
+          "purpose": "Release the powered descent stage and rover for controlled descent.",
+          "fate": "The back shell and attached parachute land separately. This is not rover separation.",
+          "touchdownCaption": "Earth received touchdown at 05:31:45.4 UTC, about 13m48s later. Event occurrence and Earth reception are different times.",
+          "jplLink": "https://www.jpl.nasa.gov/news/timeline-of-major-mission-events-during-curiositys-landing/"
+        },
+        {
+          "stepIndex": 4,
+          "stepCounter": "5 / 6",
+          "time": "05:17:38.6 UTC · T+6m52.9s",
+          "title": "Rover separation",
+          "equipment": "Descent stage and tethers",
+          "purpose": "Lower the rover below the powered descent stage on tethers.",
+          "fate": "The stage continues controlling descent while the rover approaches the ground.",
+          "touchdownCaption": "Earth received touchdown at 05:31:45.4 UTC, about 13m48s later. Event occurrence and Earth reception are different times.",
+          "jplLink": "https://www.jpl.nasa.gov/news/timeline-of-major-mission-events-during-curiositys-landing/"
+        },
+        {
+          "stepIndex": 5,
+          "stepCounter": "6 / 6",
+          "time": "05:17:57.3 UTC · T+7m11.6s",
+          "title": "Touchdown",
+          "equipment": "Curiosity rover",
+          "purpose": "Place the laboratory on its wheels, ready for surface operations.",
+          "fate": "Tethers are cut; the powered descent stage flies away and impacts separately.",
+          "touchdownCaption": "Earth received touchdown at 05:31:45.4 UTC, about 13m48s later. Event occurrence and Earth reception are different times.",
+          "jplLink": "https://www.jpl.nasa.gov/news/timeline-of-major-mission-events-during-curiositys-landing/"
+        }
+      ]
+    },
+    "spread3": {
+      "left": {
+        "eyebrow": "Curiosity · Mars Science Laboratory",
+        "heading": "Your expedition starts here.",
+        "arrival": "On this fictional future visit, trace the chain from landing hardware to scientific evidence. Open the archive to distinguish what was observed from what this reconstruction imagines.",
+        "question": "Why would a successful mission leave important equipment behind?",
+        "facts": [
+          {
+            "label": "Mission",
+            "value": "Curiosity · Mars Science Laboratory"
+          },
+          {
+            "label": "Historical status",
+            "value": "NASA record checked November 2026: active mission"
+          },
+          {
+            "label": "Location",
+            "value": "Gale Crater · landing and Yellowknife Bay archives"
+          }
+        ]
+      },
+      "right": {
+        "schematic": "/images/covers/mars.svg",
+        "caption": "Original schematic reconstruction · not a photograph.",
+        "heading": "Look a little closer.",
+        "discoveries": [
+          "A successful separation",
+          "A laboratory on six wheels",
+          "Different tools, different questions",
+          "A rock remembers water"
+        ],
+        "sources": [
+          {
+            "title": "Curiosity mission overview and dated status",
+            "url": "https://science.nasa.gov/mission/msl-curiosity/",
+            "credit": "NASA Science · status checked 13 November 2026"
+          },
+          {
+            "title": "Scene of a Martian Landing · PIA16001",
+            "url": "https://www.jpl.nasa.gov/images/pia16001-scene-of-a-martian-landing/",
+            "credit": "NASA/JPL-Caltech/University of Arizona"
+          },
+          {
+            "title": "Final Minutes of Curiosity’s Arrival at Mars",
+            "url": "https://science.nasa.gov/resource/final-minutes-of-curiositys-arrival-at-mars/",
+            "credit": "NASA/JPL-Caltech"
+          },
+          {
+            "title": "JPL Robotics · rover mobility comparison",
+            "url": "https://robotics.jpl.nasa.gov/what-we-do/flight-projects/mars-2020-rover/m2020mobility/",
+            "credit": "NASA/JPL Robotics · includes Curiosity comparison"
+          },
+          {
+            "title": "Curiosity science instruments",
+            "url": "https://science.nasa.gov/mission/msl-curiosity/science-instruments/",
+            "credit": "NASA Science"
+          },
+          {
+            "title": "Conditions Once Suited for Ancient Life on Mars",
+            "url": "https://www.jpl.nasa.gov/news/nasa-rover-finds-conditions-once-suited-for-ancient-life-on-mars/",
+            "credit": "NASA/JPL-Caltech · 12 March 2013"
+          }
+        ],
+        "sceneNote": "Schematic inspection layout, not a continuous geographic site. Landing debris and the later John Klein investigation are separated in real distance and time. Dashed lines are illustrative navigation guides, not a measured traverse. Future rover condition is imagined; no live telemetry or present-day location is shown."
+      }
+    }
+  },
+  "pioneer": {
+    "meta": {
+      "id": "pioneer",
+      "volume": "Outer Space",
+      "number": "03",
+      "title": "A message from humanity",
+      "name": "Pioneer 10"
+    },
+    "spread0": {
+      "left": {
+        "runningHeader": [
+          "Off-world / Interactive field atlas",
+          "Outer Space"
+        ],
+        "heading": "Beyond the familiar.",
+        "subtitle": "Follow the context of a remarkable journey.",
+        "controls": [
+          "left",
+          "right",
+          "up",
+          "down",
+          "zoom-in",
+          "zoom-out",
+          "overview",
+          "focus",
+          "labels"
+        ],
+        "artifacts": [
+          {
+            "id": "pioneer-10",
+            "title": "Pioneer 10",
+            "purpose": "It investigated Jupiter and the space environment on a journey beyond the inner solar system.",
+            "actions": [
+              "Open artifact dossier",
+              "Enter 3D simulation"
+            ]
+          },
+          {
+            "id": "near-shoemaker",
+            "title": "NEAR Shoemaker",
+            "purpose": "It explored the structure, composition and surface of asteroid Eros.",
+            "actions": [
+              "Open artifact dossier",
+              "Enter 3D simulation"
+            ]
+          },
+          {
+            "id": "dawn",
+            "title": "Dawn",
+            "purpose": "Comparing two surviving early worlds helped researchers investigate the solar system's formation.",
+            "actions": [
+              "Open artifact dossier",
+              "Enter 3D simulation"
+            ]
+          },
+          {
+            "id": "kepler",
+            "title": "Kepler / K2",
+            "purpose": "Its survey tested how common planets, including small planets, are in our galaxy.",
+            "actions": [
+              "Open artifact dossier",
+              "Enter 3D simulation"
+            ]
+          }
+        ],
+        "footer": [
+          "p. 01 — Space atlas",
+          "History, located."
+        ]
+      },
+      "right": {
+        "runningHeader": [
+          "Astro-archaeology expedition manual",
+          "Archive index"
+        ],
+        "volumeLine": "Contents: Volume III — Outer Space",
+        "heading": "A trail of discoveries.",
+        "subtitle": "A chronological registry of spacecraft, instruments & scientific legacies.",
+        "instruction": "Select a record to locate its scientific story. Dates refer to the event named in each entry.",
+        "records": [
+          {
+            "index": 1,
+            "id": "pioneer-10",
+            "dateLabel": "1972 · launch",
+            "title": "Pioneer 10",
+            "synopsis": "The first Jupiter flyby opens the way beyond the planets.",
+            "recordId": "R01"
+          },
+          {
+            "index": 2,
+            "id": "near-shoemaker",
+            "dateLabel": "1996 · launch",
+            "title": "NEAR Shoemaker",
+            "synopsis": "An asteroid orbiter finishes with an unexpected landing.",
+            "recordId": "R02"
+          },
+          {
+            "index": 3,
+            "id": "dawn",
+            "dateLabel": "2007 · launch",
+            "title": "Dawn",
+            "synopsis": "One spacecraft studies two very different small worlds.",
+            "recordId": "R03"
+          },
+          {
+            "index": 4,
+            "id": "kepler",
+            "dateLabel": "2009 · launch",
+            "title": "Kepler / K2",
+            "synopsis": "Tiny changes in starlight reveal distant planetary systems.",
+            "recordId": "R04"
+          }
+        ],
+        "footer": [
+          "p. 02 — Table of contents",
+          "Close book"
+        ]
+      }
+    },
+    "spread1": {
+      "left": {
+        "eyebrow": "Pioneer 10",
+        "heading": "An object becomes evidence.",
+        "introduction": "Launched in 1972, Pioneer 10 became the first spacecraft to fly past Jupiter. Its last signal reached Earth in January 2003. The hardware continues on its outward journey, while the observations it returned remain part of humanity’s scientific record.",
+        "question": "What remains when a spacecraft can no longer call home?",
+        "facts": [
+          {
+            "label": "Mission",
+            "value": "Pioneer 10"
+          },
+          {
+            "label": "Historical status",
+            "value": "Historical: last signal received in 2003"
+          },
+          {
+            "label": "Location",
+            "value": "An imagined deep-space rendezvous · no live position"
+          }
+        ]
+      },
+      "right": {
+        "image": {
+          "src": "/images/history/pioneer-concept.webp",
+          "alt": "NASA artist’s concept of Pioneer 10 near Jupiter.",
+          "caption": "Artist’s concept / NASA. Not a spacecraft photograph or its position in 2003.",
+          "source": "https://science.nasa.gov/mission/pioneer-10/"
+        },
+        "heading": "Look a little closer.",
+        "discoveries": [
+          "A conversation across space",
+          "Power far from the Sun",
+          "The first close look",
+          "A message carried onward"
+        ],
+        "sources": [
+          {
+            "title": "Pioneer 10 mission history",
+            "url": "https://science.nasa.gov/mission/pioneer-10/",
+            "credit": "NASA Science"
+          },
+          {
+            "title": "Pioneer 10 Sends Last Signal",
+            "url": "https://science.nasa.gov/missions/pioneer/pioneer-10-sends-last-signal/",
+            "credit": "NASA Science · 2003"
+          },
+          {
+            "title": "Pioneer 10 official 3D model",
+            "url": "https://science.nasa.gov/3d-resources/pioneer/",
+            "credit": "NASA/JPL/Eyes on the Solar System"
+          }
+        ],
+        "sceneNote": "Fictional astronaut rendezvous. Probe pose, lighting and encounter location are illustrative. There is no ground, no live tracking and no claim that the spacecraft has been visited or reactivated."
+      }
+    },
+    "spread2": {
+      "type": "light-time",
+      "left": {
+        "eyebrow": "PIONEER 10 · 23 JANUARY 2003",
+        "heading": "The 11-hour message",
+        "intro": "NASA received Pioneer 10’s last faint signal with no telemetry. At about 12.23 billion km away, its signal needed about 11 hours 20 minutes to reach Earth.",
+        "note": "Controllers plan ahead. They cannot use a live steering wheel across this distance.",
+        "nasaLink": "https://science.nasa.gov/mission/pioneer-10/"
+      },
+      "right": {
+        "diagramLabel": "DIAGRAM / DISTANCE AND OBJECT SIZES NOT TO SCALE",
+        "readouts": [
+          "ONE-WAY LIGHT TIME",
+          "HYPOTHETICAL ROUND TRIP"
+        ],
+        "controls": [
+          "Play signal",
+          "Reset",
+          "One way",
+          "Hypothetical round trip"
+        ],
+        "warning": "This demonstrates propagation, not an actual successful two-way contact in 2003. Processing delay, moving endpoints and hardware availability are excluded. The final faint signal contained no telemetry."
+      }
+    },
+    "spread3": {
+      "left": {
+        "eyebrow": "Pioneer 10",
+        "heading": "Your expedition starts here.",
+        "arrival": "Your fictional expedition has made an imagined rendezvous. Use your jetpack to inspect the probe, then open the records of a journey no astronaut accompanied.",
+        "question": "What remains when a spacecraft can no longer call home?",
+        "facts": [
+          {
+            "label": "Mission",
+            "value": "Pioneer 10"
+          },
+          {
+            "label": "Historical status",
+            "value": "Historical: last signal received in 2003"
+          },
+          {
+            "label": "Location",
+            "value": "An imagined deep-space rendezvous · no live position"
+          }
+        ]
+      },
+      "right": {
+        "schematic": "/images/covers/outer-space.svg",
+        "caption": "Original schematic reconstruction · not a photograph.",
+        "heading": "Look a little closer.",
+        "discoveries": [
+          "A conversation across space",
+          "Power far from the Sun",
+          "The first close look",
+          "A message carried onward"
+        ],
+        "sources": [
+          {
+            "title": "Pioneer 10 mission history",
+            "url": "https://science.nasa.gov/mission/pioneer-10/",
+            "credit": "NASA Science"
+          },
+          {
+            "title": "Pioneer 10 Sends Last Signal",
+            "url": "https://science.nasa.gov/missions/pioneer/pioneer-10-sends-last-signal/",
+            "credit": "NASA Science · 2003"
+          },
+          {
+            "title": "Pioneer 10 official 3D model",
+            "url": "https://science.nasa.gov/3d-resources/pioneer/",
+            "credit": "NASA/JPL/Eyes on the Solar System"
+          }
+        ],
+        "sceneNote": "Fictional astronaut rendezvous. Probe pose, lighting and encounter location are illustrative. There is no ground, no live tracking and no claim that the spacecraft has been visited or reactivated."
+      }
+    }
+  }
+}

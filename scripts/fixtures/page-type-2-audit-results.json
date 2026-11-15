@@ -1,0 +1,172 @@
+[
+  {
+    "id": "curiosity_edl_step_0",
+    "mission": "curiosity",
+    "state": "Atmospheric entry",
+    "viewport": "1536x864",
+    "passed": true,
+    "failures": [],
+    "spreadBottom": 800,
+    "maxChildBottom": 776
+  },
+  {
+    "id": "curiosity_edl_step_1",
+    "mission": "curiosity",
+    "state": "Parachute deployment",
+    "viewport": "1536x864",
+    "passed": true,
+    "failures": [],
+    "spreadBottom": 800,
+    "maxChildBottom": 776
+  },
+  {
+    "id": "curiosity_edl_step_2",
+    "mission": "curiosity",
+    "state": "Heat-shield separation",
+    "viewport": "1536x864",
+    "passed": true,
+    "failures": [],
+    "spreadBottom": 800,
+    "maxChildBottom": 776
+  },
+  {
+    "id": "curiosity_edl_step_3",
+    "mission": "curiosity",
+    "state": "Back shell separates",
+    "viewport": "1536x864",
+    "passed": true,
+    "failures": [],
+    "spreadBottom": 800,
+    "maxChildBottom": 776
+  },
+  {
+    "id": "curiosity_edl_step_4",
+    "mission": "curiosity",
+    "state": "Rover separation",
+    "viewport": "1536x864",
+    "passed": true,
+    "failures": [],
+    "spreadBottom": 800,
+    "maxChildBottom": 776
+  },
+  {
+    "id": "curiosity_edl_step_5",
+    "mission": "curiosity",
+    "state": "Touchdown",
+    "viewport": "1536x864",
+    "passed": true,
+    "failures": [],
+    "spreadBottom": 800,
+    "maxChildBottom": 776
+  },
+  {
+    "id": "surveyor_camera_photo",
+    "mission": "surveyor",
+    "state": "photo",
+    "viewport": "1536x864",
+    "passed": true,
+    "failures": [],
+    "spreadBottom": 800,
+    "maxChildBottom": 674
+  },
+  {
+    "id": "surveyor_camera_tests",
+    "mission": "surveyor",
+    "state": "tests",
+    "viewport": "1536x864",
+    "passed": true,
+    "failures": [],
+    "spreadBottom": 800,
+    "maxChildBottom": 699
+  },
+  {
+    "id": "surveyor_camera_reconstruction",
+    "mission": "surveyor",
+    "state": "reconstruction",
+    "viewport": "1536x864",
+    "passed": true,
+    "failures": [],
+    "spreadBottom": 800,
+    "maxChildBottom": 674
+  },
+  {
+    "id": "pioneer_light_time_one_way",
+    "mission": "pioneer",
+    "state": "one_way",
+    "viewport": "1536x864",
+    "passed": true,
+    "failures": [],
+    "spreadBottom": 800,
+    "maxChildBottom": 788
+  },
+  {
+    "id": "pioneer_light_time_round_trip",
+    "mission": "pioneer",
+    "state": "round_trip",
+    "viewport": "1536x864",
+    "passed": true,
+    "failures": [],
+    "spreadBottom": 800,
+    "maxChildBottom": 788
+  },
+  {
+    "id": "curiosity_edl_step_5_1920x1080__100__",
+    "mission": "curiosity",
+    "state": "Touchdown @ 1920x1080 (100%)",
+    "viewport": "1920x1080 (100%)",
+    "passed": true,
+    "failures": [],
+    "spreadBottom": 1016,
+    "maxChildBottom": 984
+  },
+  {
+    "id": "curiosity_edl_step_5_1366x768__100__",
+    "mission": "curiosity",
+    "state": "Touchdown @ 1366x768 (100%)",
+    "viewport": "1366x768 (100%)",
+    "passed": true,
+    "failures": [],
+    "spreadBottom": 704,
+    "maxChildBottom": 683
+  },
+  {
+    "id": "curiosity_edl_step_5_1280x720__100__",
+    "mission": "curiosity",
+    "state": "Touchdown @ 1280x720 (100%)",
+    "viewport": "1280x720 (100%)",
+    "passed": true,
+    "failures": [],
+    "spreadBottom": 656,
+    "maxChildBottom": 637
+  },
+  {
+    "id": "curiosity_edl_step_5_1536x864__90__",
+    "mission": "curiosity",
+    "state": "Touchdown @ 1536x864 (90%)",
+    "viewport": "1536x864 (90%)",
+    "passed": true,
+    "failures": [],
+    "spreadBottom": 800,
+    "maxChildBottom": 776
+  },
+  {
+    "id": "curiosity_edl_step_5_1536x864__110__",
+    "mission": "curiosity",
+    "state": "Touchdown @ 1536x864 (110%)",
+    "viewport": "1536x864 (110%)",
+    "passed": true,
+    "failures": [],
+    "spreadBottom": 800,
+    "maxChildBottom": 776
+  },
+  {
+    "id": "curiosity_edl_step_5_1536x864__125__",
+    "mission": "curiosity",
+    "state": "Touchdown @ 1536x864 (125%)",
+    "viewport": "1536x864 (125%)",
+    "passed": true,
+    "failures": [],
+    "spreadBottom": 800,
+    "maxChildBottom": 776
+  }
+]

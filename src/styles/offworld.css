@@ -859,9 +859,9 @@
 
 /* The original covers remain separate, tactile components inside a cinematic shelf. */
 .cinematic-library { position: relative; isolation: isolate; overflow-x: clip; }
-.library-environment { position: absolute; inset: 0; z-index: -1; overflow: hidden; pointer-events: none; background: #151a1d; }
+.library-environment { position: absolute; inset: 0; z-index: -1; overflow: hidden; pointer-events: none; background: #100c14; }
 .library-environment-image { position: absolute; inset: -8%; opacity: 0; filter: blur(14px); background-size: cover; background-position: center; transform: scale(1.08); transition: opacity 700ms ease, transform 1200ms ease; }
-.library-environment-light { position: absolute; inset: 0; background: radial-gradient(ellipse at 50% 48%, #586a6b35, transparent 65%), linear-gradient(180deg,#11181b80,#11181be8); transition: background-color 650ms ease; }
+.library-environment-light { position: absolute; inset: 0; background: radial-gradient(ellipse at 50% 48%, rgba(32, 20, 42, 0.18), transparent 65%), linear-gradient(180deg, rgba(16, 12, 20, 0.4), rgba(16, 12, 20, 0.85)); transition: background-color 650ms ease; }
 .library-selected .library-environment-image { opacity: .3; transform: scale(1); }
 .cinematic-library[data-theme="surveyor"] .library-environment-image { background-image: url('/images/atlas/moon-color.jpg'); }
 .cinematic-library[data-theme="curiosity"] .library-environment-image { background-image: url('/images/atlas/mars-color.jpg'); }
